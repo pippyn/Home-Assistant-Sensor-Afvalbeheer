@@ -40,7 +40,6 @@ Configuration.yaml:
       resources:                       (at least 1 required)
         - restafval
         - gft
-        - gftgratis
         - papier
         - pmd
       postcode: 1111AA                 (required)
