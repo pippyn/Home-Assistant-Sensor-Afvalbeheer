@@ -62,3 +62,12 @@ Postcode is required and is your own postcode
 ### Street number
 Street number is required and is your own street number
 
+## Custom updater
+You can use the custom updater with this sensor
+```yaml
+custom_updater:
+  track:
+    - components
+  component_urls:
+    - https://raw.githubusercontent.com/pippyn/Home-Assisant-Sensor-Afvalbeheer/master/custom_components.json
+```
