@@ -214,7 +214,7 @@ class WasteSensor(Entity):
         self.data = data
         self.type = sensor_type
         self.waste_collector = waste_collector
-        self._name = waste_collector + "_" + self.type # SENSOR_TYPES[self.type][0]
+        self._name = waste_collector + " " + self.type
         self._unit = SENSOR_TYPES[self.type][1]
         self._hidden = False
         self._entity_picture = None
