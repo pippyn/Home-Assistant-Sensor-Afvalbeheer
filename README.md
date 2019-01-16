@@ -44,6 +44,7 @@ Main resources options:
   - gft
   - papier
   - pmd
+
 Some collectors also use some of these options:
   - gftgratis
   - textiel
