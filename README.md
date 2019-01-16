@@ -7,7 +7,7 @@ This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR,
 
 ### Install:
 - Copy the afvalbeheer.py file to: [homeassistant]/config/custom_components/sensor/
-- Example content for configuration.yaml:
+- Example config:
 
 ```yaml
   sensor:
