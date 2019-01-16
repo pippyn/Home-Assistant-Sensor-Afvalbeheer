@@ -7,12 +7,12 @@ Current Version: 2.0.0 20190116 - Pippijn Stortelder
 Description:
   Provides sensors for the following Dutch waste collectors;
   - Blink
-  - Cure Afvalbeheer
+  - Cure
   - Cyclus
   - DAR
-  - HVC Groep
+  - HVC
   - Meerlanden
-  - RMN (Reinigingsbedrijf Midden Nederland)
+  - RMN
 
 Save the file as afvalbeheer.py in [homeassistant]/config/custom_components/sensor/
 
