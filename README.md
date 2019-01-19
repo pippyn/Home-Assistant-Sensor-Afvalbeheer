@@ -64,6 +64,9 @@ Postcode is required and is your own postcode
 Street number is required and is your own street number
 
 ### Date format
+```yaml
+dateformat:
+```
 If you want to adjust the way the date is presented. You can do it using the dateformat option. All [python strftime options](http://strftime.org/) should work.
 Default is '%d-%m-%Y', which will result in per example: 
 ```yaml
