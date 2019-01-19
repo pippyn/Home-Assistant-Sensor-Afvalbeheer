@@ -37,8 +37,8 @@ Example config:
 Configuration.yaml:
   sensor:
     - platform: afvalbeheer
-      waste_collector: Blink
-      date_format: '%d-%m-%Y'
+      wastecollector: Blink
+      dateformat: '%d-%m-%Y'
       resources:                       (at least 1 required)
         - restafval
         - gft
