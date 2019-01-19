@@ -71,7 +71,7 @@ Default is '%d-%m-%Y', which will result in per example:
 ```
 If you wish to remove the year and the dashes, you would provide '%d %b'. Which will result in: 
 ```yaml
-21 Sept
+21 Sep
 ```
 
 ## Custom updater
