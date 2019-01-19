@@ -12,7 +12,7 @@ This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR,
 ```yaml
   sensor:
     - platform: afvalbeheer
-      wastcollector: Bink
+      wastecollector: Blink
       resources:                      # (at least 1 required)
         - restafval
         - gft
@@ -21,9 +21,9 @@ This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR,
       postcode: 1111AA                # (required)
       streetnumber: 1                 # (required)
 ```
-### Wastcollector
+### Wastecollector
 ```
-wastcollector:
+wastecollector:
 ```
 Choose your collector from this list:
   - Blink
