@@ -67,11 +67,11 @@ Street number is required and is your own street number
 If you want to adjust the way the date is presented. You can do it using the dateformat option. All [python strftime options](http://strftime.org/) should work.
 Default is '%d-%m-%Y', which will result in per example: 
 ```yaml
-21-2-2019.
+21-9-2019.
 ```
-If you wish to remove the year and the dashes, you would provide '%d %m'. Which will result in: 
+If you wish to remove the year and the dashes, you would provide '%d %b'. Which will result in: 
 ```yaml
-21 2
+21 Sept
 ```
 
 ## Custom updater
