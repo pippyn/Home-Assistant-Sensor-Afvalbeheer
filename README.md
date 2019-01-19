@@ -13,6 +13,7 @@ This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR,
   sensor:
     - platform: afvalbeheer
       wastecollector: Blink
+      dateformat: '%d-%m-%Y'
       resources:                      # (at least 1 required)
         - restafval
         - gft
@@ -61,6 +62,17 @@ Postcode is required and is your own postcode
 
 ### Street number
 Street number is required and is your own street number
+
+### Date format
+If you want to adjust the way the date is presented. You can do it using the dateformat option.
+Default is '%d-%m-%Y', which will result in per example: 
+```yaml
+21-2-2019.
+```
+If you wish to remove the year and the dashes, you would provide '%d %m'. Which will result in: 
+```yaml
+21 2
+```
 
 ## Custom updater
 You can use the custom updater with this sensor
