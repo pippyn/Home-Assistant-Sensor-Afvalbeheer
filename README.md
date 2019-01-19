@@ -72,7 +72,7 @@ Default is '%d-%m-%Y', which will result in per example:
 ```yaml
 21-9-2019.
 ```
-If you wish to remove the year and the dashes, you would provide '%d %b'. Which will result in: 
+If you wish to remove the year and the dashes and want to show the name of the month abbreviated, you would provide '%d %b'. Which will result in: 
 ```yaml
 21 Sep
 ```
