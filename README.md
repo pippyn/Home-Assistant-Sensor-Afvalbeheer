@@ -85,5 +85,4 @@ custom_updater:
     - components
   component_urls:
     - https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/custom_components.json
-    - 
 ```
