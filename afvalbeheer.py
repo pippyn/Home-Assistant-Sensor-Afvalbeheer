@@ -1,10 +1,10 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.0.2 20190122 - Pippijn Stortelder
+Current Version: 2.0.3 20190122 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
-20190122 - Refactor code
+20190122 - Refactor code and bug fix
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -38,12 +38,11 @@ Example config:
 Configuration.yaml:
   sensor:
     - platform: afvalbeheer
-      waste_collector: Blink
+      wastecollector: Blink
       dateformat: '%d-%m-%Y'
       resources:                       (at least 1 required)
         - restafval
         - gft
-        - gftgratis
         - papier
         - pmd
       postcode: 1111AA                 (required)
@@ -62,7 +61,7 @@ from homeassistant.const import (CONF_RESOURCES)
 from homeassistant.util import Throttle
 from homeassistant.helpers.entity import Entity
 
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -160,7 +159,7 @@ class WasteData(object):
                 address_code = response[0]['bagId']
                 url = self.main_url + '/rest/adressen/' + address_code + '/afvalstromen'
                 request_json = requests.get(url).json()
-                if not response:
+                if not request_json:
                     _LOGGER.error('No Waste data found!')
                 else:
                     COLLECTOR_WASTE_ID[self.waste_collector] = {}
