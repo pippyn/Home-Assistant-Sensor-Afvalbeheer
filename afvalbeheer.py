@@ -1,9 +1,10 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.0.1 20190119 - Pippijn Stortelder
+Current Version: 2.0.2 20190122 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
+20190122 - Refactor code
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -37,11 +38,12 @@ Example config:
 Configuration.yaml:
   sensor:
     - platform: afvalbeheer
-      wastecollector: Blink
+      waste_collector: Blink
       dateformat: '%d-%m-%Y'
       resources:                       (at least 1 required)
         - restafval
         - gft
+        - gftgratis
         - papier
         - pmd
       postcode: 1111AA                 (required)
@@ -49,9 +51,9 @@ Configuration.yaml:
 """
 
 import logging
-import requests
 from datetime import datetime
 from datetime import timedelta
+import requests
 import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
@@ -60,7 +62,7 @@ from homeassistant.const import (CONF_RESOURCES)
 from homeassistant.util import Throttle
 from homeassistant.helpers.entity import Entity
 
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -76,14 +78,6 @@ ATTR_FRACTION_ID = 'ID'
 ATTR_LAST_UPDATE = 'Last update'
 ATTR_HIDDEN = 'Hidden'
 
-SENSOR_TYPES = {
-    'restafval': ['Rest Afval', '', 'mdi:recycle'],
-    'papier': ['Papier en karton', '', 'mdi:recycle'],
-    'gft': ['Groente, fruit- en tuinafval', '', 'mdi:recycle'],
-    'gftgratis': ['Blad en gft', '', 'mdi:recycle'],
-    'pmd': ['PMD', '', 'mdi:recycle'],
-}
-
 COLLECTOR_URL = {
     'blink': 'https://mijnblink.nl',
     'cure': 'https://afvalkalender.cure-afvalbeheer.nl',
@@ -94,11 +88,25 @@ COLLECTOR_URL = {
     'rmn': 'https://inzamelschema.rmn.nl',
 }
 
+RENAME_TITLES = {
+    'gft gratis': 'gft gratis',
+    'groente': 'gft',
+    'gft': 'gft',
+    'papier': 'papier',
+    'rest': 'restafval',
+    'plastic': 'pmd',
+    'sloop': 'sloopafval',
+    'klein chemisch afval': 'kca',
+    'kca': 'kca',
+    'textiel': 'textiel',
+    'kerstbo': 'kerstbomen',
+    'snoeiafval': 'snoeiafval',
+}
+
 COLLECTOR_WASTE_ID = {}
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Required(CONF_RESOURCES, default=[]):
-        vol.All(cv.ensure_list, [vol.In(SENSOR_TYPES)]),
+    vol.Required(CONF_RESOURCES, default=[]): cv.ensure_list,
     vol.Required(CONF_POSTCODE, default='1111AA'): cv.string,
     vol.Required(CONF_STREETNUMBER, default='1'): cv.string,
     vol.Optional(CONF_WASTE_COLLECTOR, default='Cure'): cv.string,
@@ -124,10 +132,6 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     for resource in config[CONF_RESOURCES]:
         sensor_type = resource.lower()
-
-        if sensor_type not in SENSOR_TYPES:
-            SENSOR_TYPES[sensor_type] = [sensor_type.title(), '', 'mdi:recycle']
-
         entities.append(WasteSensor(data, sensor_type, waste_collector, date_format))
 
     add_entities(entities)
@@ -147,7 +151,7 @@ class WasteData(object):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         try:
-            url = self.main_url + "/rest/adressen/" + self.postcode + '-' + self.street_number
+            url = self.main_url + '/rest/adressen/' + self.postcode + '-' + self.street_number
             response = requests.get(url).json()
 
             if not response:
@@ -163,47 +167,29 @@ class WasteData(object):
                     sensor_dict = {}
 
                     for key in request_json:
-                        if not key['ophaaldatum'] == None:
+                        if not key['ophaaldatum'] is None:
                             sensor_dict[str(key['id'])] = [datetime.strptime(key['ophaaldatum'], '%Y-%m-%d'), key['title'], key['title'], key['icon_data']]
 
-                        check_title = key["menu_title"]
+                        check_title = key['menu_title']
+                        title = ''
 
                         if not check_title:
-                            check_title = key["title"].lower()
+                            check_title = key['title'].lower()
                         else:
                             check_title = check_title.lower()
 
-                        if "gft gratis" in check_title.lower():
-                            title = "gft gratis"
-                        elif "groente" in check_title.lower():
-                            title = "gft"
-                        elif "gft" in check_title.lower():
-                            title = "gft"
-                        elif "papier" in check_title.lower():
-                            title = "papier"
-                        elif "rest" in check_title.lower():
-                            title = "restafval"
-                        elif "plastic" in check_title.lower():
-                            title = "pmd"
-                        elif "sloop" in check_title.lower():
-                            title = "sloopafval"
-                        elif "klein chemisch afval" in check_title.lower():
-                            title = "kca"
-                        elif "kca" in check_title.lower():
-                            title = "kca"
-                        elif "textiel" in check_title.lower():
-                            title = "textiel"
-                        elif "kerstb" in check_title.lower():
-                            title = "kerstbomen"
-                        elif "snoeiafval" in check_title.lower():
-                            title = "snoeiafval"
-                        else:
+                        for dict_title in RENAME_TITLES:
+                            if dict_title in check_title:
+                                title = RENAME_TITLES[dict_title]
+                                break
+
+                        if not title:
                             title = check_title
 
                         if title not in COLLECTOR_WASTE_ID[self.waste_collector]:
-                            COLLECTOR_WASTE_ID[self.waste_collector][title] = [str(key["id"])]
+                            COLLECTOR_WASTE_ID[self.waste_collector][title] = [str(key['id'])]
                         else:
-                            COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(key["id"]))
+                            COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(key['id']))
 
                     self.data = sensor_dict
 
@@ -220,8 +206,8 @@ class WasteSensor(Entity):
         self.type = sensor_type
         self.waste_collector = waste_collector
         self.date_format = date_format
-        self._name = waste_collector + " " + self.type
-        self._unit = SENSOR_TYPES[self.type][1]
+        self._name = waste_collector + ' ' + self.type
+        self._unit = ''
         self._hidden = False
         self._entity_picture = None
         self._state = None
@@ -286,6 +272,7 @@ class WasteSensor(Entity):
                             else:
                                 self._state = None
                             retrieved_data = 1
+
                     if retrieved_data == 0:
                         self._state = None
                         self._official_name = None
