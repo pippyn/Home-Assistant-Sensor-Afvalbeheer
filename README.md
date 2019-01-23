@@ -27,13 +27,25 @@ This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR,
 wastecollector:
 ```
 Choose your collector from this list:
+  - AlphenAanDenRijn
+  - Avalex
+  - Berkelland
   - Blink
+  - Circulus-Berkel
+  - Cranendonck
   - Cure
   - Cyclus
   - DAR
+  - DenHaag
+  - GAD
   - HVC
   - Meerlanden
+  - Montfoort
   - RMN
+  - Spaarnelanden
+  - Venray
+  - Waalre
+  - ZRD
 
 ### Recourses
 ```
