@@ -1,20 +1,33 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.0.3 20190122 - Pippijn Stortelder
+Current Version: 2.0.4 20190123 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
 20190122 - Refactor code and bug fix
+20190123 - Added 12 more waste collectors
 
 Description:
   Provides sensors for the following Dutch waste collectors;
+  - AlphenAanDenRijn
+  - Avalex
+  - Berkelland
   - Blink
+  - Circulus-Berkel
+  - Cranendonck
   - Cure
   - Cyclus
   - DAR
+  - DenHaag
+  - GAD
   - HVC
   - Meerlanden
+  - Montfoort
   - RMN
+  - Spaarnelanden
+  - Venray
+  - Waalre
+  - ZRD
 
 Save the file as afvalbeheer.py in [homeassistant]/config/custom_components/sensor/
 
@@ -61,7 +74,7 @@ from homeassistant.const import (CONF_RESOURCES)
 from homeassistant.util import Throttle
 from homeassistant.helpers.entity import Entity
 
-__version__ = '2.0.3'
+__version__ = '2.0.4'
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -78,13 +91,25 @@ ATTR_LAST_UPDATE = 'Last update'
 ATTR_HIDDEN = 'Hidden'
 
 COLLECTOR_URL = {
+    'alphenaandenrijn': 'https://afvalkalender.alphenaandenrijn.nl',
+    'avalex': 'https://www.avalex.nl',
+    'berkelland': 'https://afvalkalender.gemeenteberkelland.nl',
     'blink': 'https://mijnblink.nl',
+    'circulus-berkel': 'https://afvalkalender.circulus-berkel.nl',
+    'cranendonck': 'https://afvalkalender.cranendonck.nl',
     'cure': 'https://afvalkalender.cure-afvalbeheer.nl',
     'cyclus': 'https://afvalkalender.cyclusnv.nl',
     'dar': 'https://afvalkalender.dar.nl',
+    'denhaag': 'https://huisvuilkalender.denhaag.nl',
+    'gad': 'https://inzamelkalender.gad.nl',
     'hvc': 'https://inzamelkalender.hvcgroep.nl',
     'meerlanden': 'https://afvalkalender.meerlanden.nl',
+    'montfoort': 'https://afvalkalender.montfoort.nl',
     'rmn': 'https://inzamelschema.rmn.nl',
+    'spaarnelanden': 'https://afvalwijzer.spaarnelanden.nl',
+    'venray': 'https://afvalkalender.venray.nl',
+    'waalre': 'http://afvalkalender.waalre.nl',
+    'zrd': 'https://afvalkalender.zrd.nl',
 }
 
 RENAME_TITLES = {
