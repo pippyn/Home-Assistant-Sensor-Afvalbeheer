@@ -1,11 +1,12 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.0.4 20190123 - Pippijn Stortelder
+Current Version: 2.0.5 20190130 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
 20190122 - Refactor code and bug fix
 20190123 - Added 12 more waste collectors
+20190130 - FIXED PMD for some waste collectors
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -74,7 +75,7 @@ from homeassistant.const import (CONF_RESOURCES)
 from homeassistant.util import Throttle
 from homeassistant.helpers.entity import Entity
 
-__version__ = '2.0.4'
+__version__ = '2.0.5'
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -122,6 +123,7 @@ RENAME_TITLES = {
     'sloop': 'sloopafval',
     'klein chemisch afval': 'kca',
     'kca': 'kca',
+    'pmd': 'pmd',
     'textiel': 'textiel',
     'kerstbo': 'kerstbomen',
     'snoeiafval': 'snoeiafval',
