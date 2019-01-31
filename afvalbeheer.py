@@ -53,8 +53,7 @@ Example config:
 Configuration.yaml:
   sensor:
     - platform: afvalbeheer
-      wastecollector: Blink
-      dateformat: '%d-%m-%Y'
+      wastecollector: Blink            (required)
       resources:                       (at least 1 required)
         - restafval
         - gft
@@ -63,6 +62,7 @@ Configuration.yaml:
       postcode: 1111AA                 (required)
       streetnumber: 1                  (required)
       todaysensor: 1                   (optional)
+      dateformat: '%d-%m-%Y'           (optional)
 """
 
 import logging
