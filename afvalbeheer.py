@@ -61,7 +61,7 @@ Configuration.yaml:
         - pmd
       postcode: 1111AA                 (required)
       streetnumber: 1                  (required)
-      todaysensor: 1                   (optional)
+      upcomingsensor: 1                   (optional)
       dateformat: '%d-%m-%Y'           (optional)
 """
 
@@ -86,7 +86,7 @@ CONF_WASTE_COLLECTOR = 'wastecollector'
 CONF_POSTCODE = 'postcode'
 CONF_STREETNUMBER = 'streetnumber'
 CONF_DATE_FORMAT = 'dateformat'
-CONF_TODAY_TOMORROW = 'todaysensor'
+CONF_TODAY_TOMORROW = 'upcomingsensor'
 
 ATTR_OFFICIAL_NAME = 'Official name'
 ATTR_WASTE_COLLECTOR = 'wastecollector'
