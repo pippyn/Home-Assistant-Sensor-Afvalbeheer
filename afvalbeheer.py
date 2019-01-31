@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.1.0 20190131 - Pippijn Stortelder
+Current Version: 2.1.1 20190131 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
 20190122 - Refactor code and bug fix
@@ -77,7 +77,7 @@ from homeassistant.const import (CONF_RESOURCES)
 from homeassistant.util import Throttle
 from homeassistant.helpers.entity import Entity
 
-__version__ = '2.1.0'
+__version__ = '2.1.1'
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -385,7 +385,7 @@ class WasteTodaySensor(Entity):
                                     retrieved_data = 1
 
                         if retrieved_data == 0:
-                            self._state = None
+                            self._state = "None"
                             self._hidden = True
                         else:
                             self._state = ', '.join(new_state)
