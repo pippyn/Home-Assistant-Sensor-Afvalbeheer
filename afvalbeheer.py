@@ -367,6 +367,7 @@ class WasteTodaySensor(Entity):
         retrieved_data = 0
         try:
             if waste_data is not None:
+                new_state = []
                 for type in self.types:
                     if type in COLLECTOR_WASTE_ID[self.waste_collector]:
                         for waste_id in COLLECTOR_WASTE_ID[self.waste_collector][type]:
@@ -377,17 +378,18 @@ class WasteTodaySensor(Entity):
                                 date_diff = (pick_update - today).days + 1
 
                                 if date_diff == 1 and self.day == "morgen":
-                                    self._state = type
-                                    self._hidden = False
+                                    new_state.append(type)
                                     retrieved_data = 1
                                 elif date_diff < 1 and self.day == "vandaag":
-                                    self._state = type
-                                    self._hidden = False
+                                    new_state.append(type)
                                     retrieved_data = 1
 
                         if retrieved_data == 0:
                             self._state = None
                             self._hidden = True
+                        else:
+                            self._state = ', '.join(new_state)
+                            self._hidden = False
                     else:
                         self._state = None
                         self._hidden = True
