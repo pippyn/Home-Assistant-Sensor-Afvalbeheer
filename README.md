@@ -20,7 +20,7 @@ This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR,
         - pmd
       postcode: 1111AA                 (required)
       streetnumber: 1                  (required)
-      todaysensor: 1                   (optional)
+      upcomingsensor: 1                   (optional)
       dateformat: '%d-%m-%Y'           (optional)
 ```
 ### Wastecollector
@@ -76,9 +76,9 @@ Postcode is required and is your own postcode
 ### Street number
 Street number is required and is your own street number
 
-### Today sensor
+### Upcoming sensor
 ```yaml
-todaysensor: 1
+upcomingsensor: 1
 ```
 If you activate this option you'll get 2 extra sensors (today and tomorrow) which are handy for automations. 
 The today sensor will display the fractions collected today.
