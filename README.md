@@ -1,4 +1,4 @@
-## BETA Home Assisant sensor component for Afvalbeheer BETA
+## Home Assisant sensor component for Afvalbeheer
 
 Provides Home Assistant sensors for multiple Dutch waste collectors using REST API.
 This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, Montfoort, GAD and Cranendonck.
@@ -83,6 +83,7 @@ upcomingsensor: 1
 If you activate this option you'll get 2 extra sensors (today and tomorrow) which are handy for automations. 
 The today sensor will display the fractions collected today.
 The tomorrow sensor will display the fractions collected tomorrow.
+Default is 0.
 
 ### Date format
 ```yaml
@@ -96,4 +97,20 @@ Default is '%d-%m-%Y', which will result in per example:
 If you wish to remove the year and the dashes and want to show the name of the month abbreviated, you would provide '%d %b'. Which will result in: 
 ```yaml
 21 Sep
+```
+
+### Date only
+```yaml
+dateonly: 1
+```
+If you don't want to add dayname, tomorrow or today in front of date activate this option. Default is 0.
+
+## Custom updater
+You can use the custom updater with this sensor
+```yaml
+custom_updater:
+  track:
+    - components
+  component_urls:
+    - https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/custom_components.json
 ```
