@@ -20,8 +20,9 @@ This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR,
         - pmd
       postcode: 1111AA                 (required)
       streetnumber: 1                  (required)
-      upcomingsensor: 1                   (optional)
+      upcomingsensor: 0                (optional)
       dateformat: '%d-%m-%Y'           (optional)
+      dateonly: 0                      (optional)
 ```
 ### Wastecollector
 ```
