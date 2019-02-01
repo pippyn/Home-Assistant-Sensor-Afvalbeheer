@@ -12,15 +12,16 @@ This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR,
 ```yaml
   sensor:
     - platform: afvalbeheer
-      wastecollector: Blink
-      dateformat: '%d-%m-%Y'
-      resources:                      # (at least 1 required)
+      wastecollector: Blink            (required)
+      resources:                       (at least 1 required)
         - restafval
         - gft
         - papier
         - pmd
-      postcode: 1111AA                # (required)
-      streetnumber: 1                 # (required)
+      postcode: 1111AA                 (required)
+      streetnumber: 1                  (required)
+      upcomingsensor: 1                   (optional)
+      dateformat: '%d-%m-%Y'           (optional)
 ```
 ### Wastecollector
 ```
@@ -75,6 +76,15 @@ Postcode is required and is your own postcode
 ### Street number
 Street number is required and is your own street number
 
+### Upcoming sensor
+```yaml
+upcomingsensor: 1
+```
+If you activate this option you'll get 2 extra sensors (today and tomorrow) which are handy for automations. 
+The today sensor will display the fractions collected today.
+The tomorrow sensor will display the fractions collected tomorrow.
+Default is 0.
+
 ### Date format
 ```yaml
 dateformat:
@@ -88,6 +98,12 @@ If you wish to remove the year and the dashes and want to show the name of the m
 ```yaml
 21 Sep
 ```
+
+### Date only
+```yaml
+dateonly: 1
+```
+If you don't want to add dayname, tomorrow or today in front of date activate this option. Default is 0.
 
 ## Custom updater
 You can use the custom updater with this sensor
