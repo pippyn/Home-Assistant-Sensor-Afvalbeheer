@@ -1,13 +1,14 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.1.1 20190131 - Pippijn Stortelder
+Current Version: 2.1.2 20190201 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
 20190122 - Refactor code and bug fix
 20190123 - Added 12 more waste collectors
 20190130 - FIXED PMD for some waste collectors
 20190131 - Added Today and Tomorrow sensors
+20190201 - Added option for date only
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -61,8 +62,9 @@ Configuration.yaml:
         - pmd
       postcode: 1111AA                 (required)
       streetnumber: 1                  (required)
-      upcomingsensor: 1                   (optional)
+      upcomingsensor: 0                (optional)
       dateformat: '%d-%m-%Y'           (optional)
+      dateonly: 0                      (optional)
 """
 
 import logging
@@ -77,7 +79,7 @@ from homeassistant.const import (CONF_RESOURCES)
 from homeassistant.util import Throttle
 from homeassistant.helpers.entity import Entity
 
-__version__ = '2.1.1'
+__version__ = '2.1.2'
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -87,6 +89,7 @@ CONF_POSTCODE = 'postcode'
 CONF_STREETNUMBER = 'streetnumber'
 CONF_DATE_FORMAT = 'dateformat'
 CONF_TODAY_TOMORROW = 'upcomingsensor'
+CONF_DATE_ONLY = 'dateonly'
 
 ATTR_OFFICIAL_NAME = 'Official name'
 ATTR_WASTE_COLLECTOR = 'wastecollector'
@@ -141,6 +144,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_WASTE_COLLECTOR, default='Cure'): cv.string,
     vol.Optional(CONF_DATE_FORMAT, default='%d-%m-%Y'): cv.string,
     vol.Optional(CONF_TODAY_TOMORROW, default=False): cv.boolean,
+    vol.Optional(CONF_DATE_ONLY, default=False): cv.boolean,
 })
 
 
@@ -152,6 +156,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
     date_format = config.get(CONF_DATE_FORMAT)
     sensor_today = config.get(CONF_TODAY_TOMORROW)
+    date_only = config.get(CONF_DATE_ONLY)
 
     try:
         data = WasteData(postcode, street_number, waste_collector)
@@ -163,7 +168,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     for resource in config[CONF_RESOURCES]:
         sensor_type = resource.lower()
-        entities.append(WasteSensor(data, sensor_type, waste_collector, date_format))
+        entities.append(WasteSensor(data, sensor_type, waste_collector, date_format, date_only))
 
     if sensor_today:
         entities.append(WasteTodaySensor(data, config[CONF_RESOURCES], waste_collector, "vandaag"))
@@ -236,11 +241,12 @@ class WasteData(object):
 
 class WasteSensor(Entity):
 
-    def __init__(self, data, sensor_type, waste_collector, date_format):
+    def __init__(self, data, sensor_type, waste_collector, date_format, date_only):
         self.data = data
         self.type = sensor_type
         self.waste_collector = waste_collector
         self.date_format = date_format
+        self.date_only = date_only
         self._name = waste_collector + ' ' + self.type
         self._unit = ''
         self._hidden = False
@@ -296,16 +302,20 @@ class WasteSensor(Entity):
                             self._last_update = today.strftime('%d-%m-%Y %H:%M')
                             self._hidden = False
 
-                            if date_diff >= 8:
-                                self._state = pick_update.strftime(self.date_format)
-                            elif date_diff > 1:
-                                self._state = pick_update.strftime('%A, ' + self.date_format)
-                            elif date_diff == 1:
-                                self._state = pick_update.strftime('Tomorrow, ' + self.date_format)
-                            elif date_diff <= 0:
-                                self._state = pick_update.strftime('Today, ' + self.date_format)
+                            if self.date_only:
+                                if date_diff >= 0:
+                                    self._state = pick_update.strftime(self.date_format)
                             else:
-                                self._state = None
+                                if date_diff >= 8:
+                                    self._state = pick_update.strftime(self.date_format)
+                                elif date_diff > 1:
+                                    self._state = pick_update.strftime('%A, ' + self.date_format)
+                                elif date_diff == 1:
+                                    self._state = pick_update.strftime('Tomorrow, ' + self.date_format)
+                                elif date_diff == 0:
+                                    self._state = pick_update.strftime('Today, ' + self.date_format)
+                                else:
+                                    self._state = None
                             retrieved_data = 1
 
                     if retrieved_data == 0:
