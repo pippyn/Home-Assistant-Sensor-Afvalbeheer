@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.1.2 20190201 - Pippijn Stortelder
+Current Version: 2.1.3 20190204 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
 20190122 - Refactor code and bug fix
@@ -9,6 +9,7 @@ Current Version: 2.1.2 20190201 - Pippijn Stortelder
 20190130 - FIXED PMD for some waste collectors
 20190131 - Added Today and Tomorrow sensors
 20190201 - Added option for date only
+20190204 - Small bug fix
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -79,14 +80,14 @@ from homeassistant.const import (CONF_RESOURCES)
 from homeassistant.util import Throttle
 from homeassistant.helpers.entity import Entity
 
-__version__ = '2.1.2'
+__version__ = '2.1.3'
 
 _LOGGER = logging.getLogger(__name__)
 
 MIN_TIME_BETWEEN_UPDATES = timedelta(hours=1)
 CONF_WASTE_COLLECTOR = 'wastecollector'
 CONF_POSTCODE = 'postcode'
-CONF_STREETNUMBER = 'streetnumber'
+CONF_STREET_NUMBER = 'streetnumber'
 CONF_DATE_FORMAT = 'dateformat'
 CONF_TODAY_TOMORROW = 'upcomingsensor'
 CONF_DATE_ONLY = 'dateonly'
@@ -140,7 +141,7 @@ COLLECTOR_WASTE_ID = {}
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_RESOURCES, default=[]): cv.ensure_list,
     vol.Required(CONF_POSTCODE, default='1111AA'): cv.string,
-    vol.Required(CONF_STREETNUMBER, default='1'): cv.string,
+    vol.Required(CONF_STREET_NUMBER, default='1'): cv.string,
     vol.Optional(CONF_WASTE_COLLECTOR, default='Cure'): cv.string,
     vol.Optional(CONF_DATE_FORMAT, default='%d-%m-%Y'): cv.string,
     vol.Optional(CONF_TODAY_TOMORROW, default=False): cv.boolean,
@@ -152,7 +153,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     _LOGGER.debug('Setup Rest API retriever')
 
     postcode = config.get(CONF_POSTCODE)
-    street_number = config.get(CONF_STREETNUMBER)
+    street_number = config.get(CONF_STREET_NUMBER)
     waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
     date_format = config.get(CONF_DATE_FORMAT)
     sensor_today = config.get(CONF_TODAY_TOMORROW)
@@ -208,7 +209,7 @@ class WasteData(object):
 
                     for key in request_json:
                         if not key['ophaaldatum'] is None:
-                            sensor_dict[str(key['id'])] = [datetime.strptime(key['ophaaldatum'], '%Y-%m-%d'), key['title'], key['title'], key['icon_data']]
+                            sensor_dict[str(key['id'])] = [datetime.strptime(key['ophaaldatum'], '%Y-%m-%d'), key['title'], key['icon_data']]
 
                         check_title = key['menu_title']
                         title = ''
@@ -243,11 +244,11 @@ class WasteSensor(Entity):
 
     def __init__(self, data, sensor_type, waste_collector, date_format, date_only):
         self.data = data
-        self.type = sensor_type
+        self.sensor_type = sensor_type
         self.waste_collector = waste_collector
         self.date_format = date_format
         self.date_only = date_only
-        self._name = waste_collector + ' ' + self.type
+        self._name = waste_collector + ' ' + self.sensor_type
         self._unit = ''
         self._hidden = False
         self._entity_picture = None
@@ -288,8 +289,8 @@ class WasteSensor(Entity):
         retrieved_data = 0
         try:
             if waste_data is not None:
-                if self.type in COLLECTOR_WASTE_ID[self.waste_collector]:
-                    for waste_id in COLLECTOR_WASTE_ID[self.waste_collector][self.type]:
+                if self.sensor_type in COLLECTOR_WASTE_ID[self.waste_collector]:
+                    for waste_id in COLLECTOR_WASTE_ID[self.waste_collector][self.sensor_type]:
                         if waste_id in waste_data:
                             today = datetime.today()
                             pickup_info = waste_data.get(waste_id)
@@ -298,7 +299,7 @@ class WasteSensor(Entity):
 
                             self._official_name = pickup_info[1]
                             self._fraction_id = waste_id
-                            self._entity_picture = pickup_info[3]
+                            self._entity_picture = pickup_info[2]
                             self._last_update = today.strftime('%d-%m-%Y %H:%M')
                             self._hidden = False
 
@@ -319,33 +320,26 @@ class WasteSensor(Entity):
                             retrieved_data = 1
 
                     if retrieved_data == 0:
-                        self._state = None
-                        self._official_name = None
-                        self._fraction_id = None
-                        self._hidden = True
+                        self.set_state_none()
                 else:
-                    self._state = None
-                    self._official_name = None
-                    self._fraction_id = None
-                    self._hidden = True
+                    self.set_state_none()
             else:
-                self._state = None
-                self._official_name = None
-                self._fraction_id = None
-                self._hidden = True
+                self.set_state_none()
 
         except ValueError:
-            self._state = None
-            self._official_name = None
-            self._fraction_id = None
-            self._hidden = True
-
+            self.set_state_none()
+    
+    def set_state_none(self):
+        self._state = None
+        self._official_name = None
+        self._fraction_id = None
+        self._hidden = True
 
 class WasteTodaySensor(Entity):
 
     def __init__(self, data, sensor_types, waste_collector, day_sensor):
         self.data = data
-        self.types = sensor_types
+        self.sensor_types = sensor_types
         self.waste_collector = waste_collector
         self.day = day_sensor
         self._name = waste_collector + ' ' + self.day
@@ -378,9 +372,9 @@ class WasteTodaySensor(Entity):
         try:
             if waste_data is not None:
                 new_state = []
-                for type in self.types:
-                    if type in COLLECTOR_WASTE_ID[self.waste_collector]:
-                        for waste_id in COLLECTOR_WASTE_ID[self.waste_collector][type]:
+                for sensor_type in self.sensor_types:
+                    if sensor_type in COLLECTOR_WASTE_ID[self.waste_collector]:
+                        for waste_id in COLLECTOR_WASTE_ID[self.waste_collector][sensor_type]:
                             if waste_id in waste_data:
                                 today = datetime.today()
                                 pickup_info = waste_data.get(waste_id)
@@ -388,10 +382,10 @@ class WasteTodaySensor(Entity):
                                 date_diff = (pick_update - today).days + 1
 
                                 if date_diff == 1 and self.day == "morgen":
-                                    new_state.append(type)
+                                    new_state.append(sensor_type)
                                     retrieved_data = 1
                                 elif date_diff < 1 and self.day == "vandaag":
-                                    new_state.append(type)
+                                    new_state.append(sensor_type)
                                     retrieved_data = 1
 
                         if retrieved_data == 0:
@@ -401,12 +395,13 @@ class WasteTodaySensor(Entity):
                             self._state = ', '.join(new_state)
                             self._hidden = False
                     else:
-                        self._state = None
-                        self._hidden = True
+                        self.set_state_none()
             else:
-                self._state = None
-                self._hidden = True
-
+                self.set_state_none()
+                
         except ValueError:
-            self._state = None
-            self._hidden = True
+            self.set_state_none()
+
+    def set_state_none(self):
+        self._state = None
+        self._hidden = True
