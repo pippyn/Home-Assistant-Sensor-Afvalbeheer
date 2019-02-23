@@ -6,7 +6,7 @@ This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR,
 ![alt text](https://github.com/pippyn/Home-Assisant-Sensor-Cure-Afvalbeheer/blob/master/example.png)
 
 ### Install:
-- Copy the afvalbeheer.py file to: [homeassistant]/config/custom_components/sensor/
+- Copy the afvalbeheer.py file to: [homeassistant]/config/custom_components/afvalbeheer/sensor.py
 - Example config:
 
 ```yaml
@@ -108,10 +108,19 @@ If you don't want to add dayname, tomorrow or today in front of date activate th
 
 ## Custom updater
 You can use the custom updater with this sensor
+Home assistant 88 and higher:
 ```yaml
 custom_updater:
   track:
     - components
   component_urls:
     - https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/custom_components.json
+```
+Before Home assistant 88:
+```yaml
+custom_updater:
+  track:
+    - components
+  component_urls:
+    - https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/custom_components_old.json
 ```
