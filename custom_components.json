@@ -7,7 +7,7 @@
       "changelog": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/releases/latest"
     },
      "sensor.ophaalkalender": {
-      "version": "1.0.2",
+      "version": "1.0.3",
       "local_location": "custom_components/ophaalkalender/sensor.py",
       "remote_location": "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Ophaalkalender/master/ophaalkalender.py",
       "visit_repo": "https://github.com/pippyn/Home-Assistant-Sensor-Ophaalkalender",
