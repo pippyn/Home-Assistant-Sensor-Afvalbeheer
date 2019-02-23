@@ -108,6 +108,7 @@ If you don't want to add dayname, tomorrow or today in front of date activate th
 
 ## Custom updater
 You can use the custom updater with this sensor
+
 Home assistant 88 and higher:
 ```yaml
 custom_updater:
