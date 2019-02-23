@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.1.3 20190204 - Pippijn Stortelder
+Current Version: 2.1.4 20190223 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
 20190122 - Refactor code and bug fix
@@ -10,6 +10,7 @@ Current Version: 2.1.3 20190204 - Pippijn Stortelder
 20190131 - Added Today and Tomorrow sensors
 20190201 - Added option for date only
 20190204 - Small bug fix
+20190223 - Fix for HA 88
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -33,7 +34,7 @@ Description:
   - Waalre
   - ZRD
 
-Save the file as afvalbeheer.py in [homeassistant]/config/custom_components/sensor/
+Save this file as [homeassistant]/config/custom_components/afvalbeheer/sensor.py
 
     Main resources options:
     - restafval
@@ -80,7 +81,7 @@ from homeassistant.const import (CONF_RESOURCES)
 from homeassistant.util import Throttle
 from homeassistant.helpers.entity import Entity
 
-__version__ = '2.1.3'
+__version__ = '2.1.4'
 
 _LOGGER = logging.getLogger(__name__)
 
