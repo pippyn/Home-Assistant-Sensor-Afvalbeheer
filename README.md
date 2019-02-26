@@ -27,6 +27,8 @@ Example config:
       upcomingsensor: 0                (optional)
       dateformat: '%d-%m-%Y'           (optional)
       dateonly: 0                      (optional)
+      nameprefix: 1                    (optional)
+      builtinicons: 0                  (optional)
 ```
 ### Wastecollector
 ```
@@ -109,6 +111,25 @@ If you wish to remove the year and the dashes and want to show the name of the m
 dateonly: 1
 ```
 If you don't want to add dayname, tomorrow or today in front of date activate this option. Default is 0.
+
+### Name prefix
+```yaml
+nameprefix: 0
+```
+If you don't want to add the waste collecoctors name to the sensor name. Default is 1.
+
+### Built in icons
+```yaml
+builtinicons: 1
+```
+If you don't want to use the icons from your waste collector you can use the built in icons. Default is 0.
+For now only these fractions are supported:
+- gft
+- gftgratis
+- glas
+- papier
+- pmd
+- restafval
 
 ## Custom updater
 You can use the custom updater with this sensor
