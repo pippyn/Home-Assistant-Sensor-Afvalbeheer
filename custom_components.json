@@ -1,12 +1,12 @@
 {
-    "afvalbeheer.sensor": {
+    "sensor.afvalbeheer": {
       "version": "2.2.0",
       "local_location": "/custom_components/afvalbeheer/sensor.py",
       "remote_location": "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/afvalbeheer.py",
       "visit_repo": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer",
       "changelog": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/releases/latest"
     },
-     "ophaalkalender.sensor": {
+     "sensor.ophaalkalender": {
       "version": "1.0.3",
       "local_location": "/custom_components/ophaalkalender/sensor.py",
       "remote_location": "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Ophaalkalender/master/ophaalkalender.py",
