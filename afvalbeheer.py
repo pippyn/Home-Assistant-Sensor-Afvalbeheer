@@ -122,7 +122,7 @@ COLLECTOR_URL = {
     'rmn': 'https://inzamelschema.rmn.nl',
     'spaarnelanden': 'https://afvalwijzer.spaarnelanden.nl',
     'venray': 'https://afvalkalender.venray.nl',
-    'waalre': 'http://afvalkalender.waalre.nl',
+    'waalre': 'https://afvalkalender.waalre.nl',
     'zrd': 'https://afvalkalender.zrd.nl',
 }
 
