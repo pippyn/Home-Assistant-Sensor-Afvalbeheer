@@ -76,6 +76,7 @@ Some collectors also use some of these options:
   - chemisch
   - sloopafval
   - takken
+  - kca
 
 ### Postcode
 Postcode is required and is your own postcode
