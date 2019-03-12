@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.2.1 20190208 - Pippijn Stortelder
+Current Version: 2.2.2 20190312 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
 20190122 - Refactor code and bug fix
@@ -13,6 +13,7 @@ Current Version: 2.2.1 20190208 - Pippijn Stortelder
 20190223 - Fix for HA 88
 20190226 - Added option for name prefix and added default icons
 20190308 - Change Waalre URL
+20190312 - Fix for resource Plastic, blik en drankenkartons
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -85,7 +86,7 @@ from homeassistant.const import (CONF_RESOURCES)
 from homeassistant.util import Throttle
 from homeassistant.helpers.entity import Entity
 
-__version__ = '2.2.1'
+__version__ = '2.2.2'
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -133,6 +134,7 @@ RENAME_TITLES = {
     'gft': 'gft',
     'papier': 'papier',
     'rest': 'restafval',
+    'pbd': 'plastic, blik',
     'plastic': 'pmd',
     'sloop': 'sloopafval',
     'klein chemisch afval': 'kca',
