@@ -6,7 +6,6 @@
       "visit_repo": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer",
       "changelog": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/releases/latest",
       "resources": [
-            "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/custom_components/afvalbeheer/sensor.py",
             "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/custom_components/afvalbeheer/manifest.json"
         ]
     },
