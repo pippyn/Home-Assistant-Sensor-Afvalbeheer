@@ -10,10 +10,13 @@
         ]
     },
      "sensor.ophaalkalender": {
-      "version": "1.0.3",
-      "local_location": "/custom_components/ophaalkalender/sensor.py",
-      "remote_location": "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Ophaalkalender/master/ophaalkalender.py",
+      "version": "1.1.0",
+      "local_location": "/custom_components/ophaalkalender/__init__.py",
+      "remote_location": "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Ophaalkalender/master/custom_components/ophaalkalender/__init__.py",
       "visit_repo": "https://github.com/pippyn/Home-Assistant-Sensor-Ophaalkalender",
       "changelog": "https://github.com/pippyn/Home-Assistant-Sensor-Ophaalkalender/releases/latest"
+      "resources": [
+            "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Ophaalkalender/master/custom_components/ophaalkalender/manifest.json"
+        ]
     }
 }
