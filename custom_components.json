@@ -6,7 +6,8 @@
       "visit_repo": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer",
       "changelog": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/releases/latest",
       "resources": [
-            "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/custom_components/afvalbeheer/manifest.json"
+          "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/custom_components/afvalbeheer/manifest.json",
+          "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/custom_components/afvalbeheer/sensor.py"
         ]
     },
      "sensor.ophaalkalender": {
@@ -16,7 +17,8 @@
       "visit_repo": "https://github.com/pippyn/Home-Assistant-Sensor-Ophaalkalender",
       "changelog": "https://github.com/pippyn/Home-Assistant-Sensor-Ophaalkalender/releases/latest",
       "resources": [
-            "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Ophaalkalender/master/custom_components/ophaalkalender/manifest.json"
+          "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Ophaalkalender/master/custom_components/ophaalkalender/manifest.json",
+          "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Ophaalkalender/master/custom_components/ophaalkalender/sensor.py"
         ]
     }
 }
