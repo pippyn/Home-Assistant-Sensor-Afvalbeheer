@@ -1,0 +1,8 @@
+{
+  "domain": "afvalbeheer",
+  "name": "Afvalbeheer",
+  "documentation": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer",
+  "dependencies": [],
+  "codeowners": ["@pippyn"],
+  "requirements": []
+}
