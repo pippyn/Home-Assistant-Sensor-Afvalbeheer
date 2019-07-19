@@ -74,6 +74,7 @@ Some collectors also use some of these options:
   - sloopafval
   - takken
   - kca
+  - pbd
 
 ### Postcode
 Postcode is required and is your own postcode
