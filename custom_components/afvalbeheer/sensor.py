@@ -32,6 +32,7 @@ Description:
   - HVC
   - Meerlanden
   - Montfoort
+  - PeelEnMaas
   - RMN
   - Spaarnelanden
   - Venray
@@ -120,6 +121,7 @@ COLLECTOR_URL = {
     'hvc': 'https://inzamelkalender.hvcgroep.nl',
     'meerlanden': 'https://afvalkalender.meerlanden.nl',
     'montfoort': 'https://afvalkalender.montfoort.nl',
+    'peelenmaas': 'https://afvalkalender.peelenmaas.nl',
     'rmn': 'https://inzamelschema.rmn.nl',
     'spaarnelanden': 'https://afvalwijzer.spaarnelanden.nl',
     'venray': 'https://afvalkalender.venray.nl',
