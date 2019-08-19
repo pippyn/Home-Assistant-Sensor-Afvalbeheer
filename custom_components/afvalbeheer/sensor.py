@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.3.1 20190313 - Pippijn Stortelder
+Current Version: 2.4.0 20190819 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
 20190122 - Refactor code and bug fix
@@ -15,6 +15,7 @@ Current Version: 2.3.1 20190313 - Pippijn Stortelder
 20190308 - Change Waalre URL
 20190312 - Fix for resource Plastic, blik en drankenkartons
 20190313 - Code clean up
+20190819 - Added Peel en Maas (credits to https://github.com/tuimz)
 
 Description:
   Provides sensors for the following Dutch waste collectors;
