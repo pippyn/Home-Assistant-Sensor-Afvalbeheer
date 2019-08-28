@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.4.1 20190822 - Pippijn Stortelder
+Current Version: 2.5.0 20190828 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
 20190122 - Refactor code and bug fix
@@ -17,6 +17,7 @@ Current Version: 2.4.1 20190822 - Pippijn Stortelder
 20190313 - Code clean up
 20190819 - Added Peel en Maas (credits to https://github.com/tuimz)
 20190822 - Added built-in icon for PBD (the same icon as PMD)
+20190828 - Added Dutch translation weekdays
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -101,6 +102,7 @@ CONF_TODAY_TOMORROW = 'upcomingsensor'
 CONF_DATE_ONLY = 'dateonly'
 CONF_NAME_PREFIX = 'nameprefix'
 CONF_BUILT_IN_ICONS = 'builtinicons'
+CONF_TRANSLATE_DAYS = 'dutch'
 
 ATTR_OFFICIAL_NAME = 'Official name'
 ATTR_WASTE_COLLECTOR = 'wastecollector'
@@ -158,6 +160,16 @@ FRACTION_ICONS = {
     'restafval': 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8IS0tIENyZWF0b3I6IENvcmVsRFJBVyBYNiAtLT4NCjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWw6c3BhY2U9InByZXNlcnZlIiB3aWR0aD0iNS4zMzMzM2luIiBoZWlnaHQ9IjUuMzMzMzNpbiIgdmVyc2lvbj0iMS4xIiBzdHlsZT0ic2hhcGUtcmVuZGVyaW5nOmdlb21ldHJpY1ByZWNpc2lvbjsgdGV4dC1yZW5kZXJpbmc6Z2VvbWV0cmljUHJlY2lzaW9uOyBpbWFnZS1yZW5kZXJpbmc6b3B0aW1pemVRdWFsaXR5OyBmaWxsLXJ1bGU6ZXZlbm9kZDsgY2xpcC1ydWxlOmV2ZW5vZGQiDQp2aWV3Qm94PSIwIDAgNTMzMyA1MzMzIg0KIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiA8ZGVmcz4NCiAgPHN0eWxlIHR5cGU9InRleHQvY3NzIj4NCiAgIDwhW0NEQVRBWw0KICAgIC5zdHIwIHtzdHJva2U6IzIzMUYyMDtzdHJva2Utd2lkdGg6MTExLjExfQ0KICAgIC5maWwwIHtmaWxsOm5vbmU7ZmlsbC1ydWxlOm5vbnplcm99DQogICBdXT4NCiAgPC9zdHlsZT4NCiA8L2RlZnM+DQogPGcgaWQ9IkxheWVyX3gwMDIwXzEiPg0KICA8bWV0YWRhdGEgaWQ9IkNvcmVsQ29ycElEXzBDb3JlbC1MYXllciIvPg0KICA8cGF0aCBjbGFzcz0iZmlsMCBzdHIwIiBkPSJNNDUyNCA0MjQxYzQ4LC0zOTggMTksLTU1OCAtMTM4LC04MDMgLTE1NiwtMjQ1IC0xMDczLC0xMzEyIC0xMDczLC0xMzEybDM5MSAxMDA5IC01MjYgLTg0NiAtMjAzIDExMzUgLTExIC0xMTU0IC05MDEgNDMyIDk1MSAtNjQxIDMzOSA3NCAxMDEzIC01NDIgLTY5NSAtMTU2IC0yNzcgNDc3IDg3IC0xMDMzIC02ODkgNjAxIDEzNyAtMjM3IC01OTYgLTMwOSA0NTEgOTQzIC0xOTc0IDkyMyAtMjE3IDUyMyAyMTYgNTIwIC0xNjEgLTY3IC0xNTEgMzQwbTM5ODMgNDIxYzIwLC0xMjcgMzUsLTIzMSA0MywtMjk5Ii8+DQogIDxwYXRoIGNsYXNzPSJmaWwwIHN0cjAiIGQ9Ik01Mjc1IDI2NjVjMCwxNDQxIC0xMTY4LDI2MTAgLTI2MTAsMjYxMCAtMTQ0MSwwIC0yNjEwLC0xMTY4IC0yNjEwLC0yNjEwIDAsLTE0NDEgMTE2OCwtMjYxMCAyNjEwLC0yNjEwIDE0NDEsMCAyNjEwLDExNjggMjYxMCwyNjEwem0wIDB6Ii8+DQogPC9nPg0KPC9zdmc+DQo=',
 }
 
+DUTCH_TRANSLATION_DAYS = {
+    'Monday': 'Maandag',
+    'Tuesday': 'Dinsdag',
+    'Wednesday': 'Woensdag',
+    'Thursday': 'Donderdag',
+    'Friday': 'Vrijdag',
+    'Saturday': 'Zaterdag',
+    'Sunday': 'Zondag'
+}
+
 COLLECTOR_WASTE_ID = {}
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -170,6 +182,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_DATE_ONLY, default=False): cv.boolean,
     vol.Optional(CONF_NAME_PREFIX, default=True): cv.boolean,
     vol.Optional(CONF_BUILT_IN_ICONS, default=False): cv.boolean,
+    vol.Optional(CONF_TRANSLATE_DAYS, default=False): cv.boolean,
 })
 
 
@@ -184,6 +197,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     date_only = config.get(CONF_DATE_ONLY)
     name_prefix = config.get(CONF_NAME_PREFIX)
     built_in_icons = config.get(CONF_BUILT_IN_ICONS)
+    dutch_days = config.get(CONF_TRANSLATE_DAYS)
 
     try:
         data = WasteData(postcode, street_number, waste_collector)
@@ -196,7 +210,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     for resource in config[CONF_RESOURCES]:
         sensor_type = resource.lower()
         entities.append(WasteSensor(data, sensor_type, waste_collector, date_format, date_only, name_prefix,
-                                    built_in_icons))
+                                    built_in_icons, dutch_days))
 
     if sensor_today:
         entities.append(WasteTodaySensor(data, config[CONF_RESOURCES], waste_collector, "vandaag"))
@@ -269,7 +283,7 @@ class WasteData(object):
 
 class WasteSensor(Entity):
 
-    def __init__(self, data, sensor_type, waste_collector, date_format, date_only, name_prefix, built_in_icons):
+    def __init__(self, data, sensor_type, waste_collector, date_format, date_only, name_prefix, built_in_icons, dutch_days):
         self.data = data
         self.sensor_type = sensor_type
         self.waste_collector = waste_collector
@@ -280,6 +294,13 @@ class WasteSensor(Entity):
         else:
             self._name = self.sensor_type
         self.built_in_icons = built_in_icons
+        self.dutch_days = dutch_days
+        if self.dutch_days:
+            self._today = "Vandaag, "
+            self._tomorrow = "Morgen, "
+        else:
+            self._today = "Today, "
+            self._tomorrow = "Tomorrow, "
         self._unit = ''
         self._hidden = False
         self._entity_picture = None
@@ -343,10 +364,13 @@ class WasteSensor(Entity):
                                 self._state = pick_update.strftime(self.date_format)
                             elif date_diff > 1:
                                 self._state = pick_update.strftime('%A, ' + self.date_format)
+                                if self.dutch_days:
+                                    for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
+                                        self._state = self._state.replace(EN_day, NL_day)
                             elif date_diff == 1:
-                                self._state = pick_update.strftime('Tomorrow, ' + self.date_format)
+                                self._state = pick_update.strftime(self._tomorrow + self.date_format)
                             elif date_diff == 0:
-                                self._state = pick_update.strftime('Today, ' + self.date_format)
+                                self._state = pick_update.strftime(self._today + self.date_format)
                             else:
                                 self._state = None
                         retrieved_data = 1

@@ -26,6 +26,7 @@ Example config:
       dateonly: 0                      (optional)
       nameprefix: 1                    (optional)
       builtinicons: 0                  (optional)
+      dutch: 0                         (optional)
 ```
 ### Wastecollector
 ```
@@ -129,7 +130,14 @@ For now only these fractions are supported:
 - glas
 - papier
 - pmd
+- pbd
 - restafval
+
+### Name prefix
+```yaml
+dutch: 1
+```
+If you want to display the names of the days in dutch. Default is 0.
 
 ## Custom updater
 You can use the custom updater with this sensor
