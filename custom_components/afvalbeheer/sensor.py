@@ -249,7 +249,7 @@ class WasteData(object):
                     sensor_dict = {}
 
                     for key in request_json:
-                        if not key['ophaaldatum'] is None:
+                        if key['ophaaldatum'] is not None:
                             sensor_dict[str(key['id'])] = [datetime.strptime(key['ophaaldatum'], '%Y-%m-%d'), key['title'], key['icon_data']]
 
                         check_title = key['menu_title']
