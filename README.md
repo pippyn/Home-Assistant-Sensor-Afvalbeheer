@@ -3,8 +3,6 @@
 Provides Home Assistant sensors for multiple Dutch waste collectors using REST API.
 This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Peel en Maas, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, Montfoort, GAD and Cranendonck.
 
-![alt text](https://github.com/pippyn/Home-Assisant-Sensor-Cure-Afvalbeheer/blob/master/example.png)
-
 ### Install:
 Copy the files in the /custom_components/afvalbeheer/ folder to: [homeassistant]/config/custom_components/afvalbeheer/
 
@@ -54,7 +52,7 @@ Choose your collector from this list:
   - Waalre
   - ZRD
 
-### Recourses
+### Resources
 ```
 resources:
 ```
