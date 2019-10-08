@@ -26,4 +26,4 @@ This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR,
       builtinicons: 0                  (optional)
       dutch: 0                         (optional)
 ```
-For more information visit the repository
+[For more information visit the repository](https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/)
