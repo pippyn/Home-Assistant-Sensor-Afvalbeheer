@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.5.0 20190828 - Pippijn Stortelder
+Current Version: 2.5.1 20191008 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
 20190122 - Refactor code and bug fix
@@ -18,6 +18,7 @@ Current Version: 2.5.0 20190828 - Pippijn Stortelder
 20190819 - Added Peel en Maas (credits to https://github.com/tuimz)
 20190822 - Added built-in icon for PBD (the same icon as PMD)
 20190828 - Added Dutch translation weekdays
+20191008 - Small code clean up (credits to https://github.com/slootjes)
 
 Description:
   Provides sensors for the following Dutch waste collectors;
