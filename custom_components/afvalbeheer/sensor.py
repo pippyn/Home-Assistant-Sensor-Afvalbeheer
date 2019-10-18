@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.5.1 20191008 - Pippijn Stortelder
+Current Version: 2.5.2 20191018 - Pippijn Stortelder
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
 20190122 - Refactor code and bug fix
@@ -19,6 +19,7 @@ Current Version: 2.5.1 20191008 - Pippijn Stortelder
 20190822 - Added built-in icon for PBD (the same icon as PMD)
 20190828 - Added Dutch translation weekdays
 20191008 - Small code clean up (credits to https://github.com/slootjes)
+20191118 - Translate 'None' to Dutch
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -445,7 +446,10 @@ class WasteTodaySensor(Entity):
                                     retrieved_data = 1
 
                         if retrieved_data == 0:
-                            self._state = "None"
+                            if self.dutch_days:
+                                self._state = "Geen"
+                            else:
+                                self._state = "None"
                             self._hidden = True
                         else:
                             self._state = ', '.join(new_state)
