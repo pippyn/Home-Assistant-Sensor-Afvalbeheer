@@ -133,7 +133,7 @@ For now only these fractions are supported:
 - pbd
 - restafval
 
-### Name prefix
+### Translation
 ```yaml
 dutch: 1
 ```
