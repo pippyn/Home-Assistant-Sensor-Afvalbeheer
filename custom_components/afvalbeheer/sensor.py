@@ -78,6 +78,7 @@ Configuration.yaml:
       upcomingsensor: 0                (optional)
       dateformat: '%d-%m-%Y'           (optional)
       dateonly: 0                      (optional)
+      name: ''                         (optional)
       nameprefix: 1                    (optional)
       builtinicons: 0                  (optional)
 """
@@ -103,6 +104,7 @@ CONF_STREET_NUMBER = 'streetnumber'
 CONF_DATE_FORMAT = 'dateformat'
 CONF_TODAY_TOMORROW = 'upcomingsensor'
 CONF_DATE_ONLY = 'dateonly'
+CONF_NAME = 'name'
 CONF_NAME_PREFIX = 'nameprefix'
 CONF_BUILT_IN_ICONS = 'builtinicons'
 CONF_TRANSLATE_DAYS = 'dutch'
@@ -183,6 +185,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_DATE_FORMAT, default='%d-%m-%Y'): cv.string,
     vol.Optional(CONF_TODAY_TOMORROW, default=False): cv.boolean,
     vol.Optional(CONF_DATE_ONLY, default=False): cv.boolean,
+    vol.Optional(CONF_NAME, default=''): cv.string,
     vol.Optional(CONF_NAME_PREFIX, default=True): cv.boolean,
     vol.Optional(CONF_BUILT_IN_ICONS, default=False): cv.boolean,
     vol.Optional(CONF_TRANSLATE_DAYS, default=False): cv.boolean,
@@ -198,6 +201,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     date_format = config.get(CONF_DATE_FORMAT)
     sensor_today = config.get(CONF_TODAY_TOMORROW)
     date_only = config.get(CONF_DATE_ONLY)
+    name = config.get(CONF_NAME)
     name_prefix = config.get(CONF_NAME_PREFIX)
     built_in_icons = config.get(CONF_BUILT_IN_ICONS)
     dutch_days = config.get(CONF_TRANSLATE_DAYS)
@@ -212,12 +216,11 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     for resource in config[CONF_RESOURCES]:
         sensor_type = resource.lower()
-        entities.append(WasteSensor(data, sensor_type, waste_collector, date_format, date_only, name_prefix,
-                                    built_in_icons, dutch_days))
+        entities.append(WasteSensor(data, sensor_type, waste_collector, date_format, date_only, name, name_prefix, built_in_icons, dutch_days))
 
     if sensor_today:
-        entities.append(WasteTodaySensor(data, config[CONF_RESOURCES], waste_collector, "vandaag", dutch_days))
-        entities.append(WasteTodaySensor(data, config[CONF_RESOURCES], waste_collector, "morgen", dutch_days))
+        entities.append(WasteTodaySensor(data, config[CONF_RESOURCES], waste_collector, "vandaag", dutch_days, name, name_prefix))
+        entities.append(WasteTodaySensor(data, config[CONF_RESOURCES], waste_collector, "morgen", dutch_days, name, name_prefix))
 
     add_entities(entities)
 
@@ -286,16 +289,13 @@ class WasteData(object):
 
 class WasteSensor(Entity):
 
-    def __init__(self, data, sensor_type, waste_collector, date_format, date_only, name_prefix, built_in_icons, dutch_days):
+    def __init__(self, data, sensor_type, waste_collector, date_format, date_only, name, name_prefix, built_in_icons, dutch_days):
         self.data = data
         self.sensor_type = sensor_type
         self.waste_collector = waste_collector
         self.date_format = date_format
         self.date_only = date_only
-        if name_prefix:
-            self._name = waste_collector + ' ' + self.sensor_type
-        else:
-            self._name = self.sensor_type
+        self._name = _format_sensor(name, name_prefix, waste_collector, self.sensor_type)
         self.built_in_icons = built_in_icons
         self.dutch_days = dutch_days
         if self.dutch_days:
@@ -395,13 +395,13 @@ class WasteSensor(Entity):
 
 class WasteTodaySensor(Entity):
 
-    def __init__(self, data, sensor_types, waste_collector, day_sensor, dutch_days):
+    def __init__(self, data, sensor_types, waste_collector, day_sensor, dutch_days, name, name_prefix):
         self.data = data
         self.sensor_types = sensor_types
         self.waste_collector = waste_collector
         self.day = day_sensor
         self.dutch_days = dutch_days
-        self._name = waste_collector + ' ' + self.day
+        self._name = _format_sensor(name, name_prefix, waste_collector, self.day)
         self._unit = ''
         self._hidden = False
         self._state = None
@@ -467,3 +467,11 @@ class WasteTodaySensor(Entity):
     def set_state_none(self):
         self._state = None
         self._hidden = True
+
+
+def _format_sensor(name, name_prefix, waste_collector, sensor_type):
+    return (
+        (waste_collector + ' ' if name_prefix else "") +
+        (name + ' ' if name else "") +
+        sensor_type
+    )

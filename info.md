@@ -22,6 +22,7 @@ This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR,
       upcomingsensor: 0                (optional)
       dateformat: '%d-%m-%Y'           (optional)
       dateonly: 0                      (optional)
+      name: ""                         (optional)
       nameprefix: 1                    (optional)
       builtinicons: 0                  (optional)
       dutch: 0                         (optional)
