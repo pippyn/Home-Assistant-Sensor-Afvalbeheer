@@ -24,6 +24,7 @@ Example config:
       upcomingsensor: 0                (optional)
       dateformat: '%d-%m-%Y'           (optional)
       dateonly: 0                      (optional)
+      name: ''                         (optional)
       nameprefix: 1                    (optional)
       builtinicons: 0                  (optional)
       dutch: 0                         (optional)
@@ -112,6 +113,12 @@ If you wish to remove the year and the dashes and want to show the name of the m
 dateonly: 1
 ```
 If you don't want to add dayname, tomorrow or today in front of date activate this option. Default is 0.
+
+### Name
+```yaml
+name: 'your custom name'
+```
+If you want a custom name to be added to the sensor name. By default, no name is added. This is especially useful when you configure more than one sensor using this platform.
 
 ### Name prefix
 ```yaml
