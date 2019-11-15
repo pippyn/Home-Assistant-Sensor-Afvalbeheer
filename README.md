@@ -78,6 +78,7 @@ Some collectors also use some of these options:
   - takken
   - kca
   - pbd
+  - duobak
 
 ### Postcode
 Postcode is required and is your own postcode
