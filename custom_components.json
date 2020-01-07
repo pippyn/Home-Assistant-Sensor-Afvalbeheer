@@ -11,7 +11,7 @@
         ]
     },
      "sensor.ophaalkalender": {
-      "version": "1.1.4",
+      "version": "1.1.5",
       "local_location": "/custom_components/ophaalkalender/__init__.py",
       "remote_location": "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Ophaalkalender/master/custom_components/ophaalkalender/__init__.py",
       "visit_repo": "https://github.com/pippyn/Home-Assistant-Sensor-Ophaalkalender",
