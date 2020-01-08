@@ -2,6 +2,7 @@
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
 Current Version: 2.5.5 20191115 - Pippijn Stortelder
+20200108 - Added waste collector Purmerend
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
 20190122 - Refactor code and bug fix
@@ -41,6 +42,7 @@ Description:
   - Meerlanden
   - Montfoort
   - PeelEnMaas
+  - Purmerend
   - RMN
   - Spaarnelanden
   - Venray
@@ -134,6 +136,7 @@ COLLECTOR_URL = {
     'meerlanden': 'https://afvalkalender.meerlanden.nl',
     'montfoort': 'https://afvalkalender.montfoort.nl',
     'peelenmaas': 'https://afvalkalender.peelenmaas.nl',
+    'purmerend': 'https://afvalkalender.purmerend.nl/',
     'rmn': 'https://inzamelschema.rmn.nl',
     'spaarnelanden': 'https://afvalwijzer.spaarnelanden.nl',
     'venray': 'https://afvalkalender.venray.nl',
