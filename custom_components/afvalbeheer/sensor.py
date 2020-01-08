@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.5.5 20191115 - Pippijn Stortelder
+Current Version: 2.5.6 20200108 - Pippijn Stortelder
 20200108 - Added waste collector Purmerend
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
@@ -24,6 +24,7 @@ Current Version: 2.5.5 20191115 - Pippijn Stortelder
 20191018 - Bug Fix
 20191112 - Added support for a 'name' property for sensors
 20191115 - Added Duobak as a fraction
+20200108 - Added Purmerend and an option to disable the entity_picture
 
 Description:
   Provides sensors for the following Dutch waste collectors;
