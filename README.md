@@ -1,7 +1,7 @@
 ## Home Assisant sensor component for Afvalbeheer
 
 Provides Home Assistant sensors for multiple Dutch waste collectors using REST API.
-This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Peel en Maas, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, Montfoort, GAD and Cranendonck.
+This sensor works with the following waste collectors: Blink, Cure, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, Montfoort, GAD and Cranendonck.
 
 ![alt text](https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/example.png)
 
@@ -49,6 +49,7 @@ Choose your collector from this list:
   - Meerlanden
   - Montfoort
   - PeelEnMaas
+  - Purmerend
   - RMN
   - Spaarnelanden
   - Venray
@@ -90,7 +91,7 @@ Street number is required and is your own street number
 ```yaml
 upcomingsensor: 1
 ```
-If you activate this option you'll get 2 extra sensors (today and tomorrow) which are handy for automations. 
+If you activate this option you'll get 2 extra sensors (today and tomorrow) which are handy for automations.
 The today sensor will display the fractions collected today.
 The tomorrow sensor will display the fractions collected tomorrow.
 Default is 0.
@@ -100,11 +101,11 @@ Default is 0.
 dateformat:
 ```
 If you want to adjust the way the date is presented. You can do it using the dateformat option. All [python strftime options](http://strftime.org/) should work.
-Default is '%d-%m-%Y', which will result in per example: 
+Default is '%d-%m-%Y', which will result in per example:
 ```yaml
 21-9-2019.
 ```
-If you wish to remove the year and the dashes and want to show the name of the month abbreviated, you would provide '%d %b'. Which will result in: 
+If you wish to remove the year and the dashes and want to show the name of the month abbreviated, you would provide '%d %b'. Which will result in:
 ```yaml
 21 Sep
 ```
@@ -158,4 +159,3 @@ custom_updater:
   component_urls:
     - https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/custom_components.json
 ```
-
