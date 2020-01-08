@@ -136,7 +136,7 @@ COLLECTOR_URL = {
     'meerlanden': 'https://afvalkalender.meerlanden.nl',
     'montfoort': 'https://afvalkalender.montfoort.nl',
     'peelenmaas': 'https://afvalkalender.peelenmaas.nl',
-    'purmerend': 'https://afvalkalender.purmerend.nl/',
+    'purmerend': 'https://afvalkalender.purmerend.nl',
     'rmn': 'https://inzamelschema.rmn.nl',
     'spaarnelanden': 'https://afvalwijzer.spaarnelanden.nl',
     'venray': 'https://afvalkalender.venray.nl',
