@@ -27,6 +27,7 @@ Example config:
       name: ''                         (optional)
       nameprefix: 1                    (optional)
       builtinicons: 0                  (optional)
+      disableicons: 0                  (optional)
       dutch: 0                         (optional)
 ```
 ### Wastecollector
@@ -141,6 +142,12 @@ For now only these fractions are supported:
 - pmd
 - pbd
 - restafval
+
+### Disable the use of entity_picture
+```yaml
+disableicons: 1
+```
+If you want to assign MDI icons (in your customize section) to these sensors, you'll need to set this option to 1.
 
 ### Translation
 ```yaml
