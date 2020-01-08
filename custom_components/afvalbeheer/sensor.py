@@ -110,6 +110,7 @@ CONF_DATE_ONLY = 'dateonly'
 CONF_NAME = 'name'
 CONF_NAME_PREFIX = 'nameprefix'
 CONF_BUILT_IN_ICONS = 'builtinicons'
+CONF_DISABLE_ICONS = 'disableicons'
 CONF_TRANSLATE_DAYS = 'dutch'
 
 ATTR_OFFICIAL_NAME = 'Official name'
