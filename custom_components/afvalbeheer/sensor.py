@@ -49,6 +49,7 @@ Description:
   - Venray
   - Waalre
   - ZRD
+  - ROVA
 
 Save this file as [homeassistant]/config/custom_components/afvalbeheer/sensor.py
 
@@ -144,6 +145,7 @@ COLLECTOR_URL = {
     'venray': 'https://afvalkalender.venray.nl',
     'waalre': 'https://afvalkalender.waalre.nl',
     'zrd': 'https://afvalkalender.zrd.nl',
+    'rova': 'https://inzamelkalender.rova.nl',
 }
 
 RENAME_TITLES = {
