@@ -25,6 +25,7 @@ Current Version: 2.5.6 20200108 - Pippijn Stortelder
 20191112 - Added support for a 'name' property for sensors
 20191115 - Added Duobak as a fraction
 20200108 - Added Purmerend and an option to disable the entity_picture
+20200113 - Support for ROVA
 
 Description:
   Provides sensors for the following Dutch waste collectors;
