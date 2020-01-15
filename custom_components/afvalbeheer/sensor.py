@@ -26,6 +26,7 @@ Current Version: 2.5.7 20200113 - Pippijn Stortelder
 20191115 - Added Duobak as a fraction
 20200108 - Added Purmerend and an option to disable the entity_picture
 20200113 - Support for ROVA
+20200115 - Changed municipality of Montfoort url to Cyclus
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -138,7 +139,7 @@ COLLECTOR_URL = {
     'gad': 'https://inzamelkalender.gad.nl',
     'hvc': 'https://inzamelkalender.hvcgroep.nl',
     'meerlanden': 'https://afvalkalender.meerlanden.nl',
-    'montfoort': 'https://afvalkalender.montfoort.nl',
+    'montfoort': 'https://afvalkalender.cyclusnv.nl',
     'peelenmaas': 'https://afvalkalender.peelenmaas.nl',
     'purmerend': 'https://afvalkalender.purmerend.nl',
     'rmn': 'https://inzamelschema.rmn.nl',
