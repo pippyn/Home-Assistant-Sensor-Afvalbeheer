@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.5.8 20200113 - Pippijn Stortelder
+Current Version: 2.5.9 20200117 - Pippijn Stortelder
 20200108 - Added waste collector Purmerend
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
@@ -27,6 +27,7 @@ Current Version: 2.5.8 20200113 - Pippijn Stortelder
 20200108 - Added Purmerend and an option to disable the entity_picture
 20200113 - Support for ROVA
 20200115 - Changed municipality of Montfoort url to Cyclus
+20200117 - Added an integer to attributes for date sorting
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -124,7 +125,7 @@ ATTR_WASTE_COLLECTOR = 'wastecollector'
 ATTR_FRACTION_ID = 'ID'
 ATTR_LAST_UPDATE = 'Last update'
 ATTR_HIDDEN = 'Hidden'
-ATTR_SORT_DATE = 0
+ATTR_SORT_DATE = 'Sort date'
 
 COLLECTOR_URL = {
     'alphenaandenrijn': 'https://afvalkalender.alphenaandenrijn.nl',
