@@ -124,6 +124,7 @@ ATTR_WASTE_COLLECTOR = 'wastecollector'
 ATTR_FRACTION_ID = 'ID'
 ATTR_LAST_UPDATE = 'Last update'
 ATTR_HIDDEN = 'Hidden'
+ATTR_SORT_DATE = 0
 
 COLLECTOR_URL = {
     'alphenaandenrijn': 'https://afvalkalender.alphenaandenrijn.nl',
@@ -321,6 +322,7 @@ class WasteSensor(Entity):
             self._today = "Today, "
             self._tomorrow = "Tomorrow, "
         self._unit = ''
+        self._sort_date = 0
         self._hidden = False
         self._entity_picture = None
         self._state = None
@@ -347,7 +349,8 @@ class WasteSensor(Entity):
             ATTR_WASTE_COLLECTOR: self.waste_collector,
             ATTR_FRACTION_ID: self._fraction_id,
             ATTR_LAST_UPDATE: self._last_update,
-            ATTR_HIDDEN: self._hidden
+            ATTR_HIDDEN: self._hidden,
+            ATTR_SORT_DATE: self._sort_date
         }
 
     @property
@@ -376,6 +379,7 @@ class WasteSensor(Entity):
                         self._last_update = today.strftime('%d-%m-%Y %H:%M')
                         self._hidden = False
 
+                        self._sort_date = int(pick_update.strftime('%Y%m%d'))
                         if self.date_only and date_diff >= 0:
                             self._state = pick_update.strftime(self.date_format)
                         else:
