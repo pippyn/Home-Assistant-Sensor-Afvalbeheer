@@ -121,11 +121,11 @@ CONF_DISABLE_ICONS = 'disableicons'
 CONF_TRANSLATE_DAYS = 'dutch'
 
 ATTR_OFFICIAL_NAME = 'Official name'
-ATTR_WASTE_COLLECTOR = 'wastecollector'
+ATTR_WASTE_COLLECTOR = 'Wastecollector'
 ATTR_FRACTION_ID = 'ID'
 ATTR_LAST_UPDATE = 'Last update'
 ATTR_HIDDEN = 'Hidden'
-ATTR_SORT_DATE = 'Sort date'
+ATTR_SORT_DATE = 'Sort-date'
 
 COLLECTOR_URL = {
     'alphenaandenrijn': 'https://afvalkalender.alphenaandenrijn.nl',
