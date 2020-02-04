@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.5.9 20200117 - Pippijn Stortelder
+Current Version: 2.5.10 20200204 - Pippijn Stortelder
 20200108 - Added waste collector Purmerend
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
@@ -28,6 +28,7 @@ Current Version: 2.5.9 20200117 - Pippijn Stortelder
 20200113 - Support for ROVA
 20200115 - Changed municipality of Montfoort url to Cyclus
 20200117 - Added an integer to attributes for date sorting
+20200204 - Fixed wrong date
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -364,6 +365,7 @@ class WasteSensor(Entity):
         retrieved_data = 0
         try:
             if waste_data is not None and self.sensor_type in COLLECTOR_WASTE_ID[self.waste_collector]:
+                update_date = 0
                 for waste_id in COLLECTOR_WASTE_ID[self.waste_collector][self.sensor_type]:
                     if waste_id in waste_data:
                         today = datetime.today()
@@ -379,24 +381,25 @@ class WasteSensor(Entity):
                             self._entity_picture = pickup_info[2]
                         self._last_update = today.strftime('%d-%m-%Y %H:%M')
                         self._hidden = False
-
-                        self._sort_date = int(pick_update.strftime('%Y%m%d'))
-                        if self.date_only and date_diff >= 0:
-                            self._state = pick_update.strftime(self.date_format)
-                        else:
-                            if date_diff >= 8:
+                        if (update_date == 0) or (update_date > int(pick_update.strftime('%Y%m%d'))):
+                            self._sort_date = int(pick_update.strftime('%Y%m%d'))
+                            update_date = self._sort_date
+                            if self.date_only and date_diff >= 0:
                                 self._state = pick_update.strftime(self.date_format)
-                            elif date_diff > 1:
-                                self._state = pick_update.strftime('%A, ' + self.date_format)
-                                if self.dutch_days:
-                                    for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
-                                        self._state = self._state.replace(EN_day, NL_day)
-                            elif date_diff == 1:
-                                self._state = pick_update.strftime(self._tomorrow + self.date_format)
-                            elif date_diff == 0:
-                                self._state = pick_update.strftime(self._today + self.date_format)
                             else:
-                                self._state = None
+                                if date_diff >= 8:
+                                    self._state = pick_update.strftime(self.date_format)
+                                elif date_diff > 1:
+                                    self._state = pick_update.strftime('%A, ' + self.date_format)
+                                    if self.dutch_days:
+                                        for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
+                                            self._state = self._state.replace(EN_day, NL_day)
+                                elif date_diff == 1:
+                                    self._state = pick_update.strftime(self._tomorrow + self.date_format)
+                                elif date_diff == 0:
+                                    self._state = pick_update.strftime(self._today + self.date_format)
+                                else:
+                                    self._state = None
                         retrieved_data = 1
 
                 if retrieved_data == 0:
