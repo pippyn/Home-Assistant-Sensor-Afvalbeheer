@@ -30,9 +30,11 @@ Current Version: 2.5.11 20200204 - Pippijn Stortelder
 20200117 - Added an integer to attributes for date sorting
 20200204 - Fixed wrong date
 20200204 - Removed ROVA from docs, due to ROVA closing API
+20200204 - Added Alkmaar
 
 Description:
   Provides sensors for the following Dutch waste collectors;
+  - Alkmaar
   - AlphenAanDenRijn
   - Avalex
   - Berkelland
@@ -129,6 +131,7 @@ ATTR_HIDDEN = 'Hidden'
 ATTR_SORT_DATE = 'Sort-date'
 
 COLLECTOR_URL = {
+    'alkmaar': 'https://inzamelkalender.stadswerk072.nl/',
     'alphenaandenrijn': 'https://afvalkalender.alphenaandenrijn.nl',
     'avalex': 'https://www.avalex.nl',
     'berkelland': 'https://afvalkalender.gemeenteberkelland.nl',
