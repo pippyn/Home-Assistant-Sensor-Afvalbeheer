@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.5.10 20200204 - Pippijn Stortelder
+Current Version: 2.5.11 20200204 - Pippijn Stortelder
 20200108 - Added waste collector Purmerend
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
@@ -29,6 +29,7 @@ Current Version: 2.5.10 20200204 - Pippijn Stortelder
 20200115 - Changed municipality of Montfoort url to Cyclus
 20200117 - Added an integer to attributes for date sorting
 20200204 - Fixed wrong date
+20200204 - Removed ROVA from docs, due to ROVA closing API
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -53,7 +54,6 @@ Description:
   - Venray
   - Waalre
   - ZRD
-  - ROVA
 
 Save this file as [homeassistant]/config/custom_components/afvalbeheer/sensor.py
 
