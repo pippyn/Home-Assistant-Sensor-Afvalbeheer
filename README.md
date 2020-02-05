@@ -35,6 +35,7 @@ Example config:
 wastecollector:
 ```
 Choose your collector from this list:
+  - Alkmaar
   - AlphenAanDenRijn
   - Avalex
   - Berkelland
