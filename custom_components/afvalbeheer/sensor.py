@@ -160,6 +160,12 @@ COLLECTOR_URL = {
     'rova': 'https://inzamelkalender.rova.nl',
 }
 
+COLLECTOR_NEW_API = [ß
+    "cure",
+    "mijnafvalwijzer",
+    "afvalstoffendienstkalender"
+]
+
 RENAME_TITLES = {
     'duobak': 'duobak',
     'gft gratis': 'gft gratis',
@@ -233,9 +239,6 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     disable_icons = config.get(CONF_DISABLE_ICONS)
     dutch_days = config.get(CONF_TRANSLATE_DAYS)    
 
-    if waste_collector == "cure":
-        waste_collector = "mijnafvalwijzer"
-
     try:
         data = WasteData(postcode, street_number, suffix, waste_collector)
     except requests.exceptions.HTTPError as error:
@@ -263,7 +266,7 @@ class WasteData(object):
         self.street_number = street_number
         self.suffix = suffix
         self.waste_collector = waste_collector
-        if not self.waste_collector == "mijnafvalwijzer":
+        if not self.waste_collector in COLLECTOR_NEW_API:
             self.main_url = COLLECTOR_URL[self.waste_collector]
         else: 
             self.main_url = ""
@@ -271,9 +274,9 @@ class WasteData(object):
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
-        if self.waste_collector == "mijnafvalwijzer":
+        if self.waste_collector in COLLECTOR_NEW_API:
             fraction_id = 0
-            jsonUrl = 'https://json.{}.nl/?method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&langs=nl'.format("mijnafvalwijzer", self.postcode, self.street_number, self.suffix)
+            jsonUrl = 'https://json.{}.nl/?method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&langs=nl'.format(self.waste_collector, self.postcode, self.street_number, self.suffix)
             jsonResponse = requests.get(jsonUrl).json()
             request_json = (jsonResponse['data']['ophaaldagen']['data'] + jsonResponse['data']['ophaaldagenNext']['data'])
             if not request_json:
@@ -305,7 +308,6 @@ class WasteData(object):
                         COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(fraction_id))
 
                 self.data = sensor_dict
-                _LOGGER.error(self.data)
         else:
             try:
                 url = self.main_url + '/rest/adressen/' + self.postcode + '-' + self.street_number
@@ -350,7 +352,6 @@ class WasteData(object):
                                 COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(key['id']))
 
                         self.data = sensor_dict
-                        # _LOGGER.error(self.data)
 
             except requests.exceptions.RequestException as exc:
                 _LOGGER.error('Error occurred while fetching data: %r', exc)
@@ -430,7 +431,7 @@ class WasteSensor(Entity):
                         self._fraction_id = waste_id
                         if self.built_in_icons and self.sensor_type in FRACTION_ICONS:
                             self._entity_picture = FRACTION_ICONS[self.sensor_type]
-                        elif self.disable_icons == 0 and not self.waste_collector == "mijnafvalwijzer":
+                        elif self.disable_icons == 0 and not self.waste_collector in COLLECTOR_NEW_API:
                             self._entity_picture = pickup_info[2]
                         self._last_update = today.strftime('%d-%m-%Y %H:%M')
                         self._hidden = False
