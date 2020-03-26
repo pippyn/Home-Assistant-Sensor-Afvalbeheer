@@ -116,6 +116,7 @@ MIN_TIME_BETWEEN_UPDATES = timedelta(hours=1)
 CONF_WASTE_COLLECTOR = 'wastecollector'
 CONF_POSTCODE = 'postcode'
 CONF_STREET_NUMBER = 'streetnumber'
+CONF_SUFFIX = 'suffix'
 CONF_DATE_FORMAT = 'dateformat'
 CONF_TODAY_TOMORROW = 'upcomingsensor'
 CONF_DATE_ONLY = 'dateonly'
@@ -203,6 +204,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_RESOURCES, default=[]): cv.ensure_list,
     vol.Required(CONF_POSTCODE, default='1111AA'): cv.string,
     vol.Required(CONF_STREET_NUMBER, default='1'): cv.string,
+    vol.Optional(CONF_SUFFIX, default=''): cv.string,
     vol.Optional(CONF_WASTE_COLLECTOR, default='Cure'): cv.string,
     vol.Optional(CONF_DATE_FORMAT, default='%d-%m-%Y'): cv.string,
     vol.Optional(CONF_TODAY_TOMORROW, default=False): cv.boolean,
@@ -220,6 +222,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     postcode = config.get(CONF_POSTCODE)
     street_number = config.get(CONF_STREET_NUMBER)
+    suffix = config.get(CONF_SUFFIX)
     waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
     date_format = config.get(CONF_DATE_FORMAT)
     sensor_today = config.get(CONF_TODAY_TOMORROW)
@@ -228,10 +231,13 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     name_prefix = config.get(CONF_NAME_PREFIX)
     built_in_icons = config.get(CONF_BUILT_IN_ICONS)
     disable_icons = config.get(CONF_DISABLE_ICONS)
-    dutch_days = config.get(CONF_TRANSLATE_DAYS)
+    dutch_days = config.get(CONF_TRANSLATE_DAYS)    
+
+    if waste_collector == "cure":
+        waste_collector = "mijnafvalwijzer"
 
     try:
-        data = WasteData(postcode, street_number, waste_collector)
+        data = WasteData(postcode, street_number, suffix, waste_collector)
     except requests.exceptions.HTTPError as error:
         _LOGGER.error(error)
         return False
@@ -251,64 +257,104 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
 class WasteData(object):
 
-    def __init__(self, postcode, street_number, waste_collector):
+    def __init__(self, postcode, street_number, suffix, waste_collector):
         self.data = None
         self.postcode = postcode
         self.street_number = street_number
+        self.suffix = suffix
         self.waste_collector = waste_collector
-        self.main_url = COLLECTOR_URL[self.waste_collector]
+        if not self.waste_collector == "mijnafvalwijzer":
+            self.main_url = COLLECTOR_URL[self.waste_collector]
+        else: 
+            self.main_url = ""
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
-
-        try:
-            url = self.main_url + '/rest/adressen/' + self.postcode + '-' + self.street_number
-            response = requests.get(url).json()
-
-            if not response:
-                _LOGGER.error('Address not found!')
+        if self.waste_collector == "mijnafvalwijzer":
+            fraction_id = 0
+            jsonUrl = 'https://json.{}.nl/?method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&langs=nl'.format("mijnafvalwijzer", self.postcode, self.street_number, self.suffix)
+            jsonResponse = requests.get(jsonUrl).json()
+            request_json = (jsonResponse['data']['ophaaldagen']['data'] + jsonResponse['data']['ophaaldagenNext']['data'])
+            if not request_json:
+                _LOGGER.error('No Waste data found!')
             else:
-                address_code = response[0]['bagId']
-                url = self.main_url + '/rest/adressen/' + address_code + '/afvalstromen'
-                request_json = requests.get(url).json()
-                if not request_json:
-                    _LOGGER.error('No Waste data found!')
+                COLLECTOR_WASTE_ID[self.waste_collector] = {}
+                sensor_dict = {}
+
+                for key in request_json:
+                    fraction_id += 1
+                    if key['date'] is not None and (key['date'] - datetime.today()) >= 0:
+                        sensor_dict[str(fraction_id)] = [datetime.strptime(key['date'], '%Y-%m-%d'), key['type']]
+
+                    check_title = key['type'].lower()
+                    title = ''
+
+                    for dict_title in RENAME_TITLES:
+                        if dict_title in check_title:
+                            title = RENAME_TITLES[dict_title]
+                            break
+
+                    if not title:
+                        title = check_title
+
+                    if title not in COLLECTOR_WASTE_ID[self.waste_collector]:
+                        COLLECTOR_WASTE_ID[self.waste_collector][title] = [str(fraction_id)]
+                    else:
+                        COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(fraction_id))
+
+                self.data = sensor_dict
+                _LOGGER.error(self.data)
+        else:
+            try:
+                url = self.main_url + '/rest/adressen/' + self.postcode + '-' + self.street_number
+                response = requests.get(url).json()
+
+                if not response:
+                    _LOGGER.error('Address not found!')
                 else:
-                    COLLECTOR_WASTE_ID[self.waste_collector] = {}
-                    sensor_dict = {}
+                    address_code = response[0]['bagId']
+                    url = self.main_url + '/rest/adressen/' + address_code + '/afvalstromen'
+                    request_json = requests.get(url).json()
 
-                    for key in request_json:
-                        if key['ophaaldatum'] is not None:
-                            sensor_dict[str(key['id'])] = [datetime.strptime(key['ophaaldatum'], '%Y-%m-%d'), key['title'], key['icon_data']]
+                    if not request_json:
+                        _LOGGER.error('No Waste data found!')
+                    else:
+                        COLLECTOR_WASTE_ID[self.waste_collector] = {}
+                        sensor_dict = {}
 
-                        check_title = key['menu_title']
-                        title = ''
+                        for key in request_json:
+                            if key['ophaaldatum'] is not None:
+                                sensor_dict[str(key['id'])] = [datetime.strptime(key['ophaaldatum'], '%Y-%m-%d'), key['title'], key['icon_data']]
 
-                        if not check_title:
-                            check_title = key['title'].lower()
-                        else:
-                            check_title = check_title.lower()
+                            check_title = key['menu_title']
+                            title = ''
 
-                        for dict_title in RENAME_TITLES:
-                            if dict_title in check_title:
-                                title = RENAME_TITLES[dict_title]
-                                break
+                            if not check_title:
+                                check_title = key['title'].lower()
+                            else:
+                                check_title = check_title.lower()
 
-                        if not title:
-                            title = check_title
+                            for dict_title in RENAME_TITLES:
+                                if dict_title in check_title:
+                                    title = RENAME_TITLES[dict_title]
+                                    break
 
-                        if title not in COLLECTOR_WASTE_ID[self.waste_collector]:
-                            COLLECTOR_WASTE_ID[self.waste_collector][title] = [str(key['id'])]
-                        else:
-                            COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(key['id']))
+                            if not title:
+                                title = check_title
 
-                    self.data = sensor_dict
+                            if title not in COLLECTOR_WASTE_ID[self.waste_collector]:
+                                COLLECTOR_WASTE_ID[self.waste_collector][title] = [str(key['id'])]
+                            else:
+                                COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(key['id']))
 
-        except requests.exceptions.RequestException as exc:
-            _LOGGER.error('Error occurred while fetching data: %r', exc)
-            self.data = None
-            return False
+                        self.data = sensor_dict
+                        # _LOGGER.error(self.data)
+
+            except requests.exceptions.RequestException as exc:
+                _LOGGER.error('Error occurred while fetching data: %r', exc)
+                self.data = None
+                return False
 
 
 class WasteSensor(Entity):
