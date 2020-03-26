@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 2.5.13 20200326 - Pippijn Stortelder
+Current Version: 3.0.0beta 20200326 - Pippijn Stortelder
 20200108 - Added waste collector Purmerend
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
@@ -32,9 +32,11 @@ Current Version: 2.5.13 20200326 - Pippijn Stortelder
 20200204 - Removed ROVA from docs, due to ROVA closing API
 20200205 - Added Alkmaar
 20200326 - Added Suez
+20200326 - Support for mijnafvalwijzer and afvalstoffendienstkalender
 
 Description:
   Provides sensors for the following Dutch waste collectors;
+  - Afvalstoffendienstkalender
   - Alkmaar
   - AlphenAanDenRijn
   - Avalex
@@ -49,6 +51,7 @@ Description:
   - GAD
   - HVC
   - Meerlanden
+  - Mijnafvalwijzer
   - Montfoort
   - PeelEnMaas
   - Purmerend
@@ -141,7 +144,6 @@ COLLECTOR_URL = {
     'blink': 'https://mijnblink.nl',
     'circulus-berkel': 'https://afvalkalender.circulus-berkel.nl',
     'cranendonck': 'https://afvalkalender.cranendonck.nl',
-    'cure': 'https://afvalkalender.cure-afvalbeheer.nl',
     'cyclus': 'https://afvalkalender.cyclusnv.nl',
     'dar': 'https://afvalkalender.dar.nl',
     'denhaag': 'https://huisvuilkalender.denhaag.nl',
@@ -160,7 +162,7 @@ COLLECTOR_URL = {
     'rova': 'https://inzamelkalender.rova.nl',
 }
 
-COLLECTOR_NEW_API = [ß
+COLLECTOR_NEW_API = [
     "cure",
     "mijnafvalwijzer",
     "afvalstoffendienstkalender"
