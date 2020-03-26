@@ -163,7 +163,6 @@ COLLECTOR_URL = {
 }
 
 COLLECTOR_NEW_API = [
-    "cure",
     "mijnafvalwijzer",
     "afvalstoffendienstkalender"
 ]
@@ -240,6 +239,9 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     built_in_icons = config.get(CONF_BUILT_IN_ICONS)
     disable_icons = config.get(CONF_DISABLE_ICONS)
     dutch_days = config.get(CONF_TRANSLATE_DAYS)    
+
+    if waste_collector == "cure":
+        waste_collector = "mijnafvalwijzer"
 
     try:
         data = WasteData(postcode, street_number, suffix, waste_collector)
