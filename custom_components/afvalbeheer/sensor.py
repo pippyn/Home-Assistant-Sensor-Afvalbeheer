@@ -31,6 +31,7 @@ Current Version: 2.5.12 20200205 - Pippijn Stortelder
 20200204 - Fixed wrong date
 20200204 - Removed ROVA from docs, due to ROVA closing API
 20200205 - Added Alkmaar
+20200326 - Added Suez
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -53,6 +54,7 @@ Description:
   - Purmerend
   - RMN
   - Spaarnelanden
+  - Suez
   - Venray
   - Waalre
   - ZRD
@@ -150,6 +152,7 @@ COLLECTOR_URL = {
     'purmerend': 'https://afvalkalender.purmerend.nl',
     'rmn': 'https://inzamelschema.rmn.nl',
     'spaarnelanden': 'https://afvalwijzer.spaarnelanden.nl',
+    'suez': 'https://inzamelwijzer.suez.nl',
     'venray': 'https://afvalkalender.venray.nl',
     'waalre': 'https://afvalkalender.waalre.nl',
     'zrd': 'https://afvalkalender.zrd.nl',
