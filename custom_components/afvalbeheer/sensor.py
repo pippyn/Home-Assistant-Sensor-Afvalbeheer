@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 3.0.0beta 20200326 - Pippijn Stortelder
+Current Version: 3.0.1beta 20200327 - Pippijn Stortelder
 20200108 - Added waste collector Purmerend
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
@@ -33,6 +33,7 @@ Current Version: 3.0.0beta 20200326 - Pippijn Stortelder
 20200205 - Added Alkmaar
 20200326 - Added Suez
 20200326 - Support for mijnafvalwijzer and afvalstoffendienstkalender
+20200327 - Beta fix
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -283,6 +284,7 @@ class WasteData(object):
             jsonUrl = 'https://json.{}.nl/?method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&langs=nl'.format(self.waste_collector, self.postcode, self.street_number, self.suffix)
             jsonResponse = requests.get(jsonUrl).json()
             request_json = (jsonResponse['data']['ophaaldagen']['data'] + jsonResponse['data']['ophaaldagenNext']['data'])
+            _LOGGER.error(jsonResponse['data'])
             if not request_json:
                 _LOGGER.error('No Waste data found!')
             else:
@@ -291,7 +293,7 @@ class WasteData(object):
 
                 for key in request_json:
                     fraction_id += 1
-                    if key['date'] is not None and (datetime.strptime(key['date'], '%Y-%m-%d') - datetime.today()).days >= 0:
+                    if key['date'] is not None and ((datetime.strptime(key['date'], '%Y-%m-%d') - datetime.today()).days + 1) >= 0:
                         sensor_dict[str(fraction_id)] = [datetime.strptime(key['date'], '%Y-%m-%d'), key['type']]
                     else:
                         continue
