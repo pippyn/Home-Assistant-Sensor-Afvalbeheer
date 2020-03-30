@@ -37,7 +37,7 @@ Example config:
 wastecollector:
 ```
 Choose your collector from this list:
-  - Avalstoffendienstkalender
+  - Afvalstoffendienstkalender
   - Alkmaar
   - AlphenAanDenRijn
   - Avalex
