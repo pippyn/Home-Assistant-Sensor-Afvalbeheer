@@ -34,6 +34,7 @@ Current Version: 3.0.1beta 20200327 - Pippijn Stortelder
 20200326 - Added Suez
 20200326 - Support for mijnafvalwijzer and afvalstoffendienstkalender
 20200327 - Beta fix
+20200330 - Release 3.0.2
 
 Description:
   Provides sensors for the following Dutch waste collectors;
