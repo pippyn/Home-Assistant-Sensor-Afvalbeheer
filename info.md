@@ -4,6 +4,10 @@
 Provides Home Assistant sensors for multiple Dutch waste collectors using REST API.
 This sensor works with the following waste collectors: Blink, Suez, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, Montfoort, GAD, Cranendonck and Alkmaar.
 
+
+**Starting from version 3.0.0 this sensor now also supports MijnAfvalwijzer and Avalstoffendienstkalender**
+
+
 ![alt text](https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/example.png)
 
 ### Example config:
