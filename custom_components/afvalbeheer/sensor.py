@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 3.0.2 20200330 - Pippijn Stortelder
+Current Version: 3.0.3 20200401 - Pippijn Stortelder
 20200108 - Added waste collector Purmerend
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
@@ -35,6 +35,7 @@ Current Version: 3.0.2 20200330 - Pippijn Stortelder
 20200326 - Support for mijnafvalwijzer and afvalstoffendienstkalender
 20200327 - Beta fix
 20200330 - Release 3.0.2
+20200401 - Add warning for Cure users
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -243,6 +244,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     dutch_days = config.get(CONF_TRANSLATE_DAYS)    
 
     if waste_collector == "cure":
+        _LOGGER.error("Afvalbeheer - Update your config to use Mijnafvalwijzer! You are still using Cure as a wast collector, which is deprecated. It's from now on; Mijnafvalwijzer. Check your automations and lovelace config, as the sensor names may also be changed!")
         waste_collector = "mijnafvalwijzer"
 
     try:
@@ -285,7 +287,6 @@ class WasteData(object):
             jsonUrl = 'https://json.{}.nl/?method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&langs=nl'.format(self.waste_collector, self.postcode, self.street_number, self.suffix)
             jsonResponse = requests.get(jsonUrl).json()
             request_json = (jsonResponse['data']['ophaaldagen']['data'] + jsonResponse['data']['ophaaldagenNext']['data'])
-            _LOGGER.error(jsonResponse['data'])
             if not request_json:
                 _LOGGER.error('No Waste data found!')
             else:
