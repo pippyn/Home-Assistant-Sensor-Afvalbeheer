@@ -247,6 +247,9 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     if waste_collector == "cure":
         _LOGGER.error("Afvalbeheer - Update your config to use Mijnafvalwijzer! You are still using Cure as a wast collector, which is deprecated. It's from now on; Mijnafvalwijzer. Check your automations and lovelace config, as the sensor names may also be changed!")
         waste_collector = "mijnafvalwijzer"
+    elif waste_collector == "meerlanden":
+        _LOGGER.error("Meerlanden - Update your config to use Ximmio! You are still using Meerlanden as a wast collector, which is deprecated. It's from now on; Ximmio. Check your automations and lovelace config, as the sensor names may also be changed!")
+        waste_collector = "ximmio"
 
     try:
         data = WasteData(waste_collector, postcode, street_number, suffix)
