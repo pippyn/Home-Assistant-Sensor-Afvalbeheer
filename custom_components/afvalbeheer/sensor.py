@@ -414,14 +414,15 @@ class XimmioCollector(WasteCollector):
     def __init__(self, waste_collector, postcode, street_number, suffix):
         super(XimmioCollector, self).__init__(waste_collector, postcode, street_number, suffix)
         self.main_url = "https://wasteprod2api.ximmio.com"
+        self.company_code = "800bf8d7-6dd1-4490-ba9d-b419d6dc8a45"
         self.address_id = None
-        self.__fetch_address(self.postcode, self.street_number)
+        self.__fetch_address()
 
-    def __fetch_address(self, postcode, street_number):
+    def __fetch_address(self):
         data = {
-            "postCode": postcode,
-            "houseNumber": street_number,
-            "companyCode": "800bf8d7-6dd1-4490-ba9d-b419d6dc8a45"
+            "postCode": self.postcode,
+            "houseNumber": self.street_number,
+            "companyCode": self.company_code
         }
         response = requests.post(
             "{}/api/FetchAdress".format(self.main_url),
@@ -441,7 +442,7 @@ class XimmioCollector(WasteCollector):
                 "uniqueAddressID": self.address_id,
                 "startDate": datetime.now().strftime('%Y-%m-%d'),
                 "endDate": (datetime.now() + timedelta(days=365)).strftime('%Y-%m-%d'),
-                "companyCode": "800bf8d7-6dd1-4490-ba9d-b419d6dc8a45",
+                "companyCode": self.company_code,
             }
             response = requests.post(
                 "{}/api/GetCalendar".format(self.main_url),
