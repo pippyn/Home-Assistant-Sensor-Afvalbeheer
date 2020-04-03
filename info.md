@@ -7,6 +7,10 @@ This sensor works with the following waste collectors: Blink, Suez, Cyclus, DAR,
 
 **Starting from version 3.0.0 this sensor now also supports MijnAfvalwijzer and Afvalstoffendienstkalender**
 
+Cure users should switch to the waste collector MijnAfvalwijzer
+
+Meerlanden users should switch to the waste collector Ximmio
+
 
 ![alt text](https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/example.png)
 
