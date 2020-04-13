@@ -564,7 +564,7 @@ class WasteSensor(Entity):
                         self._fraction_id = waste_id
                         if not self.disable_icons and self.built_in_icons and self.sensor_type in FRACTION_ICONS:
                             self._entity_picture = FRACTION_ICONS[self.sensor_type]
-                        elif not self.disable_icons and 0 <= 2 < len(pickup_info):
+                        elif not self.disable_icons and len(pickup_info) > 2:
                             self._entity_picture = pickup_info[2]
                         self._last_update = today.strftime('%d-%m-%Y %H:%M')
                         self._hidden = False
