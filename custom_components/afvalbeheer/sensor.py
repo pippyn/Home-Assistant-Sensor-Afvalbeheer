@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
 Original Author: Pippijn Stortelder
-Current Version: 3.1.0 20200413 - Pippijn Stortelder
+Current Version: 3.1.1 20200414 - Pippijn Stortelder
 20200108 - Added waste collector Purmerend
 20190116 - Merged different waste collectors into 1 component
 20190119 - Added an option to change date format and fixed spelling mistakes
@@ -38,6 +38,7 @@ Current Version: 3.1.0 20200413 - Pippijn Stortelder
 20200401 - Add warning for Cure users
 20200403 - Add ximmio waste collector (credits to https://github.com/basschipper)
 20200413 - Add Ophaalkalender waste collector
+20200414 - Add support for state as dateobject
 
 Description:
   Provides sensors for the following Dutch waste collectors;
@@ -116,7 +117,7 @@ import voluptuous as vol
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 import homeassistant.helpers.config_validation as cv
-from homeassistant.const import (CONF_RESOURCES)
+from homeassistant.const import (CONF_RESOURCES, DEVICE_CLASS_TIMESTAMP)
 from homeassistant.util import Throttle
 from homeassistant.helpers.entity import Entity
 
@@ -131,6 +132,7 @@ CONF_SUFFIX = 'suffix'
 CONF_DATE_FORMAT = 'dateformat'
 CONF_TODAY_TOMORROW = 'upcomingsensor'
 CONF_DATE_ONLY = 'dateonly'
+CONF_DATE_OBJECT = 'dateobject'
 CONF_NAME = 'name'
 CONF_NAME_PREFIX = 'nameprefix'
 CONF_BUILT_IN_ICONS = 'builtinicons'
@@ -230,6 +232,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_DATE_FORMAT, default='%d-%m-%Y'): cv.string,
     vol.Optional(CONF_TODAY_TOMORROW, default=False): cv.boolean,
     vol.Optional(CONF_DATE_ONLY, default=False): cv.boolean,
+    vol.Optional(CONF_DATE_OBJECT, default=False): cv.boolean,
     vol.Optional(CONF_NAME, default=''): cv.string,
     vol.Optional(CONF_NAME_PREFIX, default=True): cv.boolean,
     vol.Optional(CONF_BUILT_IN_ICONS, default=False): cv.boolean,
@@ -248,12 +251,17 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
     date_format = config.get(CONF_DATE_FORMAT)
     sensor_today = config.get(CONF_TODAY_TOMORROW)
-    date_only = config.get(CONF_DATE_ONLY)
+    date_object = config.get(CONF_DATE_OBJECT)
     name = config.get(CONF_NAME)
     name_prefix = config.get(CONF_NAME_PREFIX)
     built_in_icons = config.get(CONF_BUILT_IN_ICONS)
     disable_icons = config.get(CONF_DISABLE_ICONS)
     dutch_days = config.get(CONF_TRANSLATE_DAYS)
+    
+    if date_object == True:
+        date_only = 1
+    else:
+        date_only = config.get(CONF_DATE_ONLY)
 
     if waste_collector == "cure":
         _LOGGER.error("Afvalbeheer - Update your config to use Mijnafvalwijzer! You are still using Cure as a wast collector, which is deprecated. It's from now on; Mijnafvalwijzer. Check your automations and lovelace config, as the sensor names may also be changed!")
@@ -272,7 +280,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     for resource in config[CONF_RESOURCES]:
         sensor_type = resource.lower()
-        entities.append(WasteSensor(data, sensor_type, waste_collector, date_format, date_only, name, name_prefix, built_in_icons, disable_icons, dutch_days))
+        entities.append(WasteSensor(data, sensor_type, waste_collector, date_format, date_only, date_object, name, name_prefix, built_in_icons, disable_icons, dutch_days))
 
     if sensor_today:
         entities.append(WasteTodaySensor(data, config[CONF_RESOURCES], waste_collector, "vandaag", dutch_days, name, name_prefix))
@@ -550,12 +558,13 @@ class XimmioCollector(WasteCollector):
 
 class WasteSensor(Entity):
 
-    def __init__(self, data, sensor_type, waste_collector, date_format, date_only, name, name_prefix, built_in_icons, disable_icons, dutch_days):
+    def __init__(self, data, sensor_type, waste_collector, date_format, date_only, date_object, name, name_prefix, built_in_icons, disable_icons, dutch_days):
         self.data = data
         self.sensor_type = sensor_type
         self.waste_collector = waste_collector
         self.date_format = date_format
         self.date_only = date_only
+        self.date_object = date_object
         self._name = _format_sensor(name, name_prefix, waste_collector, self.sensor_type)
         self.built_in_icons = built_in_icons
         self.disable_icons = disable_icons
@@ -597,6 +606,10 @@ class WasteSensor(Entity):
             ATTR_HIDDEN: self._hidden,
             ATTR_SORT_DATE: self._sort_date
         }
+    @property
+    def device_class(self):
+        if self.date_object == True:
+            return DEVICE_CLASS_TIMESTAMP
 
     @property
     def unit_of_measurement(self):
@@ -628,7 +641,9 @@ class WasteSensor(Entity):
                         if (update_date == 0) or (update_date > int(pick_update.strftime('%Y%m%d'))):
                             self._sort_date = int(pick_update.strftime('%Y%m%d'))
                             update_date = self._sort_date
-                            if self.date_only and date_diff >= 0:
+                            if self.date_object:
+                                self._state = pick_update
+                            elif self.date_only and date_diff >= 0:
                                 self._state = pick_update.strftime(self.date_format)
                             else:
                                 if date_diff >= 8:
