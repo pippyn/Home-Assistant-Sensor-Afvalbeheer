@@ -27,6 +27,7 @@ Example config:
         - papier
         - pmd
       postcode: 1111AA                 (required)
+      streetname: Abcd                 (required)
       streetnumber: 1                  (required)
       upcomingsensor: 0                (optional)
       dateformat: '%d-%m-%Y'           (optional)
