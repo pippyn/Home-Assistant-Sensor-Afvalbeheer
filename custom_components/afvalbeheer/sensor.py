@@ -139,14 +139,11 @@ CONF_BUILT_IN_ICONS = 'builtinicons'
 CONF_DISABLE_ICONS = 'disableicons'
 CONF_TRANSLATE_DAYS = 'dutch'
 
-ATTR_OFFICIAL_NAME = 'Official name'
 ATTR_WASTE_COLLECTOR = 'Wastecollector'
-ATTR_FRACTION_ID = 'ID'
-ATTR_LAST_UPDATE = 'Last update'
 ATTR_HIDDEN = 'Hidden'
 ATTR_SORT_DATE = 'Sort-date'
 
-COLLECTOR_URL = {
+OPZET_COLLECTOR_URLS = {
     'alkmaar': 'https://inzamelkalender.stadswerk072.nl/',
     'alphenaandenrijn': 'https://afvalkalender.alphenaandenrijn.nl',
     'avalex': 'https://www.avalex.nl',
@@ -172,33 +169,18 @@ COLLECTOR_URL = {
     'rova': 'https://inzamelkalender.rova.nl',
 }
 
-RENAME_TITLES = {
-    'duobak': 'duobak',
-    'gft gratis': 'gft gratis',
-    'groente': 'gft',
-    'gft': 'gft',
-    'papier': 'papier',
-    'rest': 'restafval',
-    'blik': 'pbd',
-    'plastic': 'pmd',
-    'sloop': 'sloopafval',
-    'klein chemisch afval': 'kca',
-    'kca': 'kca',
-    'pmd': 'pmd',
-    'textiel': 'textiel',
-    'kerstbo': 'kerstbomen',
-    'snoeiafval': 'snoeiafval',
-    'green': 'gft',
-    'textile': 'textiel',
-    'grey': 'restafval',
-    'branches': 'snoeiafval',
-    'tuinafval': 'gft',
-    'p-k': 'papier',
-    'rest': 'restafval',
-    'grof huisvuil': 'grofafval',
-    'grof huisvuil afroep': 'grofafval',
-    'gemengde plastics': 'plastic'
-}
+WASTE_TYPE_BRANCHES = 'takken'
+WASTE_TYPE_BULKLITTER = 'grofvuil'
+WASTE_TYPE_GLASS = 'glas'
+WASTE_TYPE_GREEN = 'gft'
+WASTE_TYPE_GREENGREY = 'duobak'
+WASTE_TYPE_GREY = 'restafval'
+WASTE_TYPE_KCA = 'chemisch'
+WASTE_TYPE_PACKAGES = 'pmd'
+WASTE_TYPE_PAPER = 'papier'
+WASTE_TYPE_TEXTILE = 'textiel'
+WASTE_TYPE_TREE = 'kerstbomen'
+WASTE_TYPE_BULKYGARDENWASTE = 'tuinafval'
 
 FRACTION_ICONS = {
     'gft': 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8IS0tIENyZWF0b3I6IENvcmVsRFJBVyBYNiAtLT4NCjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWw6c3BhY2U9InByZXNlcnZlIiB3aWR0aD0iNS4zMzMzM2luIiBoZWlnaHQ9IjUuMzMzMzNpbiIgdmVyc2lvbj0iMS4xIiBzdHlsZT0ic2hhcGUtcmVuZGVyaW5nOmdlb21ldHJpY1ByZWNpc2lvbjsgdGV4dC1yZW5kZXJpbmc6Z2VvbWV0cmljUHJlY2lzaW9uOyBpbWFnZS1yZW5kZXJpbmc6b3B0aW1pemVRdWFsaXR5OyBmaWxsLXJ1bGU6ZXZlbm9kZDsgY2xpcC1ydWxlOmV2ZW5vZGQiDQp2aWV3Qm94PSIwIDAgNTMzMyA1MzMzIg0KIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiA8ZGVmcz4NCiAgPHN0eWxlIHR5cGU9InRleHQvY3NzIj4NCiAgIDwhW0NEQVRBWw0KICAgIC5zdHIwIHtzdHJva2U6IzIzMUYyMDtzdHJva2Utd2lkdGg6MTExLjExfQ0KICAgIC5maWwwIHtmaWxsOm5vbmU7ZmlsbC1ydWxlOm5vbnplcm99DQogICBdXT4NCiAgPC9zdHlsZT4NCiA8L2RlZnM+DQogPGcgaWQ9IkxheWVyX3gwMDIwXzEiPg0KICA8bWV0YWRhdGEgaWQ9IkNvcmVsQ29ycElEXzBDb3JlbC1MYXllciIvPg0KICA8cGF0aCBjbGFzcz0iZmlsMCBzdHIwIiBkPSJNNTI3NSAyNjY1YzAsMTQ0MSAtMTE2OCwyNjEwIC0yNjEwLDI2MTAgLTE0NDEsMCAtMjYxMCwtMTE2OCAtMjYxMCwtMjYxMCAwLC0xNDQxIDExNjgsLTI2MTAgMjYxMCwtMjYxMCAxNDQxLDAgMjYxMCwxMTY4IDI2MTAsMjYxMHptMCAweiIvPg0KICA8cGF0aCBjbGFzcz0iZmlsMCBzdHIwIiBkPSJNMzEwOSAyMjQ4YzAsMCAtNTEzLDQzNyAtMTg2LDEwOTMgMTA3LDIxMyAxOTUsMzQ0IDI2NSw0MjQiLz4NCiAgPHBhdGggY2xhc3M9ImZpbDAgc3RyMCIgZD0iTTE5NzggMzY1MGM4NDMsLTcyOCAtNTksLTE2MzEgLTU5LC0xNjMxIi8+DQogIDxwYXRoIGNsYXNzPSJmaWwwIHN0cjAiIGQ9Ik0yMzY3IDIxNjBjMCwwIDMyNyw4NjMgLTg3LDE1MTkiLz4NCiAgPHBhdGggY2xhc3M9ImZpbDAgc3RyMCIgZD0iTTI5NTQgMzc1MWMtMTU5LC0xNzMgLTUzMiwtNjI5IC00MDEsLTk2OCA3NSwtMTk1IDI4NCwtNDM0IDQwMiwtNTY0Ii8+DQogIDxwYXRoIGNsYXNzPSJmaWwwIHN0cjAiIGQ9Ik0yOTk1IDIxNzFjLTE1MCwtODIgLTQwNSwtMTYxIC03MDYsMzAgLTExLDAgLTY4OSwtMzcwIC05NDAsLTE5NiAtMjUxLDE3NCAxNzUsLTE5NiAxNzUsLTE5NiAwLDAgNjgxLC00NjYgMTIxNCwtMzkgNyw2IDE0LDEyIDIxLDE4IDExLDAgNjU2LC01MTIgMTE2OSwyMiAtMTEsMCAtNzMyLDY1IC03ODcsNDU3IC00LDQgLTU3LC00NiAtMTQ3LC05NnoiLz4NCiAgPHBhdGggY2xhc3M9ImZpbDAgc3RyMCIgZD0iTTE1NjkgMzgxMmMxMzEsMTIwIDQyNiw1NDQgMTAyNyw3NiAwLDAgNDkyLDQ0NiAxMDM4LDEzMCAtMTEsMCAyOTUsLTc2IDQwNCwtNDM1IC03NywzMyAtMjQwLDI1MCAtNjAxLDEyMCAwLDAgLTQwNCwyNjEgLTcyMSwtMTA5IDAsLTIyIC00OTIsMTc0IC02OTksMCAwLC0xMSAtMzE3LDIzOSAtNTc5LC00MyAwLDAgMCwxNDEgMTMxLDI2MXptMCAweiIvPg0KICA8cGF0aCBjbGFzcz0iZmlsMCBzdHIwIiBkPSJNMzQ3MCAxMDk4YzAsMCAtNzA5LDE0MiAtNjk4LDYzMyAtMTEsMCAtMjI5LC0yNzMgNjExLC04MjlsODcgMTk2em0wIDB6Ii8+DQogPC9nPg0KPC9zdmc+DQo=',
@@ -219,8 +201,6 @@ DUTCH_TRANSLATION_DAYS = {
     'Saturday': 'Zaterdag',
     'Sunday': 'Zondag'
 }
-
-COLLECTOR_WASTE_ID = {}
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_RESOURCES, default=[]): cv.ensure_list,
@@ -257,7 +237,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     built_in_icons = config.get(CONF_BUILT_IN_ICONS)
     disable_icons = config.get(CONF_DISABLE_ICONS)
     dutch_days = config.get(CONF_TRANSLATE_DAYS)
-    
+
     if date_object == True:
         date_only = 1
     else:
@@ -279,14 +259,50 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     entities = []
 
     for resource in config[CONF_RESOURCES]:
-        sensor_type = resource.lower()
-        entities.append(WasteSensor(data, sensor_type, waste_collector, date_format, date_only, date_object, name, name_prefix, built_in_icons, disable_icons, dutch_days))
+        waste_type = resource.lower()
+        entities.append(WasteTypeSensor(data, waste_type, waste_collector, date_format, date_only, date_object, name, name_prefix, built_in_icons, disable_icons, dutch_days))
 
     if sensor_today:
-        entities.append(WasteTodaySensor(data, config[CONF_RESOURCES], waste_collector, "vandaag", dutch_days, name, name_prefix))
-        entities.append(WasteTodaySensor(data, config[CONF_RESOURCES], waste_collector, "morgen", dutch_days, name, name_prefix))
+        entities.append(WasteDateSensor(data, config[CONF_RESOURCES], waste_collector, timedelta(), dutch_days, name, name_prefix))
+        entities.append(WasteDateSensor(data, config[CONF_RESOURCES], waste_collector, timedelta(days=1), dutch_days, name, name_prefix))
 
     add_entities(entities)
+
+
+class WasteCollectionRepository(object):
+
+    def __init__(self):
+        self.collections = []
+
+    def add(self, collection):
+        self.collections.append(collection)
+
+    def remove_all(self):
+        self.collections = []
+
+    def get_sorted(self):
+        return sorted(self.collections, key=lambda x: x.date)
+
+    def get_next_by_type(self, waste_type):
+        today = datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)
+        for collection in self.get_sorted():
+            if collection.date >= today:
+                return collection
+        return None
+
+    def get_by_date(self, date, waste_types=None):
+        if waste_types:
+            return filter(lambda x: x.date.date() == date.date() and x.waste_type in waste_types, self.get_sorted())
+        else:
+            return filter(lambda x: x.date.date() == date.date(), self.get_sorted())
+
+
+class WasteCollection(object):
+
+    def __init__(self):
+        self.date = None
+        self.waste_type = None
+        self.icon_data = None
 
 
 class WasteData(object):
@@ -307,18 +323,18 @@ class WasteData(object):
             self.collector = AfvalwijzerCollector(self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "ophaalkalender":
             self.collector = OphaalkalenderCollector(self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix)
-        elif self.waste_collector in COLLECTOR_URL.keys():
+        elif self.waste_collector in OPZET_COLLECTOR_URLS.keys():
             self.collector = OpzetCollector(self.waste_collector, self.postcode, self.street_number, self.suffix)
         else:
             _LOGGER.error("Waste collector not found!")
 
-    # @Throttle(MIN_TIME_BETWEEN_UPDATES)
+    @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
         self.collector.update()
 
     @property
-    def data(self):
-        return self.collector.data
+    def collections(self):
+        return self.collector.collections
 
 
 class WasteCollector(metaclass=abc.ABCMeta):
@@ -328,155 +344,212 @@ class WasteCollector(metaclass=abc.ABCMeta):
         self.postcode = postcode
         self.street_number = street_number
         self.suffix = suffix
-        self.data = None
+        self.collections = WasteCollectionRepository()
 
     @abc.abstractmethod
     def update(self):
         pass
 
+    def map_waste_type(self, name):
+        return self.WASTE_TYPE_MAPPING[name] if name in self.WASTE_TYPE_MAPPING else None
+
 
 class AfvalwijzerCollector(WasteCollector):
+    WASTE_TYPE_MAPPING = {
+        'takken': WASTE_TYPE_BRANCHES,
+        'grofvuil': WASTE_TYPE_BULKLITTER,
+        'tuinafval': WASTE_TYPE_BULKYGARDENWASTE,
+        'glas': WASTE_TYPE_GLASS,
+        'gft': WASTE_TYPE_GREEN,
+        'kca': WASTE_TYPE_KCA,
+        'restafval': WASTE_TYPE_GREY,
+        'plastic': WASTE_TYPE_PACKAGES,
+        'papier': WASTE_TYPE_PAPER,
+        'textiel': WASTE_TYPE_TEXTILE,
+        'kerstbomen': WASTE_TYPE_TREE,
+    }
 
     def __init__(self, waste_collector, postcode, street_number, suffix):
         super(AfvalwijzerCollector, self).__init__(waste_collector, postcode, street_number, suffix)
 
     def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
-        fraction_id = 0
-        jsonUrl = 'https://json.{}.nl/?method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&langs=nl'.format(self.waste_collector, self.postcode, self.street_number, self.suffix)
-        jsonResponse = requests.get(jsonUrl).json()
-        request_json = (jsonResponse['data']['ophaaldagen']['data'] + jsonResponse['data']['ophaaldagenNext']['data'])
-        if not request_json:
-            _LOGGER.error('No Waste data found!')
-        else:
-            COLLECTOR_WASTE_ID[self.waste_collector] = {}
-            sensor_dict = {}
-            for key in request_json:
-                fraction_id += 1
-                if key['date'] is not None and ((datetime.strptime(key['date'], '%Y-%m-%d') - datetime.today()).days + 1) >= 0:
-                    sensor_dict[str(fraction_id)] = [datetime.strptime(key['date'], '%Y-%m-%d'), key['type']]
-                else:
+
+        self.collections.remove_all()
+
+        try:
+            response = requests.get('https://json.{}.nl/?method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&langs=nl'.format(
+                self.waste_collector, self.postcode, self.street_number, self.suffix)).json()
+
+            collect_data = (response['data']['ophaaldagen']['data'] + response['data']['ophaaldagenNext']['data'])
+
+            if not collect_data:
+                _LOGGER.error('No Waste data found!')
+                return
+
+            for item in collect_data:
+                if not item['date']:
                     continue
-                check_title = key['type'].lower()
-                title = ''
-                for dict_title in RENAME_TITLES:
-                    if dict_title in check_title:
-                        title = RENAME_TITLES[dict_title]
-                        break
-                if not title:
-                    title = check_title
-                if title not in COLLECTOR_WASTE_ID[self.waste_collector]:
-                    COLLECTOR_WASTE_ID[self.waste_collector][title] = [str(fraction_id)]
-                else:
-                    COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(fraction_id))
-            self.data = sensor_dict
+
+                waste_type = self.map_waste_type(item['type'])
+                if not waste_type:
+                    continue
+
+                collection = WasteCollection()
+                collection.date = datetime.strptime(item['date'], '%Y-%m-%d')
+                collection.waste_type = waste_type
+
+                self.collections.add(collection)
+
+        except requests.exceptions.RequestException as exc:
+            _LOGGER.error('Error occurred while fetching data: %r', exc)
+            return False
 
 
 class OphaalkalenderCollector(WasteCollector):
+    WASTE_TYPE_MAPPING = {
+        # 'tak-snoeiafval': WASTE_TYPE_BRANCHES,
+        'grof huisvuil': WASTE_TYPE_BULKLITTER,
+        'grof huisvuil afroep': WASTE_TYPE_BULKLITTER,
+        # 'tak-snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
+        # 'fles-groen-glas': WASTE_TYPE_GLASS,
+        'tuinafval': WASTE_TYPE_GREEN,
+        # 'batterij': WASTE_TYPE_KCA,
+        'rest': WASTE_TYPE_GREY,
+        'gemengde plastics': WASTE_TYPE_PACKAGES,
+        'p-k': WASTE_TYPE_PAPER,
+        # 'shirt-textiel': WASTE_TYPE_TEXTILE,
+        # 'kerstboom': WASTE_TYPE_TREE,
+    }
 
     def __init__(self, waste_collector, postcode, street_name, street_number, suffix):
         super(OphaalkalenderCollector, self).__init__(waste_collector, postcode, street_number, suffix)
         self.street_name = street_name
         self.main_url = "https://www.ophaalkalender.be"
+        self.address_id = None
+        self.__fetch_address()
 
-    def update(self):
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
-        fraction_id = 0
-        url = self.main_url + '/calendar/findstreets/?query=' + self.street_name + "&zipcode=" + self.postcode
-        response = requests.get(url).json()
+    def __fetch_address(self):
+        response = requests.get('{}/calendar/findstreets/?query={}&zipcode={}'.format(
+            self.main_url, self.street_name, self.postcode)).json()
+
         if not response:
             _LOGGER.error('Address not found!')
-        else:
-            address_code = response[0]["Id"]
-            url = self.main_url +  '/api/rides?id=' + str(address_code) + '&housenumber=' + self.street_number + '&zipcode=' + self.postcode
-            request_json = requests.get(url).json()
-            if not request_json:
-                _LOGGER.error('No Waste data found!')
-            else:
-                COLLECTOR_WASTE_ID[self.waste_collector] = {}
-                sensor_dict = {}
-                for key in request_json:
-                    fraction_id += 1
-                    
-                    if key['start'] is not None and ((datetime.strptime(key['start'].split("T")[0], '%Y-%m-%d') - datetime.today()).days + 1) >= 0:
-                        sensor_dict[str(fraction_id)] = [datetime.strptime(key['start'].split("T")[0], '%Y-%m-%d'), key['title']]
-                    else:
-                        continue
-                    check_title = key['title'].lower()
-                    title = ''
-                    for dict_title in RENAME_TITLES:
-                        if dict_title in check_title:
-                            title = RENAME_TITLES[dict_title]
-                            break
-                    if not title:
-                        title = check_title
-                    if title not in COLLECTOR_WASTE_ID[self.waste_collector]:
-                        COLLECTOR_WASTE_ID[self.waste_collector][title] = [str(fraction_id)]
-                    else:
-                        COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(fraction_id))
-                self.data = sensor_dict
+            return
 
-
-class OpzetCollector(WasteCollector):
-
-    def __init__(self, waste_collector, postcode, street_number, suffix):
-        super(OpzetCollector, self).__init__(waste_collector, postcode, street_number, suffix)
-        self.main_url = COLLECTOR_URL[self.waste_collector]
+        self.address_id = str(response[0]["Id"])
 
     def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
+        self.collections.remove_all()
+
         try:
-            url = self.main_url + '/rest/adressen/' + self.postcode + '-' + self.street_number
-            response = requests.get(url).json()
+            response = requests.get('{}/api/rides?id={}&housenumber={}&zipcode={}'.format(
+                self.main_url, self.address_id, self.street_number, self.postcode)).json()
 
             if not response:
-                _LOGGER.error('Address not found!')
-            else:
-                address_code = response[0]['bagId']
-                url = self.main_url + '/rest/adressen/' + address_code + '/afvalstromen'
-                request_json = requests.get(url).json()
+                _LOGGER.error('No Waste data found!')
+                return
 
-                if not request_json:
-                    _LOGGER.error('No Waste data found!')
-                else:
-                    COLLECTOR_WASTE_ID[self.waste_collector] = {}
-                    sensor_dict = {}
+            for item in response:
+                if not item['start']:
+                    continue
 
-                    for key in request_json:
-                        if key['ophaaldatum'] is not None:
-                            sensor_dict[str(key['id'])] = [datetime.strptime(key['ophaaldatum'], '%Y-%m-%d'), key['title'], key['icon_data']]
+                waste_type = self.map_waste_type(item['type'])
+                if not waste_type:
+                    continue
 
-                        check_title = key['menu_title']
-                        title = ''
+                collection = WasteCollection()
+                collection.date = datetime.strptime(item['start'], '%Y-%m-%dT%H:%M:%S%z')
+                collection.waste_type = waste_type
 
-                        if not check_title:
-                            check_title = key['title'].lower()
-                        else:
-                            check_title = check_title.lower()
-
-                        for dict_title in RENAME_TITLES:
-                            if dict_title in check_title:
-                                title = RENAME_TITLES[dict_title]
-                                break
-
-                        if not title:
-                            title = check_title
-
-                        if title not in COLLECTOR_WASTE_ID[self.waste_collector]:
-                            COLLECTOR_WASTE_ID[self.waste_collector][title] = [str(key['id'])]
-                        else:
-                            COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(key['id']))
-
-                    self.data = sensor_dict
+                self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
-            self.data = None
+            return False
+
+
+class OpzetCollector(WasteCollector):
+    WASTE_TYPE_MAPPING = {
+        # 'tak-snoeiafval': WASTE_TYPE_BRANCHES,
+        'stoel-grof-afval': WASTE_TYPE_BULKLITTER,
+        'tak-snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
+        'fles-groen-glas': WASTE_TYPE_GLASS,
+        'appel-gft': WASTE_TYPE_GREEN,
+        'batterij': WASTE_TYPE_KCA,
+        'zak-grijs-rest': WASTE_TYPE_GREY,
+        'plastic-pak-blik': WASTE_TYPE_PACKAGES,
+        'papier': WASTE_TYPE_PAPER,
+        'shirt-textiel': WASTE_TYPE_TEXTILE,
+        'kerstboom': WASTE_TYPE_TREE,
+    }
+
+    def __init__(self, waste_collector, postcode, street_number, suffix):
+        super(OpzetCollector, self).__init__(waste_collector, postcode, street_number, suffix)
+        self.main_url = OPZET_COLLECTOR_URLS[self.waste_collector]
+        self.bag_id = None
+        self.__fetch_address()
+
+    def __fetch_address(self):
+        response = requests.get(
+            "{}/rest/adressen/{}-{}".format(self.main_url, self.postcode, self.street_number)).json()
+
+        if not response:
+            _LOGGER.error('Address not found!')
+            return
+
+        self.bag_id = response[0]['bagId']
+
+    def update(self):
+        _LOGGER.debug('Updating Waste collection dates using Rest API')
+
+        self.collections.remove_all()
+
+        try:
+            response = requests.get("{}/rest/adressen/{}/afvalstromen".format(
+                self.main_url,
+                self.bag_id)).json()
+
+            if not response:
+                _LOGGER.error('No Waste data found!')
+                return
+
+            for item in response:
+                if not item['ophaaldatum']:
+                    continue
+
+                waste_type = self.map_waste_type(item['icon'])
+                if not waste_type:
+                    continue
+
+                collection = WasteCollection()
+                collection.date = datetime.strptime(item['ophaaldatum'], '%Y-%m-%d')
+                collection.waste_type = waste_type
+                collection.icon_data = item['icon_data']
+
+                self.collections.add(collection)
+
+        except requests.exceptions.RequestException as exc:
+            _LOGGER.error('Error occurred while fetching data: %r', exc)
             return False
 
 
 class XimmioCollector(WasteCollector):
+    WASTE_TYPE_MAPPING = {
+        'BRANCHES': WASTE_TYPE_BRANCHES,
+        'BULKLITTER': WASTE_TYPE_BULKLITTER,
+        'BULKYGARDENWASTE': WASTE_TYPE_BULKYGARDENWASTE,
+        'GLASS': WASTE_TYPE_GLASS,
+        'GREEN': WASTE_TYPE_GREEN,
+        'GREY': WASTE_TYPE_GREY,
+        'KCA': WASTE_TYPE_KCA,
+        'PACKAGES': WASTE_TYPE_PACKAGES,
+        'PAPER': WASTE_TYPE_PAPER,
+        'TEXTILE': WASTE_TYPE_TEXTILE,
+        'TREE': WASTE_TYPE_TREE,
+    }
 
     def __init__(self, waste_collector, postcode, street_number, suffix):
         super(XimmioCollector, self).__init__(waste_collector, postcode, street_number, suffix)
@@ -504,6 +577,8 @@ class XimmioCollector(WasteCollector):
     def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
+        self.collections.remove_all()
+
         try:
             data = {
                 "uniqueAddressID": self.address_id,
@@ -519,53 +594,33 @@ class XimmioCollector(WasteCollector):
                 _LOGGER.error('No Waste data found!')
                 return
 
-            sensor_dict = {}
-            COLLECTOR_WASTE_ID[self.waste_collector] = {}
+            for item in response['dataList']:
+                for date in item['pickupDates']:
+                    waste_type = self.map_waste_type(item['_pickupTypeText'])
+                    if not waste_type:
+                        continue
 
-            fraction_id = 0
-            for pickup in response['dataList']:
-                for date in pickup['pickupDates']:
-                    fraction_id += 1
+                    collection = WasteCollection()
+                    collection.date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
+                    collection.waste_type = waste_type
 
-                    sensor_dict[str(fraction_id)] = [
-                        datetime.strptime(date, '%Y-%m-%dT%H:%M:%S'),
-                        pickup['_pickupTypeText']
-                    ]
-
-                    check_title = pickup['_pickupTypeText'].lower()
-                    title = ''
-
-                    for dict_title in RENAME_TITLES:
-                        if dict_title in check_title:
-                            title = RENAME_TITLES[dict_title]
-                            break
-
-                    if not title:
-                        title = check_title
-
-                    if title not in COLLECTOR_WASTE_ID[self.waste_collector]:
-                        COLLECTOR_WASTE_ID[self.waste_collector][title] = [str(fraction_id)]
-                    else:
-                        COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(fraction_id))
-
-            self.data = sensor_dict
+                    self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
-            self.data = None
             return False
 
 
-class WasteSensor(Entity):
+class WasteTypeSensor(Entity):
 
-    def __init__(self, data, sensor_type, waste_collector, date_format, date_only, date_object, name, name_prefix, built_in_icons, disable_icons, dutch_days):
+    def __init__(self, data, waste_type, waste_collector, date_format, date_only, date_object, name, name_prefix, built_in_icons, disable_icons, dutch_days):
         self.data = data
-        self.sensor_type = sensor_type
+        self.waste_type = waste_type
         self.waste_collector = waste_collector
         self.date_format = date_format
         self.date_only = date_only
         self.date_object = date_object
-        self._name = _format_sensor(name, name_prefix, waste_collector, self.sensor_type)
+        self._name = _format_sensor(name, name_prefix, waste_collector, self.waste_type)
         self.built_in_icons = built_in_icons
         self.disable_icons = disable_icons
         self.dutch_days = dutch_days
@@ -580,9 +635,6 @@ class WasteSensor(Entity):
         self._hidden = False
         self._entity_picture = None
         self._state = None
-        self._official_name = None
-        self._fraction_id = None
-        self._last_update = None
 
     @property
     def name(self):
@@ -599,13 +651,11 @@ class WasteSensor(Entity):
     @property
     def device_state_attributes(self):
         return {
-            ATTR_OFFICIAL_NAME: self._official_name,
             ATTR_WASTE_COLLECTOR: self.waste_collector,
-            ATTR_FRACTION_ID: self._fraction_id,
-            ATTR_LAST_UPDATE: self._last_update,
             ATTR_HIDDEN: self._hidden,
             ATTR_SORT_DATE: self._sort_date
         }
+
     @property
     def device_class(self):
         if self.date_object == True:
@@ -616,74 +666,62 @@ class WasteSensor(Entity):
         return self._unit
 
     def update(self):
-        self.data.update()
-        waste_data = self.data.data
-        retrieved_data = 0
-        try:
-            if waste_data is not None and self.sensor_type in COLLECTOR_WASTE_ID[self.waste_collector]:
-                update_date = 0
-                for waste_id in COLLECTOR_WASTE_ID[self.waste_collector][self.sensor_type]:
-                    if waste_id in waste_data:
-                        today = datetime.today()
-                        pickup_info = waste_data.get(waste_id)
-                        pick_update = pickup_info[0]
-                        date_diff = (pick_update - today).days + 1
+        collection = self.data.collections.get_next_by_type(self.waste_type)
+        if not collection:
+            self._state = None
+            self._hidden = True
+            return
 
-                        self._official_name = pickup_info[1]
-                        self._fraction_id = waste_id
-                        if not self.disable_icons and self.built_in_icons and self.sensor_type in FRACTION_ICONS:
-                            self._entity_picture = FRACTION_ICONS[self.sensor_type]
-                        elif not self.disable_icons and len(pickup_info) > 2:
-                            self._entity_picture = pickup_info[2]
-                        self._last_update = today.strftime('%d-%m-%Y %H:%M')
-                        self._hidden = False
-                        
-                        if (update_date == 0) or (update_date > int(pick_update.strftime('%Y%m%d'))):
-                            self._sort_date = int(pick_update.strftime('%Y%m%d'))
-                            update_date = self._sort_date
-                            if self.date_object:
-                                self._state = pick_update
-                            elif self.date_only and date_diff >= 0:
-                                self._state = pick_update.strftime(self.date_format)
-                            else:
-                                if date_diff >= 8:
-                                    self._state = pick_update.strftime(self.date_format)
-                                elif date_diff > 1:
-                                    self._state = pick_update.strftime('%A, ' + self.date_format)
-                                    if self.dutch_days:
-                                        for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
-                                            self._state = self._state.replace(EN_day, NL_day)
-                                elif date_diff == 1:
-                                    self._state = pick_update.strftime(self._tomorrow + self.date_format)
-                                elif date_diff == 0:
-                                    self._state = pick_update.strftime(self._today + self.date_format)
-                                else:
-                                    self._state = None
-                        retrieved_data = 1
-                if retrieved_data == 0:
-                    self.set_state_none()
-            else:
-                self.set_state_none()
+        self._hidden = False
+        self.__set_state(collection)
+        self.__set_picture(collection)
 
-        except ValueError:
-            self.set_state_none()
+    def __set_state(self, collection):
+        date_diff = (collection.date - datetime.now()).days + 1
 
-    def set_state_none(self):
-        self._state = None
-        self._official_name = None
-        self._fraction_id = None
-        self._hidden = True
+        if self.date_object:
+            self._state = collection.date
+        elif self.date_only:
+            self._state = collection.date.strftime(self.date_format)
+        elif date_diff >= 8:
+            self._state = collection.date.strftime(self.date_format)
+        elif date_diff > 1:
+            self._state = collection.date.strftime('%A, ' + self.date_format)
+            if self.dutch_days:
+                for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
+                    self._state = self._state.replace(EN_day, NL_day)
+        elif date_diff == 1:
+            self._state = collection.date.strftime(self._tomorrow + self.date_format)
+        elif date_diff == 0:
+            self._state = collection.date.strftime(self._today + self.date_format)
+        else:
+            self._state = None
+
+    def __set_picture(self, collection):
+        if self.disable_icons:
+            return
+
+        if self.built_in_icons and self.waste_type in FRACTION_ICONS:
+            self._entity_picture = FRACTION_ICONS[self.waste_type]
+        elif collection.icon_data:
+            self._entity_picture = collection.icon_data
 
 
-class WasteTodaySensor(Entity):
+class WasteDateSensor(Entity):
 
-    def __init__(self, data, sensor_types, waste_collector, day_sensor, dutch_days, name, name_prefix):
+    def __init__(self, data, waste_types, waste_collector, date_delta, dutch_days, name, name_prefix):
         self.data = data
-        self.sensor_types = sensor_types
+        self.waste_types = waste_types
         self.waste_collector = waste_collector
-        self.day = day_sensor
+        self.date_delta = date_delta
         self.dutch_days = dutch_days
-        self._name = _format_sensor(name, name_prefix, waste_collector, self.day)
+        if date_delta.days == 0:
+            day = 'vandaag'
+        elif date_delta.days == 1:
+            day = 'morgen'
+        else:
+            day = ''
+        self._name = _format_sensor(name, name_prefix, waste_collector, day)
         self._unit = ''
         self._hidden = False
         self._state = None
@@ -707,48 +745,19 @@ class WasteTodaySensor(Entity):
         return self._unit
 
     def update(self):
-        self.data.update()
-        waste_data = self.data.data
-        retrieved_data = 0
-        try:
-            if waste_data is not None:
-                new_state = []
-                for sensor_type in self.sensor_types:
-                    if sensor_type in COLLECTOR_WASTE_ID[self.waste_collector]:
-                        for waste_id in COLLECTOR_WASTE_ID[self.waste_collector][sensor_type]:
-                            if waste_id in waste_data:
-                                today = datetime.today()
-                                pickup_info = waste_data.get(waste_id)
-                                pick_update = pickup_info[0]
-                                date_diff = (pick_update - today).days + 1
+        date = datetime.now() + self.date_delta
+        collections = self.data.collections.get_by_date(date, self.waste_types)
 
-                                if date_diff == 1 and self.day == "morgen":
-                                    new_state.append(sensor_type)
-                                    retrieved_data = 1
-                                elif date_diff < 1 and self.day == "vandaag":
-                                    new_state.append(sensor_type)
-                                    retrieved_data = 1
+        if not collections:
+            self._hidden = True
+            self._state = "Geen" if self.dutch_days else "None"
+            return
 
-                        if retrieved_data == 0:
-                            if self.dutch_days:
-                                self._state = "Geen"
-                            else:
-                                self._state = "None"
-                            self._hidden = True
-                        else:
-                            self._state = ', '.join(new_state)
-                            self._hidden = False
-                    else:
-                        self.set_state_none()
-            else:
-                self.set_state_none()
+        self._hidden = False
+        self.__set_state(collections)
 
-        except ValueError:
-            self.set_state_none()
-
-    def set_state_none(self):
-        self._state = None
-        self._hidden = True
+    def __set_state(self, collections):
+        self._state = ', '.join([x.waste_type for x in collections])
 
 
 def _format_sensor(name, name_prefix, waste_collector, sensor_type):
