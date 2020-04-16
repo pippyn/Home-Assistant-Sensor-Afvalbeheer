@@ -53,6 +53,7 @@ Description:
   - Cure
   - Cyclus
   - DAR
+  - DeAfvalApp
   - DenHaag
   - GAD
   - HVC
@@ -170,6 +171,7 @@ COLLECTOR_URL = {
     'waalre': 'https://afvalkalender.waalre.nl',
     'zrd': 'https://afvalkalender.zrd.nl',
     'rova': 'https://inzamelkalender.rova.nl',
+    'deafvalapp': 'http://dataservice.deafvalapp.nl',
 }
 
 RENAME_TITLES = {
@@ -197,7 +199,9 @@ RENAME_TITLES = {
     'rest': 'restafval',
     'grof huisvuil': 'grofafval',
     'grof huisvuil afroep': 'grofafval',
-    'gemengde plastics': 'plastic'
+    'gemengde plastics': 'plastic',
+    'zak_blauw': 'restafval',
+    'pbp': 'pmd'
 }
 
 FRACTION_ICONS = {
@@ -307,6 +311,8 @@ class WasteData(object):
             self.collector = AfvalwijzerCollector(self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "ophaalkalender":
             self.collector = OphaalkalenderCollector(self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix)
+        elif self.waste_collector == "deafvalapp":
+            self.collector = DeafvalappCollector(self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector in COLLECTOR_URL.keys():
             self.collector = OpzetCollector(self.waste_collector, self.postcode, self.street_number, self.suffix)
         else:
@@ -415,6 +421,55 @@ class OphaalkalenderCollector(WasteCollector):
                     else:
                         COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(fraction_id))
                 self.data = sensor_dict
+
+
+class DeafvalappCollector(WasteCollector):
+
+    def __init__(self, waste_collector, postcode, street_number, suffix):
+        super(DeafvalappCollector, self).__init__(waste_collector, postcode, street_number, suffix)
+        self.main_url = COLLECTOR_URL[self.waste_collector]
+
+    def update(self):
+        _LOGGER.debug('Updating Waste collection dates using webservices')
+        fraction_id = 0
+        try:
+            response = requests.get(self.main_url + '/dataservice/DataServiceServlet?service=OPHAALSCHEMA&land=NL&postcode=' + self.postcode + '&straatId=0&huisnr=' + self.street_number + '&huisnrtoev=' + self.suffix).text
+
+            if not response:
+                _LOGGER.error('Address not found!')
+            else:
+                COLLECTOR_WASTE_ID[self.waste_collector] = {}
+                sensor_dict = {}
+                data = {}
+                for rows in response.strip().split('\n'):
+                    id = rows.split(';')[0]
+                    data[id] = rows.split(';')[1:-1]
+                for key in data:
+                    fraction_id += 1
+                    data[key].sort(key=lambda date: datetime.strptime(date, "%d-%m-%Y"))
+                    upcomingdate = [i for i in data[key] if datetime.today() <= datetime.strptime(i, "%d-%m-%Y")][0]
+                    if upcomingdate is not None and ((datetime.strptime(upcomingdate, "%d-%m-%Y") - datetime.today()).days + 1) >= 0:
+                        sensor_dict[str(fraction_id)] = [datetime.strptime(upcomingdate, "%d-%m-%Y"), key]
+                    else:
+                        continue
+                    check_title = key.lower()
+                    title = ''
+                    for dict_title in RENAME_TITLES:
+                        if dict_title in check_title:
+                            title = RENAME_TITLES[dict_title]
+                            break
+                    if not title:
+                        title = check_title
+                    if title not in COLLECTOR_WASTE_ID[self.waste_collector]:
+                        COLLECTOR_WASTE_ID[self.waste_collector][title] = [str(fraction_id)]
+                    else:
+                        COLLECTOR_WASTE_ID[self.waste_collector][title].append(str(fraction_id))
+                self.data = sensor_dict
+
+        except requests.exceptions.RequestException as exc:
+            _LOGGER.error('Error occurred while fetching data: %r', exc)
+            self.data = None
+            return False
 
 
 class OpzetCollector(WasteCollector):
