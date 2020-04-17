@@ -283,18 +283,19 @@ class WasteCollectionRepository(object):
     def get_sorted(self):
         return sorted(self.collections, key=lambda x: x.date)
 
-    def get_next_by_type(self, waste_type):
-        today = datetime.now().replace(hour=0,minute=0,second=0,microsecond=0)
-        for collection in self.get_sorted():
-            if collection.date >= today:
-                return collection
-        return None
+    def get_upcoming_by_type(self, waste_type):
+        today = datetime.now()
+        return list(filter(lambda x: x.date.date() >= today.date() and x.waste_type == waste_type, self.get_sorted()))
+
+    def get_first_upcoming_by_type(self, waste_type):
+        upcoming = self.get_upcoming_by_type(waste_type)
+        return upcoming[0] if upcoming else None
 
     def get_by_date(self, date, waste_types=None):
         if waste_types:
-            return filter(lambda x: x.date.date() == date.date() and x.waste_type in waste_types, self.get_sorted())
+            return list(filter(lambda x: x.date.date() == date.date() and x.waste_type in waste_types, self.get_sorted()))
         else:
-            return filter(lambda x: x.date.date() == date.date(), self.get_sorted())
+            return list(filter(lambda x: x.date.date() == date.date(), self.get_sorted()))
 
 
 class WasteCollection(object):
@@ -303,6 +304,14 @@ class WasteCollection(object):
         self.date = None
         self.waste_type = None
         self.icon_data = None
+
+    @classmethod
+    def create(cls, date, waste_type, icon_data=None):
+        collection = cls()
+        collection.date = date
+        collection.waste_type = waste_type
+        collection.icon_data = icon_data
+        return collection
 
 
 class WasteData(object):
@@ -381,13 +390,13 @@ class AfvalwijzerCollector(WasteCollector):
             response = requests.get('https://json.{}.nl/?method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&langs=nl'.format(
                 self.waste_collector, self.postcode, self.street_number, self.suffix)).json()
 
-            collect_data = (response['data']['ophaaldagen']['data'] + response['data']['ophaaldagenNext']['data'])
+            data = (response['data']['ophaaldagen']['data'] + response['data']['ophaaldagenNext']['data'])
 
-            if not collect_data:
+            if not data:
                 _LOGGER.error('No Waste data found!')
                 return
 
-            for item in collect_data:
+            for item in data:
                 if not item['date']:
                     continue
 
@@ -395,10 +404,10 @@ class AfvalwijzerCollector(WasteCollector):
                 if not waste_type:
                     continue
 
-                collection = WasteCollection()
-                collection.date = datetime.strptime(item['date'], '%Y-%m-%d')
-                collection.waste_type = waste_type
-
+                collection = WasteCollection.create(
+                    date=datetime.strptime(item['date'], '%Y-%m-%d'),
+                    waste_type=waste_type
+                )
                 self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
@@ -460,10 +469,10 @@ class OphaalkalenderCollector(WasteCollector):
                 if not waste_type:
                     continue
 
-                collection = WasteCollection()
-                collection.date = datetime.strptime(item['start'], '%Y-%m-%dT%H:%M:%S%z')
-                collection.waste_type = waste_type
-
+                collection = WasteCollection.create(
+                    date=datetime.strptime(item['start'], '%Y-%m-%dT%H:%M:%S%z'),
+                    waste_type=waste_type
+                )
                 self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
@@ -524,11 +533,11 @@ class OpzetCollector(WasteCollector):
                 if not waste_type:
                     continue
 
-                collection = WasteCollection()
-                collection.date = datetime.strptime(item['ophaaldatum'], '%Y-%m-%d')
-                collection.waste_type = waste_type
-                collection.icon_data = item['icon_data']
-
+                collection = WasteCollection.create(
+                    date=datetime.strptime(item['ophaaldatum'], '%Y-%m-%d'),
+                    waste_type=waste_type,
+                    icon_data=item['icon_data']
+                )
                 self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
@@ -600,10 +609,10 @@ class XimmioCollector(WasteCollector):
                     if not waste_type:
                         continue
 
-                    collection = WasteCollection()
-                    collection.date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S')
-                    collection.waste_type = waste_type
-
+                    collection = WasteCollection.create(
+                        date=datetime.strptime(date, '%Y-%m-%dT%H:%M:%S'),
+                        waste_type=waste_type
+                    )
                     self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
@@ -666,7 +675,7 @@ class WasteTypeSensor(Entity):
         return self._unit
 
     def update(self):
-        collection = self.data.collections.get_next_by_type(self.waste_type)
+        collection = self.data.collections.get_first_upcoming_by_type(self.waste_type)
         if not collection:
             self._state = None
             self._hidden = True
