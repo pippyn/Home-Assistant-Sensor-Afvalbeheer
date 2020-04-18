@@ -118,12 +118,14 @@ import voluptuous as vol
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 import homeassistant.helpers.config_validation as cv
 from homeassistant.const import (CONF_RESOURCES, DEVICE_CLASS_TIMESTAMP)
-from homeassistant.util import Throttle
 from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.event import async_track_point_in_utc_time
+from homeassistant.util import dt as dt_util
 
 _LOGGER = logging.getLogger(__name__)
 
-MIN_TIME_BETWEEN_UPDATES = timedelta(hours=1)
+SCHEDULE_UPDATE_INTERVAL = timedelta(hours=1)
+
 CONF_WASTE_COLLECTOR = 'wastecollector'
 CONF_POSTCODE = 'postcode'
 CONF_STREET_NAME = 'streetname'
@@ -221,7 +223,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 })
 
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     _LOGGER.debug('Setup Rest API retriever')
 
     postcode = config.get(CONF_POSTCODE)
@@ -250,11 +252,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         _LOGGER.error("Meerlanden - Update your config to use Ximmio! You are still using Meerlanden as a wast collector, which is deprecated. It's from now on; Ximmio. Check your automations and lovelace config, as the sensor names may also be changed!")
         waste_collector = "ximmio"
 
-    try:
-        data = WasteData(waste_collector, postcode, street_name, street_number, suffix)
-    except requests.exceptions.HTTPError as error:
-        _LOGGER.error(error)
-        return False
+    data = WasteData(hass, waste_collector, postcode, street_name, street_number, suffix)
 
     entities = []
 
@@ -266,7 +264,9 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         entities.append(WasteDateSensor(data, config[CONF_RESOURCES], waste_collector, timedelta(), dutch_days, name, name_prefix))
         entities.append(WasteDateSensor(data, config[CONF_RESOURCES], waste_collector, timedelta(days=1), dutch_days, name, name_prefix))
 
-    add_entities(entities)
+    async_add_entities(entities)
+
+    await data.schedule_update(timedelta())
 
 
 class WasteCollectionRepository(object):
@@ -316,7 +316,8 @@ class WasteCollection(object):
 
 class WasteData(object):
 
-    def __init__(self, waste_collector, postcode, street_name, street_number, suffix):
+    def __init__(self, hass, waste_collector, postcode, street_name, street_number, suffix):
+        self.hass = hass
         self.waste_collector = waste_collector
         self.postcode = postcode
         self.street_name = street_name
@@ -337,9 +338,13 @@ class WasteData(object):
         else:
             _LOGGER.error("Waste collector not found!")
 
-    @Throttle(MIN_TIME_BETWEEN_UPDATES)
-    def update(self):
-        self.collector.update()
+    async def schedule_update(self, interval):
+        nxt = dt_util.utcnow() + interval
+        async_track_point_in_utc_time(self.hass, self.async_update, nxt)
+
+    async def async_update(self, *_):
+        await self.collector.update()
+        await self.schedule_update(SCHEDULE_UPDATE_INTERVAL)
 
     @property
     def collections(self):
@@ -356,7 +361,7 @@ class WasteCollector(metaclass=abc.ABCMeta):
         self.collections = WasteCollectionRepository()
 
     @abc.abstractmethod
-    def update(self):
+    async def update(self):
         pass
 
     def map_waste_type(self, name):
@@ -381,7 +386,7 @@ class AfvalwijzerCollector(WasteCollector):
     def __init__(self, waste_collector, postcode, street_number, suffix):
         super(AfvalwijzerCollector, self).__init__(waste_collector, postcode, street_number, suffix)
 
-    def update(self):
+    async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -448,7 +453,7 @@ class OphaalkalenderCollector(WasteCollector):
 
         self.address_id = str(response[0]["Id"])
 
-    def update(self):
+    async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -511,7 +516,7 @@ class OpzetCollector(WasteCollector):
 
         self.bag_id = response[0]['bagId']
 
-    def update(self):
+    async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -583,7 +588,7 @@ class XimmioCollector(WasteCollector):
 
         self.address_id = response['dataList'][0]['UniqueId']
 
-    def update(self):
+    async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
