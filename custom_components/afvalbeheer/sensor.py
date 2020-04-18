@@ -423,15 +423,15 @@ class AfvalwijzerCollector(WasteCollector):
 class OphaalkalenderCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
         # 'tak-snoeiafval': WASTE_TYPE_BRANCHES,
-        'grof huisvuil': WASTE_TYPE_BULKLITTER,
-        'grof huisvuil afroep': WASTE_TYPE_BULKLITTER,
+        # 'grof huisvuil': WASTE_TYPE_BULKLITTER,
+        # 'grof huisvuil afroep': WASTE_TYPE_BULKLITTER,
         # 'tak-snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
         # 'fles-groen-glas': WASTE_TYPE_GLASS,
-        'tuinafval': WASTE_TYPE_GREEN,
+        # 'tuinafval': WASTE_TYPE_GREEN,
         # 'batterij': WASTE_TYPE_KCA,
-        'rest': WASTE_TYPE_GREY,
-        'gemengde plastics': WASTE_TYPE_PACKAGES,
-        'p-k': WASTE_TYPE_PAPER,
+        'Restafval': WASTE_TYPE_GREY,
+        'PMD': WASTE_TYPE_PACKAGES,
+        'P-K': WASTE_TYPE_PAPER,
         # 'shirt-textiel': WASTE_TYPE_TEXTILE,
         # 'kerstboom': WASTE_TYPE_TREE,
     }
@@ -475,7 +475,7 @@ class OphaalkalenderCollector(WasteCollector):
                     continue
 
                 collection = WasteCollection.create(
-                    date=datetime.strptime(item['start'], '%Y-%m-%dT%H:%M:%S%z'),
+                    date=datetime.strptime(item['start'], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None),
                     waste_type=waste_type
                 )
                 self.collections.add(collection)
