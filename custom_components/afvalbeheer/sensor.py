@@ -470,7 +470,7 @@ class OphaalkalenderCollector(WasteCollector):
                 if not item['start']:
                     continue
 
-                waste_type = self.map_waste_type(item['type'])
+                waste_type = self.map_waste_type(item['title'])
                 if not waste_type:
                     continue
 
