@@ -364,7 +364,10 @@ class WasteCollector(metaclass=abc.ABCMeta):
         pass
 
     def map_waste_type(self, name):
-        return self.WASTE_TYPE_MAPPING[name] if name in self.WASTE_TYPE_MAPPING else None
+        for from_type, to_type in self.WASTE_TYPE_MAPPING.items():
+            if from_type in name.lower():
+                return to_type
+        return None
 
 
 class AfvalwijzerCollector(WasteCollector):
@@ -549,12 +552,6 @@ class OpzetCollector(WasteCollector):
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
             return False
-
-    def map_waste_type(self, name):
-        for from_type, to_type in self.WASTE_TYPE_MAPPING.items():
-            if from_type in name.lower():
-                return to_type
-        return None
 
 
 class XimmioCollector(WasteCollector):
