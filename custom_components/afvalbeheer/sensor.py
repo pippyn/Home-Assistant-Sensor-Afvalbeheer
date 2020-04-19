@@ -158,7 +158,6 @@ OPZET_COLLECTOR_URLS = {
     'denhaag': 'https://huisvuilkalender.denhaag.nl',
     'gad': 'https://inzamelkalender.gad.nl',
     'hvc': 'https://inzamelkalender.hvcgroep.nl',
-    'meerlanden': 'https://afvalkalender.meerlanden.nl',
     'montfoort': 'https://afvalkalender.cyclusnv.nl',
     'peelenmaas': 'https://afvalkalender.peelenmaas.nl',
     'purmerend': 'https://afvalkalender.purmerend.nl',
