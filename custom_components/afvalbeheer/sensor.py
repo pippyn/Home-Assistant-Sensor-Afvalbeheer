@@ -179,6 +179,7 @@ WASTE_TYPE_GREY = 'restafval'
 WASTE_TYPE_KCA = 'chemisch'
 WASTE_TYPE_PACKAGES = 'pmd'
 WASTE_TYPE_PAPER = 'papier'
+WASTE_TYPE_PLASTIC = 'plastic'
 WASTE_TYPE_TEXTILE = 'textiel'
 WASTE_TYPE_TREE = 'kerstbomen'
 WASTE_TYPE_BULKYGARDENWASTE = 'tuinafval'
@@ -425,17 +426,18 @@ class AfvalwijzerCollector(WasteCollector):
 class OphaalkalenderCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
         # 'tak-snoeiafval': WASTE_TYPE_BRANCHES,
-        # 'grof huisvuil': WASTE_TYPE_BULKLITTER,
-        # 'grof huisvuil afroep': WASTE_TYPE_BULKLITTER,
+        'grof huisvuil': WASTE_TYPE_BULKLITTER,
+        'grof huisvuil afroep': WASTE_TYPE_BULKLITTER,
         # 'tak-snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
         # 'fles-groen-glas': WASTE_TYPE_GLASS,
-        # 'tuinafval': WASTE_TYPE_GREEN,
+        'tuinafval': WASTE_TYPE_GREEN,
         # 'batterij': WASTE_TYPE_KCA,
-        'Restafval': WASTE_TYPE_GREY,
-        'PMD': WASTE_TYPE_PACKAGES,
-        'P-K': WASTE_TYPE_PAPER,
+        'restafval': WASTE_TYPE_GREY,
+        'pmd': WASTE_TYPE_PACKAGES,
+        'p-k': WASTE_TYPE_PAPER,
         # 'shirt-textiel': WASTE_TYPE_TEXTILE,
         # 'kerstboom': WASTE_TYPE_TREE,
+        'gemengde plastics': WASTE_TYPE_PLASTIC,
     }
 
     def __init__(self, waste_collector, postcode, street_name, street_number, suffix):
@@ -491,7 +493,6 @@ class OpzetCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
         'snoeiafval': WASTE_TYPE_BRANCHES,
         'sloop': WASTE_TYPE_BULKLITTER,
-        # 'snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
         'glas': WASTE_TYPE_GLASS,
         'groente': WASTE_TYPE_GREEN,
         'gft': WASTE_TYPE_GREEN,
