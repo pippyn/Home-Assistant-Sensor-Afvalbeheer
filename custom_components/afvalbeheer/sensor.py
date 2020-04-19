@@ -1,92 +1,8 @@
 """
-Sensor component for waste pickup dates from dutch waste collectors (using the http://www.opzet.nl app)
+Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 3.1.1 20200414 - Pippijn Stortelder
-20200108 - Added waste collector Purmerend
-20190116 - Merged different waste collectors into 1 component
-20190119 - Added an option to change date format and fixed spelling mistakes
-20190122 - Refactor code and bug fix
-20190123 - Added 12 more waste collectors
-20190130 - FIXED PMD for some waste collectors
-20190131 - Added Today and Tomorrow sensors
-20190201 - Added option for date only
-20190204 - Small bug fix
-20190223 - Fix for HA 88
-20190226 - Added option for name prefix and added default icons
-20190308 - Change Waalre URL
-20190312 - Fix for resource Plastic, blik en drankenkartons
-20190313 - Code clean up
-20190819 - Added Peel en Maas (credits to https://github.com/tuimz)
-20190822 - Added built-in icon for PBD (the same icon as PMD)
-20190828 - Added Dutch translation weekdays
-20191008 - Small code clean up (credits to https://github.com/slootjes)
-20191018 - Translate 'None' to Dutch
-20191018 - Bug Fix
-20191112 - Added support for a 'name' property for sensors
-20191115 - Added Duobak as a fraction
-20200108 - Added Purmerend and an option to disable the entity_picture
-20200113 - Support for ROVA
-20200115 - Changed municipality of Montfoort url to Cyclus
-20200117 - Added an integer to attributes for date sorting
-20200204 - Fixed wrong date
-20200204 - Removed ROVA from docs, due to ROVA closing API
-20200205 - Added Alkmaar
-20200326 - Added Suez
-20200326 - Support for mijnafvalwijzer and afvalstoffendienstkalender
-20200327 - Beta fix
-20200330 - Release 3.0.2
-20200401 - Add warning for Cure users
-20200403 - Add ximmio waste collector (credits to https://github.com/basschipper)
-20200413 - Add Ophaalkalender waste collector
-20200414 - Add support for state as dateobject
-
-Description:
-  Provides sensors for the following Dutch waste collectors;
-  - Afvalstoffendienstkalender
-  - Alkmaar
-  - AlphenAanDenRijn
-  - Avalex
-  - Berkelland
-  - Blink
-  - Circulus-Berkel
-  - Cranendonck
-  - Cure
-  - Cyclus
-  - DAR
-  - DenHaag
-  - GAD
-  - HVC
-  - Meerlanden
-  - Mijnafvalwijzer
-  - Montfoort
-  - Ophaalkalender
-  - PeelEnMaas
-  - Purmerend
-  - RMN
-  - Spaarnelanden
-  - Suez
-  - Venray
-  - Waalre
-  - ZRD
-
-Save this file as [homeassistant]/config/custom_components/afvalbeheer/sensor.py
-
-    Main resources options:
-    - restafval
-    - gft
-    - papier
-    - pmd
-    Some collectors also use some of these options:
-    - gftgratis
-    - textiel
-    - glas
-    - grofvuil
-    - asbest
-    - apparaten
-    - chemisch
-    - sloopafval
-    - takken
-    - duobak
+Current Version: 4.0.0 20200419 - Pippijn Stortelder
+20200419 - Major code refactor (credits @basschipper)
 
 Example config:
 Configuration.yaml:
@@ -103,6 +19,7 @@ Configuration.yaml:
       upcomingsensor: 0                (optional)
       dateformat: '%d-%m-%Y'           (optional)
       dateonly: 0                      (optional)
+      dateobject: 0                    (optional)
       name: ''                         (optional)
       nameprefix: 1                    (optional)
       builtinicons: 0                  (optional)
