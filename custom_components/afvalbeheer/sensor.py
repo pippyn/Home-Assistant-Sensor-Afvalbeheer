@@ -487,17 +487,19 @@ class OphaalkalenderCollector(WasteCollector):
 
 class OpzetCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
-        # 'tak-snoeiafval': WASTE_TYPE_BRANCHES,
-        'stoel-grof-afval': WASTE_TYPE_BULKLITTER,
-        'tak-snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
-        'fles-groen-glas': WASTE_TYPE_GLASS,
-        'appel-gft': WASTE_TYPE_GREEN,
-        'batterij': WASTE_TYPE_KCA,
-        'zak-grijs-rest': WASTE_TYPE_GREY,
-        'plastic-pak-blik': WASTE_TYPE_PACKAGES,
+        'snoeiafval': WASTE_TYPE_BRANCHES,
+        'sloop': WASTE_TYPE_BULKLITTER,
+        # 'snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
+        'glas': WASTE_TYPE_GLASS,
+        'groente': WASTE_TYPE_GREEN,
+        'gft': WASTE_TYPE_GREEN,
+        'chemisch': WASTE_TYPE_KCA,
+        'kca': WASTE_TYPE_KCA,
+        'rest': WASTE_TYPE_GREY,
+        'plastic': WASTE_TYPE_PACKAGES,
         'papier': WASTE_TYPE_PAPER,
-        'shirt-textiel': WASTE_TYPE_TEXTILE,
-        'kerstboom': WASTE_TYPE_TREE,
+        'textiel': WASTE_TYPE_TEXTILE,
+        'kerstb': WASTE_TYPE_TREE,
     }
 
     def __init__(self, waste_collector, postcode, street_number, suffix):
@@ -534,7 +536,7 @@ class OpzetCollector(WasteCollector):
                 if not item['ophaaldatum']:
                     continue
 
-                waste_type = self.map_waste_type(item['icon'])
+                waste_type = self.map_waste_type(item['menu_title'])
                 if not waste_type:
                     continue
 
@@ -548,6 +550,12 @@ class OpzetCollector(WasteCollector):
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
             return False
+
+    def map_waste_type(self, name):
+        for from_type, to_type in self.WASTE_TYPE_MAPPING.items():
+            if from_type in name.lower():
+                return to_type
+        return None
 
 
 class XimmioCollector(WasteCollector):
