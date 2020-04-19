@@ -365,7 +365,7 @@ class WasteCollector(metaclass=abc.ABCMeta):
 
     def map_waste_type(self, name):
         for from_type, to_type in self.WASTE_TYPE_MAPPING.items():
-            if from_type in name.lower():
+            if from_type.lower() in name.lower():
                 return to_type
         return None
 
