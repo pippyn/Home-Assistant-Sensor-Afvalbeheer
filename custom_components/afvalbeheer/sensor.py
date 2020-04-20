@@ -1,9 +1,10 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.0.1 20200419 - Pippijn Stortelder
+Current Version: 4.1.0 20200420 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
+20200420 - Added support for DeAfvalApp
 
 Example config:
 Configuration.yaml:
@@ -249,6 +250,8 @@ class WasteData(object):
             self.collector = XimmioCollector(self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector in ["mijnafvalwijzer", "afvalstoffendienstkalender"]:
             self.collector = AfvalwijzerCollector(self.waste_collector, self.postcode, self.street_number, self.suffix)
+        elif self.waste_collector == "deafvalapp":
+            self.collector = DeAfvalAppCollector(self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "ophaalkalender":
             self.collector = OphaalkalenderCollector(self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix)
         elif self.waste_collector in OPZET_COLLECTOR_URLS.keys():
@@ -286,7 +289,7 @@ class WasteCollector(metaclass=abc.ABCMeta):
         for from_type, to_type in self.WASTE_TYPE_MAPPING.items():
             if from_type.lower() in name.lower():
                 return to_type
-        return name
+        return name.lower()
 
 
 class AfvalwijzerCollector(WasteCollector):
@@ -335,6 +338,52 @@ class AfvalwijzerCollector(WasteCollector):
                     waste_type=waste_type
                 )
                 self.collections.add(collection)
+
+        except requests.exceptions.RequestException as exc:
+            _LOGGER.error('Error occurred while fetching data: %r', exc)
+            return False
+
+
+class DeAfvalAppCollector(WasteCollector):
+    WASTE_TYPE_MAPPING = {
+        'gemengde plastics': WASTE_TYPE_PLASTIC,
+        'zak_blauw': WASTE_TYPE_GREY,
+        'pbp': WASTE_TYPE_PACKAGES,
+        'rest': WASTE_TYPE_GREY,
+        'kerstboom': WASTE_TYPE_TREE
+    }
+
+    def __init__(self, waste_collector, postcode, street_number, suffix):
+        super(DeAfvalAppCollector, self).__init__(waste_collector, postcode, street_number, suffix)
+        self.main_url = "http://dataservice.deafvalapp.nl"
+
+    async def update(self):
+        _LOGGER.debug('Updating Waste collection dates using Rest API')
+
+        self.collections.remove_all()
+
+        try:
+            response = requests.get('{}/dataservice/DataServiceServlet?service=OPHAALSCHEMA&land=NL&postcode={}&straatId=0&huisnr={}&huisnrtoev={}'.format(
+                self.main_url, self.postcode, self.street_number, self.suffix)).text
+
+            if not response:
+                _LOGGER.error('No Waste data found!')
+                return
+
+            for rows in response.strip().split('\n'):
+                waste_type = self.map_waste_type(rows.split(';')[0])
+                if not waste_type:
+                    continue
+
+                for ophaaldatum in rows.split(';')[1:-1]:
+                    if not ophaaldatum:
+                        continue
+
+                    collection = WasteCollection.create(
+                        date=datetime.strptime(ophaaldatum, '%d-%m-%Y'),
+                        waste_type=waste_type
+                    )
+                    self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
