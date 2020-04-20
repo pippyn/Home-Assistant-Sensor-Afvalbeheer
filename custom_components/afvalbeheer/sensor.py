@@ -1,10 +1,10 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.1.0 20200419 - Pippijn Stortelder
+Current Version: 4.1.0 20200420 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
-20200421 - Added support for DeAfvalApp
+20200420 - Added support for DeAfvalApp
 
 Example config:
 Configuration.yaml:
@@ -350,7 +350,7 @@ class DeAfvalAppCollector(WasteCollector):
         'zak_blauw': WASTE_TYPE_GREY,
         'pbp': WASTE_TYPE_PACKAGES,
         'rest': WASTE_TYPE_GREY,
-        'KERSTBOOM': WASTE_TYPE_TREE
+        'kerstboom': WASTE_TYPE_TREE
     }
 
     def __init__(self, waste_collector, postcode, street_number, suffix):
