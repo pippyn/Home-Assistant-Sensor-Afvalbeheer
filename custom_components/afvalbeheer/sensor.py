@@ -1,8 +1,9 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.0.0 20200419 - Pippijn Stortelder
+Current Version: 4.0.1 20200419 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
+20200420 - Add sensor even though not in mapping
 
 Example config:
 Configuration.yaml:
@@ -285,7 +286,7 @@ class WasteCollector(metaclass=abc.ABCMeta):
         for from_type, to_type in self.WASTE_TYPE_MAPPING.items():
             if from_type.lower() in name.lower():
                 return to_type
-        return None
+        return name
 
 
 class AfvalwijzerCollector(WasteCollector):
