@@ -318,7 +318,7 @@ class WasteData(object):
         else:
             _LOGGER.error("Waste collector not found!")
 
-    # @Throttle(MIN_TIME_BETWEEN_UPDATES)
+    @Throttle(MIN_TIME_BETWEEN_UPDATES)
     def update(self):
         self.collector.update()
 
@@ -447,7 +447,7 @@ class DeafvalappCollector(WasteCollector):
                 for key in data:
                     fraction_id += 1
                     data[key].sort(key=lambda date: datetime.strptime(date, "%d-%m-%Y"))
-                    upcomingdate = [i for i in data[key] if datetime.today() <= datetime.strptime(i, "%d-%m-%Y")][0]
+                    upcomingdate = [i for i in data[key] if datetime.today().date() <= datetime.strptime(i, "%d-%m-%Y").date()][0]
                     if upcomingdate is not None and ((datetime.strptime(upcomingdate, "%d-%m-%Y") - datetime.today()).days + 1) >= 0:
                         sensor_dict[str(fraction_id)] = [datetime.strptime(upcomingdate, "%d-%m-%Y"), key]
                     else:
