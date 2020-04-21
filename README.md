@@ -1,9 +1,7 @@
 ## Home Assisant sensor component for Afvalbeheer
 
-Provides Home Assistant sensors for multiple Dutch waste collectors using REST API.
+Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API.
 This sensor works with the following waste collectors: Blink, Cure, Suez, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, Montfoort, GAD, Cranendonck, Ophaalkalender, DeAfvalApp and Alkmaar.
-
-**Starting from version 3.0.0 this sensor now also supports MijnAfvalwijzer and Afvalstoffendienstkalender**
 
 Cure users should switch to the waste collector MijnAfvalwijzer
 
@@ -31,6 +29,7 @@ Example config:
       upcomingsensor: 0                (optional)
       dateformat: '%d-%m-%Y'           (optional)
       dateonly: 0                      (optional)
+      dateobject: 0                    (optional)
       name: ''                         (optional)
       nameprefix: 1                    (optional)
       builtinicons: 0                  (optional)
@@ -50,17 +49,17 @@ Choose your collector from this list:
   - Blink
   - Circulus-Berkel
   - Cranendonck
-  - Cure
+  - Cure (use MijnAfvalwijzer)
   - Cyclus
   - DAR
   - DeAfvalApp
   - DenHaag
   - GAD
   - HVC
-  - Meerlanden
+  - Meerlanden (use Ximmio)
   - MijnAfvalwijzer
   - Montfoort
-  - Ophaalkalender
+  - Ophaalkalender (don't forget the streetname option)
   - PeelEnMaas
   - Purmerend
   - RMN
@@ -97,8 +96,14 @@ Some collectors also use some of these options:
 ### Postcode
 Postcode is required and is your own postcode
 
-### Street number
-Street number is required and is your own street number
+### Streetnumber
+Streetnumber is required and is your own street number
+
+### Streetname
+```yaml
+streetname: ?
+```
+Street number is only required for Ophaalkalender.be
 
 ### Upcoming sensor
 ```yaml
@@ -128,6 +133,12 @@ If you wish to remove the year and the dashes and want to show the name of the m
 dateonly: 1
 ```
 If you don't want to add dayname, tomorrow or today in front of date activate this option. Default is 0.
+
+### Date object
+```yaml
+dateobject: 1
+```
+If you want the sensor state to be a date-time object. Default is 0 (state as string).
 
 ### Name
 ```yaml
@@ -167,14 +178,8 @@ dutch: 1
 ```
 If you want to display the names of the days in dutch. Default is 0.
 
-## Custom updater
-You can use the custom updater with this sensor
+## HACS
+You can use HACS to install this sensor. It is included by default.
 
-Home assistant 88 and higher:
-```yaml
-custom_updater:
-  track:
-    - components
-  component_urls:
-    - https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/custom_components.json
-```
+
+
