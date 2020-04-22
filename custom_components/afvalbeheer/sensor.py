@@ -83,6 +83,7 @@ OPZET_COLLECTOR_URLS = {
     'purmerend': 'https://afvalkalender.purmerend.nl',
     'rmn': 'https://inzamelschema.rmn.nl',
     'spaarnelanden': 'https://afvalwijzer.spaarnelanden.nl',
+    'sudwestfryslan': 'https://afvalkalender.sudwestfryslan.nl',
     'suez': 'https://inzamelwijzer.suez.nl',
     'venray': 'https://afvalkalender.venray.nl',
     'waalre': 'https://afvalkalender.waalre.nl',
