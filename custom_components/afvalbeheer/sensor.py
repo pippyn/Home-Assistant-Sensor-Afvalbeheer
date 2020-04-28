@@ -1,13 +1,14 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.1.3 20200428 - Pippijn Stortelder
+Current Version: 4.1.4 20200428 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
 20200421 - Fix for OpzetCollector PMD
 20200422 - Add wastecollector sudwestfryslan
 20200428 - Restore sort_date function
+20200428 - Option added to disable daynames (dayofweek)
 
 Example config:
 Configuration.yaml:
@@ -25,6 +26,7 @@ sensor:
     dateformat: '%d-%m-%Y'           (optional)
     dateonly: 0                      (optional)
     dateobject: 0                    (optional)
+    dayofweek: 1                     (optional)
     name: ''                         (optional)
     nameprefix: 1                    (optional)
     builtinicons: 0                  (optional)
@@ -62,6 +64,7 @@ CONF_NAME_PREFIX = 'nameprefix'
 CONF_BUILT_IN_ICONS = 'builtinicons'
 CONF_DISABLE_ICONS = 'disableicons'
 CONF_TRANSLATE_DAYS = 'dutch'
+CONF_DAY_OF_WEEK = 'dayofweek'
 
 ATTR_WASTE_COLLECTOR = 'Wastecollector'
 ATTR_HIDDEN = 'Hidden'
@@ -143,6 +146,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_BUILT_IN_ICONS, default=False): cv.boolean,
     vol.Optional(CONF_DISABLE_ICONS, default=False): cv.boolean,
     vol.Optional(CONF_TRANSLATE_DAYS, default=False): cv.boolean,
+    vol.Optional(CONF_DAY_OF_WEEK, default=True): cv.boolean,
 })
 
 
@@ -162,6 +166,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     built_in_icons = config.get(CONF_BUILT_IN_ICONS)
     disable_icons = config.get(CONF_DISABLE_ICONS)
     dutch_days = config.get(CONF_TRANSLATE_DAYS)
+    day_of_week = config.get(CONF_DAY_OF_WEEK)
 
     if date_object == True:
         date_only = 1
@@ -181,7 +186,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     for resource in config[CONF_RESOURCES]:
         waste_type = resource.lower()
-        entities.append(WasteTypeSensor(data, waste_type, waste_collector, date_format, date_only, date_object, name, name_prefix, built_in_icons, disable_icons, dutch_days))
+        entities.append(WasteTypeSensor(data, waste_type, waste_collector, date_format, date_only, date_object, name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week))
 
     if sensor_today:
         entities.append(WasteDateSensor(data, config[CONF_RESOURCES], waste_collector, timedelta(), dutch_days, name, name_prefix))
@@ -604,7 +609,7 @@ class XimmioCollector(WasteCollector):
 
 class WasteTypeSensor(Entity):
 
-    def __init__(self, data, waste_type, waste_collector, date_format, date_only, date_object, name, name_prefix, built_in_icons, disable_icons, dutch_days):
+    def __init__(self, data, waste_type, waste_collector, date_format, date_only, date_object, name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week):
         self.data = data
         self.waste_type = waste_type
         self.waste_collector = waste_collector
@@ -615,6 +620,7 @@ class WasteTypeSensor(Entity):
         self.built_in_icons = built_in_icons
         self.disable_icons = disable_icons
         self.dutch_days = dutch_days
+        self.day_of_week = day_of_week
         if self.dutch_days:
             self._today = "Vandaag, "
             self._tomorrow = "Morgen, "
@@ -678,10 +684,13 @@ class WasteTypeSensor(Entity):
         elif date_diff >= 8:
             self._state = collection.date.strftime(self.date_format)
         elif date_diff > 1:
-            self._state = collection.date.strftime('%A, ' + self.date_format)
-            if self.dutch_days:
-                for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
-                    self._state = self._state.replace(EN_day, NL_day)
+            if self.day_of_week:
+                self._state = collection.date.strftime('%A, ' + self.date_format)
+                if self.dutch_days:
+                    for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
+                        self._state = self._state.replace(EN_day, NL_day)
+            else:
+                self._state = collection.date.strftime(self.date_format)
         elif date_diff == 1:
             self._state = collection.date.strftime(self._tomorrow + self.date_format)
         elif date_diff == 0:
