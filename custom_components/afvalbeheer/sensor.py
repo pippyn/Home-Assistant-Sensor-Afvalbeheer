@@ -1,32 +1,33 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.1.2 20200422 - Pippijn Stortelder
+Current Version: 4.1.3 20200428 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
 20200421 - Fix for OpzetCollector PMD
 20200422 - Add wastecollector sudwestfryslan
+20200428 - Restore sort_date function
 
 Example config:
 Configuration.yaml:
-  sensor:
-    - platform: afvalbeheer
-      wastecollector: Blink            (required)
-      resources:                       (at least 1 required)
-        - restafval
-        - gft
-        - papier
-        - pmd
-      postcode: 1111AA                 (required)
-      streetnumber: 1                  (required)
-      upcomingsensor: 0                (optional)
-      dateformat: '%d-%m-%Y'           (optional)
-      dateonly: 0                      (optional)
-      dateobject: 0                    (optional)
-      name: ''                         (optional)
-      nameprefix: 1                    (optional)
-      builtinicons: 0                  (optional)
+sensor:
+- platform: afvalbeheer
+    wastecollector: Blink            (required)
+    resources:                       (at least 1 required)
+    - restafval
+    - gft
+    - papier
+    - pmd
+    postcode: 1111AA                 (required)
+    streetnumber: 1                  (required)
+    upcomingsensor: 0                (optional)
+    dateformat: '%d-%m-%Y'           (optional)
+    dateonly: 0                      (optional)
+    dateobject: 0                    (optional)
+    name: ''                         (optional)
+    nameprefix: 1                    (optional)
+    builtinicons: 0                  (optional)
 """
 
 import abc
@@ -664,6 +665,7 @@ class WasteTypeSensor(Entity):
 
         self._hidden = False
         self.__set_state(collection)
+        self.__set_sort_date(collection)
         self.__set_picture(collection)
 
     def __set_state(self, collection):
@@ -686,6 +688,9 @@ class WasteTypeSensor(Entity):
             self._state = collection.date.strftime(self._today + self.date_format)
         else:
             self._state = None
+
+    def __set_sort_date(self, collection):
+        self._sort_date = int(collection.date.strftime('%Y%m%d'))
 
     def __set_picture(self, collection):
         if self.disable_icons:
