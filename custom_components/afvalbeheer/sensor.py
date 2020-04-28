@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.1.4 20200428 - Pippijn Stortelder
+Current Version: 4.1.5 20200428 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -9,6 +9,7 @@ Current Version: 4.1.4 20200428 - Pippijn Stortelder
 20200422 - Add wastecollector sudwestfryslan
 20200428 - Restore sort_date function
 20200428 - Option added to disable daynames (dayofweek)
+20200428 - Fixed waste type mapping
 
 Example config:
 Configuration.yaml:
@@ -402,6 +403,7 @@ class DeAfvalAppCollector(WasteCollector):
 class OphaalkalenderCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
         # 'tak-snoeiafval': WASTE_TYPE_BRANCHES,
+        'gemengde plastics': WASTE_TYPE_PLASTIC,
         'grof huisvuil': WASTE_TYPE_BULKLITTER,
         'grof huisvuil afroep': WASTE_TYPE_BULKLITTER,
         # 'tak-snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
@@ -470,6 +472,7 @@ class OpzetCollector(WasteCollector):
         'snoeiafval': WASTE_TYPE_BRANCHES,
         'sloop': WASTE_TYPE_BULKLITTER,
         'glas': WASTE_TYPE_GLASS,
+        'duobak': WASTE_TYPE_GREENGREY,
         'groente': WASTE_TYPE_GREEN,
         'gft': WASTE_TYPE_GREEN,
         'chemisch': WASTE_TYPE_KCA,
