@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.1.5 20200428 - Pippijn Stortelder
+Current Version: 4.1.6 20200430 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -10,6 +10,7 @@ Current Version: 4.1.5 20200428 - Pippijn Stortelder
 20200428 - Restore sort_date function
 20200428 - Option added to disable daynames (dayofweek)
 20200428 - Fixed waste type mapping
+20200430 - Fix for the "I/O inside the event loop" warning
 
 Example config:
 Configuration.yaml:
@@ -257,15 +258,15 @@ class WasteData(object):
 
     def __select_collector(self):
         if self.waste_collector == "ximmio":
-            self.collector = XimmioCollector(self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = XimmioCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector in ["mijnafvalwijzer", "afvalstoffendienstkalender"]:
-            self.collector = AfvalwijzerCollector(self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = AfvalwijzerCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "deafvalapp":
-            self.collector = DeAfvalAppCollector(self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = DeAfvalAppCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "ophaalkalender":
-            self.collector = OphaalkalenderCollector(self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix)
+            self.collector = OphaalkalenderCollector(self.hass, self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix)
         elif self.waste_collector in OPZET_COLLECTOR_URLS.keys():
-            self.collector = OpzetCollector(self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = OpzetCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         else:
             _LOGGER.error("Waste collector not found!")
 
@@ -284,7 +285,8 @@ class WasteData(object):
 
 class WasteCollector(metaclass=abc.ABCMeta):
 
-    def __init__(self, waste_collector, postcode, street_number, suffix):
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
+        self.hass = hass
         self.waste_collector = waste_collector
         self.postcode = postcode
         self.street_number = street_number
@@ -317,8 +319,13 @@ class AfvalwijzerCollector(WasteCollector):
         'kerstbomen': WASTE_TYPE_TREE,
     }
 
-    def __init__(self, waste_collector, postcode, street_number, suffix):
-        super(AfvalwijzerCollector, self).__init__(waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
+        super(AfvalwijzerCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
+
+    def __get_data(self):
+        get_url = 'https://json.{}.nl/?method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&langs=nl'.format(
+                self.waste_collector, self.postcode, self.street_number, self.suffix)
+        return requests.get(get_url)
 
     async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
@@ -326,8 +333,8 @@ class AfvalwijzerCollector(WasteCollector):
         self.collections.remove_all()
 
         try:
-            response = requests.get('https://json.{}.nl/?method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&langs=nl'.format(
-                self.waste_collector, self.postcode, self.street_number, self.suffix)).json()
+            r = await self.hass.async_add_executor_job(self.__get_data)
+            response = r.json()
 
             data = (response['data']['ophaaldagen']['data'] + response['data']['ophaaldagenNext']['data'])
 
@@ -363,9 +370,14 @@ class DeAfvalAppCollector(WasteCollector):
         'kerstboom': WASTE_TYPE_TREE
     }
 
-    def __init__(self, waste_collector, postcode, street_number, suffix):
-        super(DeAfvalAppCollector, self).__init__(waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
+        super(DeAfvalAppCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
         self.main_url = "http://dataservice.deafvalapp.nl"
+
+    def __get_data(self):
+        get_url = '{}/dataservice/DataServiceServlet?service=OPHAALSCHEMA&land=NL&postcode={}&straatId=0&huisnr={}&huisnrtoev={}'.format(
+                self.main_url, self.postcode, self.street_number, self.suffix)
+        return requests.get(get_url)
 
     async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
@@ -373,8 +385,8 @@ class DeAfvalAppCollector(WasteCollector):
         self.collections.remove_all()
 
         try:
-            response = requests.get('{}/dataservice/DataServiceServlet?service=OPHAALSCHEMA&land=NL&postcode={}&straatId=0&huisnr={}&huisnrtoev={}'.format(
-                self.main_url, self.postcode, self.street_number, self.suffix)).text
+            r = await self.hass.async_add_executor_job(self.__get_data)
+            response = r.text
 
             if not response:
                 _LOGGER.error('No Waste data found!')
@@ -418,12 +430,11 @@ class OphaalkalenderCollector(WasteCollector):
         'gemengde plastics': WASTE_TYPE_PLASTIC,
     }
 
-    def __init__(self, waste_collector, postcode, street_name, street_number, suffix):
-        super(OphaalkalenderCollector, self).__init__(waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_name, street_number, suffix):
+        super(OphaalkalenderCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
         self.street_name = street_name
         self.main_url = "https://www.ophaalkalender.be"
         self.address_id = None
-        self.__fetch_address()
 
     def __fetch_address(self):
         response = requests.get('{}/calendar/findstreets/?query={}&zipcode={}'.format(
@@ -435,14 +446,20 @@ class OphaalkalenderCollector(WasteCollector):
 
         self.address_id = str(response[0]["Id"])
 
+    def __get_data(self):
+        get_url = '{}/api/rides?id={}&housenumber={}&zipcode={}'.format(
+                self.main_url, self.address_id, self.street_number, self.postcode)
+        return requests.get(get_url)
+
     async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
         try:
-            response = requests.get('{}/api/rides?id={}&housenumber={}&zipcode={}'.format(
-                self.main_url, self.address_id, self.street_number, self.postcode)).json()
+            await self.hass.async_add_executor_job(self.__fetch_address)
+            r = await self.hass.async_add_executor_job(self.__get_data)
+            response = r.json()
 
             if not response:
                 _LOGGER.error('No Waste data found!')
@@ -485,11 +502,10 @@ class OpzetCollector(WasteCollector):
         'pmd': WASTE_TYPE_PACKAGES,
     }
 
-    def __init__(self, waste_collector, postcode, street_number, suffix):
-        super(OpzetCollector, self).__init__(waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
+        super(OpzetCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
         self.main_url = OPZET_COLLECTOR_URLS[self.waste_collector]
         self.bag_id = None
-        self.__fetch_address()
 
     def __fetch_address(self):
         response = requests.get(
@@ -501,15 +517,21 @@ class OpzetCollector(WasteCollector):
 
         self.bag_id = response[0]['bagId']
 
+    def __get_data(self):
+        get_url = "{}/rest/adressen/{}/afvalstromen".format(
+                self.main_url,
+                self.bag_id)
+        return requests.get(get_url)
+
     async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
         try:
-            response = requests.get("{}/rest/adressen/{}/afvalstromen".format(
-                self.main_url,
-                self.bag_id)).json()
+            await self.hass.async_add_executor_job(self.__fetch_address)
+            r = await self.hass.async_add_executor_job(self.__get_data)
+            response = r.json()
 
             if not response:
                 _LOGGER.error('No Waste data found!')
@@ -550,12 +572,11 @@ class XimmioCollector(WasteCollector):
         'TREE': WASTE_TYPE_TREE,
     }
 
-    def __init__(self, waste_collector, postcode, street_number, suffix):
-        super(XimmioCollector, self).__init__(waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
+        super(XimmioCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
         self.main_url = "https://wasteprod2api.ximmio.com"
         self.company_code = "800bf8d7-6dd1-4490-ba9d-b419d6dc8a45"
         self.address_id = None
-        self.__fetch_address()
 
     def __fetch_address(self):
         data = {
@@ -573,21 +594,27 @@ class XimmioCollector(WasteCollector):
 
         self.address_id = response['dataList'][0]['UniqueId']
 
+    def __get_data(self):
+        data = {
+            "uniqueAddressID": self.address_id,
+            "startDate": datetime.now().strftime('%Y-%m-%d'),
+            "endDate": (datetime.now() + timedelta(days=365)).strftime('%Y-%m-%d'),
+            "companyCode": self.company_code,
+        }
+        response = requests.post(
+            "{}/api/GetCalendar".format(self.main_url),
+            data=data)
+        return response
+
     async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
         try:
-            data = {
-                "uniqueAddressID": self.address_id,
-                "startDate": datetime.now().strftime('%Y-%m-%d'),
-                "endDate": (datetime.now() + timedelta(days=365)).strftime('%Y-%m-%d'),
-                "companyCode": self.company_code,
-            }
-            response = requests.post(
-                "{}/api/GetCalendar".format(self.main_url),
-                data=data).json()
+            await self.hass.async_add_executor_job(self.__fetch_address)
+            r = await self.hass.async_add_executor_job(self.__get_data)
+            response = r.json()
 
             if not response['dataList']:
                 _LOGGER.error('No Waste data found!')
