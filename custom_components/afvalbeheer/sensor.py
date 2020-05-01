@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.1.6 20200430 - Pippijn Stortelder
+Current Version: 4.1.7 20200501 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -11,6 +11,7 @@ Current Version: 4.1.6 20200430 - Pippijn Stortelder
 20200428 - Option added to disable daynames (dayofweek)
 20200428 - Fixed waste type mapping
 20200430 - Fix for the "I/O inside the event loop" warning
+20200501 - Fetch address more efficient
 
 Example config:
 Configuration.yaml:
@@ -457,7 +458,9 @@ class OphaalkalenderCollector(WasteCollector):
         self.collections.remove_all()
 
         try:
-            await self.hass.async_add_executor_job(self.__fetch_address)
+            if not self.address_id:
+                await self.hass.async_add_executor_job(self.__fetch_address)
+
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
 
@@ -529,7 +532,9 @@ class OpzetCollector(WasteCollector):
         self.collections.remove_all()
 
         try:
-            await self.hass.async_add_executor_job(self.__fetch_address)
+            if not self.bag_id:
+                await self.hass.async_add_executor_job(self.__fetch_address)
+
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
 
@@ -612,7 +617,9 @@ class XimmioCollector(WasteCollector):
         self.collections.remove_all()
 
         try:
-            await self.hass.async_add_executor_job(self.__fetch_address)
+            if not self.address_id:
+                await self.hass.async_add_executor_job(self.__fetch_address)
+
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
 
