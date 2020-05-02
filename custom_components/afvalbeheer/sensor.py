@@ -587,7 +587,7 @@ class XimmioCollector(WasteCollector):
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix):
         super(XimmioCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
-        self.main_url = "https://wasteprod2api.ximmio.com"
+        self.main_url = "https://wasteapi.ximmio.com"
         self.company_code = XIMMIO_COLLECTOR_IDS[self.waste_collector]
         self.address_id = None
 
