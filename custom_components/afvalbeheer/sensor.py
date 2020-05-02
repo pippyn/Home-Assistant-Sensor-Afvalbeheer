@@ -101,6 +101,8 @@ OPZET_COLLECTOR_URLS = {
 }
 
 XIMMIO_COLLECTOR_IDS = {
+    'acv': 'f8e2844a-095e-48f9-9f98-71fceb51d2c3',
+    'hellendoorn': '24434f5b-7244-412b-9306-3a2bd1e22bc1',
     'meerlanden': '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
     'twentemilieu': '8d97bb56-5afd-4cbc-a651-b4f7314264b4',
     'ximmio': '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
@@ -187,7 +189,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         _LOGGER.error("Afvalbeheer - Update your config to use Mijnafvalwijzer! You are still using Cure as a wast collector, which is deprecated. It's from now on; Mijnafvalwijzer. Check your automations and lovelace config, as the sensor names may also be changed!")
         waste_collector = "mijnafvalwijzer"
     elif waste_collector == "ximmio":
-        _LOGGER.error("Ximmio - due to more collectors using Ximmio, you need to change your config config to Meerlanden or TwenteMilieu as a wast collector. Using Ximmio in your config, this sensor will asume you meant Meerlanden.")
+        _LOGGER.error("Ximmio - due to more collectors using Ximmio, you need to change your config. Set the wast collector to the actual collector (i.e. Meerlanden, TwenteMilieu , etc.). Using Ximmio in your config, this sensor will asume you meant Meerlanden.")
 
     data = WasteData(hass, waste_collector, postcode, street_name, street_number, suffix)
 
