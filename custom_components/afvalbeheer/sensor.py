@@ -99,6 +99,12 @@ OPZET_COLLECTOR_URLS = {
     'rova': 'https://inzamelkalender.rova.nl',
 }
 
+XIMMIO_COLLECTOR_IDS = {
+    'meerlanden': '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
+    'twentemilieu': '8d97bb56-5afd-4cbc-a651-b4f7314264b4',
+    'ximmio': '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
+}
+
 WASTE_TYPE_BRANCHES = 'takken'
 WASTE_TYPE_BULKLITTER = 'grofvuil'
 WASTE_TYPE_GLASS = 'glas'
@@ -179,9 +185,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     if waste_collector == "cure":
         _LOGGER.error("Afvalbeheer - Update your config to use Mijnafvalwijzer! You are still using Cure as a wast collector, which is deprecated. It's from now on; Mijnafvalwijzer. Check your automations and lovelace config, as the sensor names may also be changed!")
         waste_collector = "mijnafvalwijzer"
-    elif waste_collector == "meerlanden":
-        _LOGGER.error("Meerlanden - Update your config to use Ximmio! You are still using Meerlanden as a wast collector, which is deprecated. It's from now on; Ximmio. Check your automations and lovelace config, as the sensor names may also be changed!")
-        waste_collector = "ximmio"
+    elif waste_collector == "ximmio":
+        _LOGGER.error("Ximmio - due to more collectors using Ximmio, you need to change your config config to Meerlanden or TwenteMilieu as a wast collector. Using Ximmio in your config, this sensor will asume you meant Meerlanden.")
 
     data = WasteData(hass, waste_collector, postcode, street_name, street_number, suffix)
 
@@ -258,7 +263,7 @@ class WasteData(object):
         self.__select_collector()
 
     def __select_collector(self):
-        if self.waste_collector == "ximmio":
+        if self.waste_collector in XIMMIO_COLLECTOR_IDS.keys():
             self.collector = XimmioCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector in ["mijnafvalwijzer", "afvalstoffendienstkalender"]:
             self.collector = AfvalwijzerCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
@@ -269,7 +274,7 @@ class WasteData(object):
         elif self.waste_collector in OPZET_COLLECTOR_URLS.keys():
             self.collector = OpzetCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         else:
-            _LOGGER.error("Waste collector not found!")
+            _LOGGER.error('Waste collector "{}" not found!'.format(self.waste_collector))
 
     async def schedule_update(self, interval):
         nxt = dt_util.utcnow() + interval
@@ -580,7 +585,7 @@ class XimmioCollector(WasteCollector):
     def __init__(self, hass, waste_collector, postcode, street_number, suffix):
         super(XimmioCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
         self.main_url = "https://wasteprod2api.ximmio.com"
-        self.company_code = "800bf8d7-6dd1-4490-ba9d-b419d6dc8a45"
+        self.company_code = XIMMIO_COLLECTOR_IDS[self.waste_collector]
         self.address_id = None
 
     def __fetch_address(self):
