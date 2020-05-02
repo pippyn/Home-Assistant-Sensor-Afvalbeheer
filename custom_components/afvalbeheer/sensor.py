@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.1.7 20200501 - Pippijn Stortelder
+Current Version: 4.1.8 20200502 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -12,6 +12,7 @@ Current Version: 4.1.7 20200501 - Pippijn Stortelder
 20200428 - Fixed waste type mapping
 20200430 - Fix for the "I/O inside the event loop" warning
 20200501 - Fetch address more efficient
+20200502 - Support for Twente Milieu
 
 Example config:
 Configuration.yaml:
