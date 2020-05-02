@@ -12,7 +12,7 @@ Current Version: 4.1.8 20200502 - Pippijn Stortelder
 20200428 - Fixed waste type mapping
 20200430 - Fix for the "I/O inside the event loop" warning
 20200501 - Fetch address more efficient
-20200502 - Support for Twente Milieu
+20200502 - Support for ACV, Hellendoorn en Twente Milieu
 
 Example config:
 Configuration.yaml:
