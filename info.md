@@ -1,11 +1,9 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
 ## Home Assisant sensor component for Afvalbeheer
 
-Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API. This sensor works with the following waste collectors: Blink, Cure, Suez, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, Montfoort, GAD, Cranendonck, Ophaalkalender, DeAfvalApp and Alkmaar.
+Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API. This sensor works with the following waste collectors: Blink, Cure, Suez, ACV, Twente Milieu, Hellendoorn, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, SudwestFryslan, Montfoort, GAD, Cranendonck, Ophaalkalender, DeAfvalApp and Alkmaar.
 
 Cure users should switch to the waste collector MijnAfvalwijzer
-
-Meerlanden users should switch to the waste collector Ximmio
 
 ![alt text](https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/example.png)
 
