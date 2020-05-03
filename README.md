@@ -2,12 +2,9 @@
 ## Home Assisant sensor component for Afvalbeheer
 
 Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API.
-This sensor works with the following waste collectors: Blink, Cure, Suez, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, SudwestFryslan, Montfoort, GAD, Cranendonck, Ophaalkalender, DeAfvalApp and Alkmaar.
+This sensor works with the following waste collectors: Blink, Cure, Suez, ACV, Twente Milieu, Hellendoorn, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, SudwestFryslan, Montfoort, GAD, Cranendonck, Ophaalkalender, DeAfvalApp and Alkmaar.
 
 Cure users should switch to the waste collector MijnAfvalwijzer
-
-Meerlanden users should switch to the waste collector Ximmio
-
 
 ![alt text](https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/example.png)
 
@@ -42,6 +39,7 @@ Example config:
 wastecollector:
 ```
 Choose your collector from this list:
+  - ACV
   - Afvalstoffendienstkalender
   - Alkmaar
   - AlphenAanDenRijn
@@ -56,8 +54,9 @@ Choose your collector from this list:
   - DeAfvalApp
   - DenHaag
   - GAD
+  - Hellendoorn
   - HVC
-  - Meerlanden (use Ximmio)
+  - Meerlanden
   - MijnAfvalwijzer
   - Montfoort
   - Ophaalkalender (don't forget the streetname option)
@@ -66,6 +65,7 @@ Choose your collector from this list:
   - RMN
   - Spaarnelanden
   - SudwestFryslan
+  - Twente Milieu
   - Venray
   - Waalre
   - ZRD
