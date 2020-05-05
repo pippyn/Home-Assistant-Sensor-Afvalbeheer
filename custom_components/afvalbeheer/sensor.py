@@ -281,10 +281,10 @@ class WasteData(object):
             self.collector = CirculusBerkelCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "ophaalkalender":
             self.collector = OphaalkalenderCollector(self.hass, self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix)
-        elif self.waste_collector == "rova":
-            self.collector = RovaCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "rd4":
             self.collector = RD4Collector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+        elif self.waste_collector == "rova":
+            self.collector = RovaCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector in OPZET_COLLECTOR_URLS.keys():
             self.collector = OpzetCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         else:
@@ -670,6 +670,71 @@ class OpzetCollector(WasteCollector):
             _LOGGER.error('Error occurred while fetching data: %r', exc)
             return False
 
+        
+class RD4Collector(WasteCollector):
+    WASTE_TYPE_MAPPING = {
+        # 'snoeiafval': WASTE_TYPE_BRANCHES,
+        # 'sloop': WASTE_TYPE_BULKLITTER,
+        # 'glas': WASTE_TYPE_GLASS,
+        # 'duobak': WASTE_TYPE_GREENGREY,
+        # 'groente': WASTE_TYPE_GREEN,
+        # 'gft': WASTE_TYPE_GREEN,
+        # 'chemisch': WASTE_TYPE_KCA,
+        # 'kca': WASTE_TYPE_KCA,
+        # 'rest': WASTE_TYPE_GREY,
+        # 'plastic': WASTE_TYPE_PACKAGES,
+        # 'papier': WASTE_TYPE_PAPER,
+        # 'textiel': WASTE_TYPE_TEXTILE,
+        # 'kerstb': WASTE_TYPE_TREE,
+        # 'pmd': WASTE_TYPE_PACKAGES,
+    }
+
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
+        super(RD4Collector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
+        self.main_url = 'https://rd4.syzygy.eu'
+        self.rova_id = random.randint(10000, 30000)
+
+#         https://rd4.syzygy.eu/1234AA/56
+#         https://www.rd4info.nl/NSI/Burger/aspx/afvalkalender_public.aspx
+        
+    def __get_data(self):
+        response = requests.get(
+            '{}/{}/{}{}'.format(self.main_url, self.postcode, self.street_number, self.suffix)
+        )
+        return response
+
+    async def update(self):
+        _LOGGER.debug('Updating Waste collection dates using Rest API')
+
+        self.collections.remove_all()
+
+        try:
+            r = await self.hass.async_add_executor_job(self.__get_data)
+            response = r.json()
+            _LOGGER.error(response)
+
+            if not response:
+                _LOGGER.error('No Waste data found!')
+                return
+
+            for item in response:
+                if not item['Date']:
+                    continue
+
+                waste_type = self.map_waste_type(item['GarbageTypeCode'])
+                if not waste_type:
+                    continue
+
+                collection = WasteCollection.create(
+                    date=datetime.strptime(item["Date"], "%Y-%m-%dT%H:%M:%S"),
+                    waste_type=waste_type
+                )
+                self.collections.add(collection)
+
+        except requests.exceptions.RequestException as exc:
+            _LOGGER.error('Error occurred while fetching data: %r', exc)
+            return False
+        
 
 class RovaCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
