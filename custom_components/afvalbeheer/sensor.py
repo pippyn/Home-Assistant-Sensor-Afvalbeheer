@@ -387,6 +387,7 @@ class CirculusBerkelCollector(WasteCollector):
         'GFT': WASTE_TYPE_GREEN,
         'RESTAFR': WASTE_TYPE_GREY,
         # 'KCA': WASTE_TYPE_KCA,
+        'ZWAKRA': WASTE_TYPE_PACKAGES,
         'PMD': WASTE_TYPE_PACKAGES,
         'PAP': WASTE_TYPE_PAPER,
         # 'TEXTILE': WASTE_TYPE_TEXTILE,
