@@ -1048,3 +1048,10 @@ def _format_sensor(name, name_prefix, waste_collector, sensor_type):
         (name + ' ' if name else "") +
         sensor_type
     )
+
+
+# https://limburg.net/api-proxy/public/kalender/71022/2020-1?straatNummer=33751&huisNummer=13&toevoeging=
+# https://limburg.net/api-proxy/public/afval-kalender/gemeenten/search?query=Hasselt
+# https://limburg.net/api-proxy/public/afval-kalender/gemeente/71022/straten/search?query=Grote+Markt
+
+# https://limburg.net/api-proxy/public/kalender/71022/0000?straatNummer=33751&huisNummer=13&toevoeging=
