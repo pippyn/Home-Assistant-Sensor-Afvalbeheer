@@ -62,6 +62,7 @@ Choose your collector from this list:
   - Ophaalkalender (don't forget the streetname option)
   - PeelEnMaas
   - Purmerend
+  - ROVA
   - RMN
   - Spaarnelanden
   - SudwestFryslan
