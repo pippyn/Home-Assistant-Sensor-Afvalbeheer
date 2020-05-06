@@ -575,9 +575,22 @@ class LimburgNetCollector(WasteCollector):
         self.street_id = response[0]['nummer']
 
     def __get_data(self):
-        get_url = '{}/kalender/{}/0000?straatNummer={}&huisNummer={}&toevoeging={}'.format(
-                self.main_url, self.city_id, self.street_id, self.street_number, self.suffix)
-        return requests.get(get_url)
+        today = datetime.today()
+        year = today.year
+        month = today.month
+        get_url = '{}/kalender/{}/{}-{}?straatNummer={}&huisNummer={}&toevoeging={}'.format(
+                self.main_url, self.city_id, year, month, self.street_id, self.street_number, self.suffix)
+        current_month = requests.get(get_url).json()
+
+        today = (today.replace(day=1) + timedelta(days=32)).replace(day=1)
+        year = today.year
+        month = today.month
+        get_url = '{}/kalender/{}/{}-{}?straatNummer={}&huisNummer={}&toevoeging={}'.format(
+                self.main_url, self.city_id, year, month, self.street_id, self.street_number, self.suffix)
+        next_month = requests.get(get_url).json()
+
+        data = current_month['events'] + next_month['events']
+        return data
 
     async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
@@ -588,14 +601,13 @@ class LimburgNetCollector(WasteCollector):
             if not self.city_id or not self.street_id:
                 await self.hass.async_add_executor_job(self.__fetch_address)
 
-            r = await self.hass.async_add_executor_job(self.__get_data)
-            response = r.json()
+            response = await self.hass.async_add_executor_job(self.__get_data)
 
             if not response:
                 _LOGGER.error('No Waste data found!')
                 return
 
-            for item in response['events']:
+            for item in response:
                 if not item['date']:
                     continue
 
