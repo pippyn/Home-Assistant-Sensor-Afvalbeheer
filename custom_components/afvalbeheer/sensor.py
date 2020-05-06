@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.2.2 20200505 - Pippijn Stortelder
+Current Version: 4.2.3 20200505 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -17,6 +17,7 @@ Current Version: 4.2.2 20200505 - Pippijn Stortelder
 20200503 - Added new Rova API
 20200505 - Fix Circulus-Berkel Mapping
 20200505 - Added support for RD4
+20200506 - Support for Limburg.NET and AfvalAlert
 
 Example config:
 Configuration.yaml:
