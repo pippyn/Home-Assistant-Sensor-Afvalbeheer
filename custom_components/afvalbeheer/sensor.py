@@ -122,6 +122,7 @@ WASTE_TYPE_GREEN = 'gft'
 WASTE_TYPE_GREENGREY = 'duobak'
 WASTE_TYPE_GREY = 'restafval'
 WASTE_TYPE_KCA = 'chemisch'
+WASTE_TYPE_MILIEUB = 'milieuboer'
 WASTE_TYPE_PACKAGES = 'pmd'
 WASTE_TYPE_PAPER = 'papier'
 WASTE_TYPE_PLASTIC = 'plastic'
@@ -280,6 +281,8 @@ class WasteData(object):
             self.collector = XimmioCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector in ["mijnafvalwijzer", "afvalstoffendienstkalender"]:
             self.collector = AfvalwijzerCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+        elif self.waste_collector == "afvalalert":
+            self.collector = AfvalAlertCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "deafvalapp":
             self.collector = DeAfvalAppCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "circulus-berkel":
@@ -329,6 +332,65 @@ class WasteCollector(metaclass=abc.ABCMeta):
             if from_type.lower() in name.lower():
                 return to_type
         return name.lower()
+
+
+class AfvalAlertCollector(WasteCollector):
+    WASTE_TYPE_MAPPING = {
+        # 'tak-snoeiafval': WASTE_TYPE_BRANCHES,
+        # 'gemengde plastics': WASTE_TYPE_PLASTIC,
+        # 'grof huisvuil': WASTE_TYPE_BULKLITTER,
+        # 'grof huisvuil afroep': WASTE_TYPE_BULKLITTER,
+        # 'tak-snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
+        # 'fles-groen-glas': WASTE_TYPE_GLASS,
+        'gft': WASTE_TYPE_GREEN,
+        # 'batterij': WASTE_TYPE_KCA,
+        'rest': WASTE_TYPE_GREY,
+        'milb': WASTE_TYPE_MILIEUB,
+        # 'p-k': WASTE_TYPE_PAPER,
+        # 'shirt-textiel': WASTE_TYPE_TEXTILE,
+        'kerst': WASTE_TYPE_TREE,
+        # 'gemengde plastics': WASTE_TYPE_PLASTIC,
+    }
+
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
+        super(AfvalAlertCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
+        self.main_url = "https://www.afvalalert.nl/kalender"
+
+    def __get_data(self):
+        get_url = '{}/{}/{}{}'.format(
+                self.main_url, self.postcode, self.street_number, self.suffix)
+        return requests.get(get_url)
+
+    async def update(self):
+        _LOGGER.debug('Updating Waste collection dates using Rest API')
+
+        self.collections.remove_all()
+
+        try:
+            r = await self.hass.async_add_executor_job(self.__get_data)
+            response = r.json()
+
+            if not response:
+                _LOGGER.error('No Waste data found!')
+                return
+
+            for item in response['items']:
+                if not item['date']:
+                    continue
+
+                waste_type = self.map_waste_type(item['type'])
+                if not waste_type:
+                    continue
+
+                collection = WasteCollection.create(
+                    date=datetime.strptime(item['date'], '%Y-%m-%d'),
+                    waste_type=waste_type
+                )
+                self.collections.add(collection)
+
+        except requests.exceptions.RequestException as exc:
+            _LOGGER.error('Error occurred while fetching data: %r', exc)
+            return False
 
 
 class AfvalwijzerCollector(WasteCollector):
@@ -774,7 +836,7 @@ class OpzetCollector(WasteCollector):
             _LOGGER.error('Error occurred while fetching data: %r', exc)
             return False
 
-        
+
 class RD4Collector(WasteCollector):
     WASTE_TYPE_MAPPING = {
         # 'snoeiafval': WASTE_TYPE_BRANCHES,
@@ -834,7 +896,7 @@ class RD4Collector(WasteCollector):
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
             return False
-        
+
 
 class RovaCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
