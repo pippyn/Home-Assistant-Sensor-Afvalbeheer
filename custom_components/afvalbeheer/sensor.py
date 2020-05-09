@@ -638,21 +638,20 @@ class LimburgNetCollector(WasteCollector):
         self.street_id = response[0]['nummer']
 
     def __get_data(self):
-        today = datetime.today()
-        year = today.year
-        month = today.month
-        get_url = '{}/kalender/{}/{}-{}?straatNummer={}&huisNummer={}&toevoeging={}'.format(
-                self.main_url, self.city_id, year, month, self.street_id, self.street_number, self.suffix)
-        current_month = requests.get(get_url).json()
+        data = []
+        
+        for x in range(0, 3):
+            if x == 0:
+                today = datetime.today()
+            else: 
+                today = (today.replace(day=1) + timedelta(days=32)).replace(day=1)
+            year = today.year
+            month = today.month
+            get_url = '{}/kalender/{}/{}-{}?straatNummer={}&huisNummer={}&toevoeging={}'.format(
+                    self.main_url, self.city_id, year, month, self.street_id, self.street_number, self.suffix)
+            month_json = requests.get(get_url).json()
+            data = data + month_json['events']
 
-        today = (today.replace(day=1) + timedelta(days=32)).replace(day=1)
-        year = today.year
-        month = today.month
-        get_url = '{}/kalender/{}/{}-{}?straatNummer={}&huisNummer={}&toevoeging={}'.format(
-                self.main_url, self.city_id, year, month, self.street_id, self.street_number, self.suffix)
-        next_month = requests.get(get_url).json()
-
-        data = current_month['events'] + next_month['events']
         return data
 
     async def update(self):
