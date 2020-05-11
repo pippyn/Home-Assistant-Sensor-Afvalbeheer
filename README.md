@@ -57,7 +57,7 @@ Choose your collector from this list:
   - GAD
   - Hellendoorn
   - HVC
-  - Limburg.NET
+  - Limburg.NET (don't forget the streetname and cityname option)
   - Meerlanden
   - MijnAfvalwijzer
   - Montfoort
