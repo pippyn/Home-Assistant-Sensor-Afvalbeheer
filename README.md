@@ -109,7 +109,13 @@ Streetnumber is required and is your own street number
 ```yaml
 streetname: ?
 ```
-Street number is only required for Ophaalkalender.be
+Streetname is only required for Ophaalkalender.be and Limburg.NET
+
+### Cityname
+```yaml
+cityname: ?
+```
+Cityname is only required for Limburg.NET
 
 ### Upcoming sensor
 ```yaml
