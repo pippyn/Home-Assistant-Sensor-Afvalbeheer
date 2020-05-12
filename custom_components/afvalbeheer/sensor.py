@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.2.3 20200505 - Pippijn Stortelder
+Current Version: 4.2.4 20200512 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -18,6 +18,7 @@ Current Version: 4.2.3 20200505 - Pippijn Stortelder
 20200505 - Fix Circulus-Berkel Mapping
 20200505 - Added support for RD4
 20200506 - Support for Limburg.NET and AfvalAlert
+20200512 - Fix fraction mapping for Circulus Berkel
 
 Example config:
 Configuration.yaml:
@@ -456,9 +457,10 @@ class CirculusBerkelCollector(WasteCollector):
         # 'BRANCHES': WASTE_TYPE_BRANCHES,
         # 'BULKLITTER': WASTE_TYPE_BULKLITTER,
         # 'BULKYGARDENWASTE': WASTE_TYPE_BULKYGARDENWASTE,
+        'DROCODEV': WASTE_TYPE_PAPER,
         # 'GLASS': WASTE_TYPE_GLASS,
         'GFT': WASTE_TYPE_GREEN,
-        'RESTAFR': WASTE_TYPE_GREY,
+        'REST': WASTE_TYPE_GREY,
         # 'KCA': WASTE_TYPE_KCA,
         'ZWAKRA': WASTE_TYPE_PACKAGES,
         'PMD': WASTE_TYPE_PACKAGES,
