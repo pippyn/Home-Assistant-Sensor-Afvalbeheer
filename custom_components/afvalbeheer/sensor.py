@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.2.4 20200512 - Pippijn Stortelder
+Current Version: 4.2.5 20200513 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -19,6 +19,7 @@ Current Version: 4.2.4 20200512 - Pippijn Stortelder
 20200505 - Added support for RD4
 20200506 - Support for Limburg.NET and AfvalAlert
 20200512 - Fix fraction mapping for Circulus Berkel
+20200513 - Add attribute days_until
 
 Example config:
 Configuration.yaml:
@@ -83,6 +84,7 @@ CONF_DAY_OF_WEEK = 'dayofweek'
 ATTR_WASTE_COLLECTOR = 'Wastecollector'
 ATTR_HIDDEN = 'Hidden'
 ATTR_SORT_DATE = 'Sort-date'
+ATTR_DAYS_UNTIL = 'Days-until'
 
 OPZET_COLLECTOR_URLS = {
     'alkmaar': 'https://inzamelkalender.stadswerk072.nl/',
@@ -1072,6 +1074,7 @@ class WasteTypeSensor(Entity):
         else:
             self._today = "Today, "
             self._tomorrow = "Tomorrow, "
+        self._days_until = None
         self._unit = ''
         self._sort_date = 0
         self._hidden = False
@@ -1095,7 +1098,8 @@ class WasteTypeSensor(Entity):
         return {
             ATTR_WASTE_COLLECTOR: self.waste_collector,
             ATTR_HIDDEN: self._hidden,
-            ATTR_SORT_DATE: self._sort_date
+            ATTR_SORT_DATE: self._sort_date,
+            ATTR_DAYS_UNTIL: self._days_until
         }
 
     @property
@@ -1121,7 +1125,7 @@ class WasteTypeSensor(Entity):
 
     def __set_state(self, collection):
         date_diff = (collection.date - datetime.now()).days + 1
-
+        self._days_until = date_diff
         if self.date_object:
             self._state = collection.date
         elif self.date_only:
