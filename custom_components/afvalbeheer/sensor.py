@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.2.5 20200513 - Pippijn Stortelder
+Current Version: 4.2.6 20200514 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -20,6 +20,7 @@ Current Version: 4.2.5 20200513 - Pippijn Stortelder
 20200506 - Support for Limburg.NET and AfvalAlert
 20200512 - Fix fraction mapping for Circulus Berkel
 20200513 - Add attribute days_until
+20200514 - Fix raction mapping for MijnAfvalWijzer
 
 Example config:
 Configuration.yaml:
@@ -127,6 +128,7 @@ WASTE_TYPE_GREENGREY = 'duobak'
 WASTE_TYPE_GREY = 'restafval'
 WASTE_TYPE_KCA = 'chemisch'
 WASTE_TYPE_MILIEUB = 'milieuboer'
+WASTE_TYPE_PAPER_PMD = 'papier-pmd'
 WASTE_TYPE_PACKAGES = 'pmd'
 WASTE_TYPE_PAPER = 'papier'
 WASTE_TYPE_PLASTIC = 'plastic'
@@ -399,6 +401,8 @@ class AfvalAlertCollector(WasteCollector):
 
 class AfvalwijzerCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
+        'dhm': WASTE_TYPE_PAPER_PMD,
+        'restgft': WASTE_TYPE_GREENGREY,
         'takken': WASTE_TYPE_BRANCHES,
         'grofvuil': WASTE_TYPE_BULKLITTER,
         'tuinafval': WASTE_TYPE_BULKYGARDENWASTE,
@@ -430,7 +434,6 @@ class AfvalwijzerCollector(WasteCollector):
             response = r.json()
 
             data = (response['data']['ophaaldagen']['data'] + response['data']['ophaaldagenNext']['data'])
-
             if not data:
                 _LOGGER.error('No Waste data found!')
                 return
