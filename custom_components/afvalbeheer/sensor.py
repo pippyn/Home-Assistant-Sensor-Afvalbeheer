@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.2.6 20200514 - Pippijn Stortelder
+Current Version: 4.2.7 20200515 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -21,6 +21,7 @@ Current Version: 4.2.6 20200514 - Pippijn Stortelder
 20200512 - Fix fraction mapping for Circulus Berkel
 20200513 - Add attribute days_until
 20200514 - Fix raction mapping for MijnAfvalWijzer
+20200515 - Fix raction mapping for Limburg.NET
 
 Example config:
 Configuration.yaml:
@@ -606,7 +607,7 @@ class LimburgNetCollector(WasteCollector):
         'Grofvuil': WASTE_TYPE_BULKLITTER,
         # 'grof huisvuil afroep': WASTE_TYPE_BULKLITTER,
         # 'tak-snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
-        # 'fles-groen-glas': WASTE_TYPE_GLASS,
+        'glas': WASTE_TYPE_GLASS,
         'GFT': WASTE_TYPE_GREEN,
         # 'batterij': WASTE_TYPE_KCA,
         'Huisvuil': WASTE_TYPE_GREY,
