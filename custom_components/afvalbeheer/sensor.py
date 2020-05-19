@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.2.7 20200515 - Pippijn Stortelder
+Current Version: 4.2.8 20200515 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -22,6 +22,7 @@ Current Version: 4.2.7 20200515 - Pippijn Stortelder
 20200513 - Add attribute days_until
 20200514 - Fix raction mapping for MijnAfvalWijzer
 20200515 - Fix raction mapping for Limburg.NET
+20200519 - Fix raction mapping for Circulus-Berkel
 
 Example config:
 Configuration.yaml:
@@ -463,7 +464,7 @@ class CirculusBerkelCollector(WasteCollector):
         # 'BRANCHES': WASTE_TYPE_BRANCHES,
         # 'BULKLITTER': WASTE_TYPE_BULKLITTER,
         # 'BULKYGARDENWASTE': WASTE_TYPE_BULKYGARDENWASTE,
-        'DROCODEV': WASTE_TYPE_PAPER,
+        'DROCO': WASTE_TYPE_PAPER,
         # 'GLASS': WASTE_TYPE_GLASS,
         'GFT': WASTE_TYPE_GREEN,
         'REST': WASTE_TYPE_GREY,
