@@ -20,9 +20,10 @@ Current Version: 4.2.8 20200515 - Pippijn Stortelder
 20200506 - Support for Limburg.NET and AfvalAlert
 20200512 - Fix fraction mapping for Circulus Berkel
 20200513 - Add attribute days_until
-20200514 - Fix fraction mapping for MijnAfvalWijzer
-20200515 - Fix fraction mapping for Limburg.NET
-20200519 - Fix fraction mapping for Circulus-Berkel
+20200514 - Fix raction mapping for MijnAfvalWijzer
+20200515 - Fix raction mapping for Limburg.NET
+20200519 - Fix raction mapping for Circulus-Berkel
+20200523 - Support for Area Reiniging
 
 Example config:
 Configuration.yaml:
@@ -116,6 +117,7 @@ OPZET_COLLECTOR_URLS = {
 
 XIMMIO_COLLECTOR_IDS = {
     'acv': 'f8e2844a-095e-48f9-9f98-71fceb51d2c3',
+    'area': 'adc418da-d19b-11e5-ab30-625662870761',
     'hellendoorn': '24434f5b-7244-412b-9306-3a2bd1e22bc1',
     'meerlanden': '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
     'twentemilieu': '8d97bb56-5afd-4cbc-a651-b4f7314264b4',
@@ -134,6 +136,7 @@ WASTE_TYPE_PAPER_PMD = 'papier-pmd'
 WASTE_TYPE_PACKAGES = 'pmd'
 WASTE_TYPE_PAPER = 'papier'
 WASTE_TYPE_PLASTIC = 'plastic'
+WASTE_TYPE_REMAINDER = 'restwagen'
 WASTE_TYPE_TEXTILE = 'textiel'
 WASTE_TYPE_TREE = 'kerstbomen'
 WASTE_TYPE_BULKYGARDENWASTE = 'tuinafval'
@@ -988,6 +991,7 @@ class XimmioCollector(WasteCollector):
         'KCA': WASTE_TYPE_KCA,
         'PACKAGES': WASTE_TYPE_PACKAGES,
         'PAPER': WASTE_TYPE_PAPER,
+        'REMAINDER': WASTE_TYPE_REMAINDER,
         'TEXTILE': WASTE_TYPE_TEXTILE,
         'TREE': WASTE_TYPE_TREE,
     }
