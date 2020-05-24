@@ -20,9 +20,9 @@ Current Version: 4.2.8 20200515 - Pippijn Stortelder
 20200506 - Support for Limburg.NET and AfvalAlert
 20200512 - Fix fraction mapping for Circulus Berkel
 20200513 - Add attribute days_until
-20200514 - Fix raction mapping for MijnAfvalWijzer
-20200515 - Fix raction mapping for Limburg.NET
-20200519 - Fix raction mapping for Circulus-Berkel
+20200514 - Fix fraction mapping for MijnAfvalWijzer
+20200515 - Fix fraction mapping for Limburg.NET
+20200519 - Fix fraction mapping for Circulus-Berkel
 20200523 - Support for Area Reiniging
 
 Example config:
