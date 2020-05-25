@@ -44,7 +44,7 @@ Choose your collector from this list:
   - AfvalAlert
   - Alkmaar
   - AlphenAanDenRijn
-  - Area Reiniging
+  - AreaReiniging
   - Avalex
   - Berkelland
   - Blink
