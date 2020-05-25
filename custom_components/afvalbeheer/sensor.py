@@ -213,6 +213,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     elif waste_collector == "ximmio":
         _LOGGER.error("Ximmio - due to more collectors using Ximmio, you need to change your config. Set the wast collector to the actual collector (i.e. Meerlanden, TwenteMilieu , etc.). Using Ximmio in your config, this sensor will asume you meant Meerlanden.")
     elif waste_collector == "area":
+        _LOGGER.error("Area - Update your config to use AreaReiniging as a waste collector.")
         waste_collector = "areareiniging"    
     data = WasteData(hass, waste_collector, city_name, postcode, street_name, street_number, suffix)
 
