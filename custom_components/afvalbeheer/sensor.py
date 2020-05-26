@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.2.11 20200526 - Pippijn Stortelder
+Current Version: 4.2.12 20200526 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -26,6 +26,7 @@ Current Version: 4.2.11 20200526 - Pippijn Stortelder
 20200523 - Support for Area Reiniging
 20200525 - Fix for Area Reiniging
 20200526 - Fix mapping for Area Reiniging
+20200526 - Added option to always show the day names
 
 Example config:
 Configuration.yaml:
@@ -86,6 +87,7 @@ CONF_BUILT_IN_ICONS = 'builtinicons'
 CONF_DISABLE_ICONS = 'disableicons'
 CONF_TRANSLATE_DAYS = 'dutch'
 CONF_DAY_OF_WEEK = 'dayofweek'
+CONF_ALWAYS_SHOW_DAY = 'alwaysshowday'
 
 ATTR_WASTE_COLLECTOR = 'Wastecollector'
 ATTR_HIDDEN = 'Hidden'
@@ -181,6 +183,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_DISABLE_ICONS, default=False): cv.boolean,
     vol.Optional(CONF_TRANSLATE_DAYS, default=False): cv.boolean,
     vol.Optional(CONF_DAY_OF_WEEK, default=True): cv.boolean,
+    vol.Optional(CONF_ALWAYS_SHOW_DAY, default=False): cv.boolean,
 })
 
 
@@ -202,6 +205,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     disable_icons = config.get(CONF_DISABLE_ICONS)
     dutch_days = config.get(CONF_TRANSLATE_DAYS)
     day_of_week = config.get(CONF_DAY_OF_WEEK)
+    always_show_day = config.get(CONF_ALWAYS_SHOW_DAY)
 
     if date_object == True:
         date_only = 1
@@ -222,7 +226,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     for resource in config[CONF_RESOURCES]:
         waste_type = resource.lower()
-        entities.append(WasteTypeSensor(data, waste_type, waste_collector, date_format, date_only, date_object, name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week))
+        entities.append(WasteTypeSensor(data, waste_type, waste_collector, date_format, date_only, date_object, 
+            name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week, always_show_day))
 
     if sensor_today:
         entities.append(WasteDateSensor(data, config[CONF_RESOURCES], waste_collector, timedelta(), dutch_days, name, name_prefix))
@@ -1070,7 +1075,8 @@ class XimmioCollector(WasteCollector):
 
 class WasteTypeSensor(Entity):
 
-    def __init__(self, data, waste_type, waste_collector, date_format, date_only, date_object, name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week):
+    def __init__(self, data, waste_type, waste_collector, date_format, date_only, date_object, 
+        name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week, always_show_day):
         self.data = data
         self.waste_type = waste_type
         self.waste_collector = waste_collector
@@ -1082,6 +1088,7 @@ class WasteTypeSensor(Entity):
         self.disable_icons = disable_icons
         self.dutch_days = dutch_days
         self.day_of_week = day_of_week
+        self.always_show_day = always_show_day
         if self.dutch_days:
             self._today = "Vandaag, "
             self._tomorrow = "Morgen, "
@@ -1144,7 +1151,7 @@ class WasteTypeSensor(Entity):
             self._state = collection.date
         elif self.date_only:
             self._state = collection.date.strftime(self.date_format)
-        elif date_diff >= 8:
+        elif date_diff >= 8 and not self.always_show_day:
             self._state = collection.date.strftime(self.date_format)
         elif date_diff > 1:
             if self.day_of_week:
