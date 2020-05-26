@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.2.10 20200525 - Pippijn Stortelder
+Current Version: 4.2.11 20200526 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -25,6 +25,7 @@ Current Version: 4.2.10 20200525 - Pippijn Stortelder
 20200519 - Fix fraction mapping for Circulus-Berkel
 20200523 - Support for Area Reiniging
 20200525 - Fix for Area Reiniging
+20200526 - Fix mapping for Area Reiniging
 
 Example config:
 Configuration.yaml:
@@ -992,6 +993,7 @@ class XimmioCollector(WasteCollector):
         'GREEN': WASTE_TYPE_GREEN,
         'GREY': WASTE_TYPE_GREY,
         'KCA': WASTE_TYPE_KCA,
+        'PLASTIC': WASTE_TYPE_PACKAGES,
         'PACKAGES': WASTE_TYPE_PACKAGES,
         'PAPER': WASTE_TYPE_PAPER,
         'REMAINDER': WASTE_TYPE_REMAINDER,
