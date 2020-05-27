@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.3.0 20200527 - Pippijn Stortelder
+Current Version: 4.3.1 20200527 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -28,6 +28,7 @@ Current Version: 4.3.0 20200527 - Pippijn Stortelder
 20200526 - Fix mapping for Area Reiniging
 20200526 - Added option to always show the day names
 20200527 - Support for Omrin
+20200527 - Support for Almere
 
 Example config:
 Configuration.yaml:
@@ -126,6 +127,7 @@ OPZET_COLLECTOR_URLS = {
 
 XIMMIO_COLLECTOR_IDS = {
     'acv': 'f8e2844a-095e-48f9-9f98-71fceb51d2c3',
+    'almere': '53d8db94-7945-42fd-9742-9bbc71dbe4c1',
     'areareiniging': 'adc418da-d19b-11e5-ab30-625662870761',
     'hellendoorn': '24434f5b-7244-412b-9306-3a2bd1e22bc1',
     'meerlanden': '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
