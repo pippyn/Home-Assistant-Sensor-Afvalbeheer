@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.2.12 20200526 - Pippijn Stortelder
+Current Version: 4.3.0 20200527 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -27,6 +27,7 @@ Current Version: 4.2.12 20200526 - Pippijn Stortelder
 20200525 - Fix for Area Reiniging
 20200526 - Fix mapping for Area Reiniging
 20200526 - Added option to always show the day names
+20200527 - Support for Omrin
 
 Example config:
 Configuration.yaml:
@@ -59,6 +60,10 @@ import random
 import requests
 import re
 import voluptuous as vol
+import uuid
+from rsa import key, common, pkcs1
+from Crypto.PublicKey import RSA
+from base64 import b64decode, b64encode
 
 from homeassistant.components.sensor import PLATFORM_SCHEMA
 import homeassistant.helpers.config_validation as cv
@@ -309,6 +314,8 @@ class WasteData(object):
             self.collector = CirculusBerkelCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "limburg.net":
             self.collector = LimburgNetCollector(self.hass, self.waste_collector, self.city_name, self.postcode, self.street_name, self.street_number, self.suffix)
+        elif self.waste_collector == "omrin":
+            self.collector = OmrinCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "ophaalkalender":
             self.collector = OphaalkalenderCollector(self.hass, self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix)
         elif self.waste_collector == "rd4":
@@ -700,6 +707,71 @@ class LimburgNetCollector(WasteCollector):
 
                 collection = WasteCollection.create(
                     date=datetime.strptime(item['date'], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None),
+                    waste_type=waste_type
+                )
+                self.collections.add(collection)
+
+        except requests.exceptions.RequestException as exc:
+            _LOGGER.error('Error occurred while fetching data: %r', exc)
+            return False
+
+
+class OmrinCollector(WasteCollector):
+    WASTE_TYPE_MAPPING = {
+        # 'BRANCHES': WASTE_TYPE_BRANCHES,
+        'Grofvuil': WASTE_TYPE_BULKLITTER,
+        # 'BULKYGARDENWASTE': WASTE_TYPE_BULKYGARDENWASTE,
+        # 'GLASS': WASTE_TYPE_GLASS,
+        'Biobak': WASTE_TYPE_GREEN,
+        # 'GREY': WASTE_TYPE_GREY,
+        'KCA': WASTE_TYPE_KCA,
+        # 'Sortibak': WASTE_TYPE_PACKAGES,
+        'Papier': WASTE_TYPE_PAPER,
+        # 'REMAINDER': WASTE_TYPE_REMAINDER,
+        # 'TEXTILE': WASTE_TYPE_TEXTILE,
+        # 'TREE': WASTE_TYPE_TREE,
+    }
+
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
+        super(OmrinCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
+        self.main_url = "https://api-omrin.freed.nl/Account"
+        self.appId = uuid.uuid1().__str__()
+        self.publicKey = None
+
+    def __fetch_publickey(self):
+        response = requests.post("{}/GetToken/".format(self.main_url), json={'AppId': self.appId, 'AppVersion': '', 'OsVersion': '', 'Platform': ''}).json()
+        self.publicKey = b64decode(response['PublicKey'])
+
+    def __get_data(self):
+        rsaPublicKey = RSA.importKey(self.publicKey)
+        requestBody = {'a': False, 'Email': None, 'Password': None, 'PostalCode': self.postcode, 'HouseNumber': self.street_number}
+
+        encryptedRequest = pkcs1.encrypt(json.dumps(requestBody).encode(), rsaPublicKey)
+        base64EncodedRequest = b64encode(encryptedRequest).decode("utf-8")
+
+        response = requests.post("{}/FetchAccount/".format(self.main_url) + self.appId, '"' + base64EncodedRequest + '"').json()
+        return response['CalendarHomeV2']
+
+    async def update(self):
+        _LOGGER.debug('Updating Waste collection dates using Rest API')
+
+        self.collections.remove_all()
+
+        try:
+            if not self.publicKey:
+                await self.hass.async_add_executor_job(self.__fetch_publickey)
+
+            response = await self.hass.async_add_executor_job(self.__get_data)
+            for item in response:
+                if not item['Datum']:
+                    continue
+
+                waste_type = self.map_waste_type(item['Omschrijving'])
+                if not waste_type:
+                    continue
+
+                collection = WasteCollection.create(
+                    date=datetime.strptime(item['Datum'], '%Y-%m-%dT%H:%M:%S'),
                     waste_type=waste_type
                 )
                 self.collections.add(collection)
