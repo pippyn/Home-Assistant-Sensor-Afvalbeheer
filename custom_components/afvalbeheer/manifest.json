@@ -4,5 +4,5 @@
   "documentation": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer",
   "dependencies": [],
   "codeowners": ["@pippyn"],
-  "requirements": ["rsa"]
+  "requirements": ["rsa==4.0"]
 }
