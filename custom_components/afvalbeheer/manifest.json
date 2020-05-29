@@ -2,7 +2,7 @@
   "domain": "afvalbeheer",
   "name": "Afvalbeheer",
   "documentation": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer",
-  "dependencies": ["rsa"],
+  "dependencies": [],
   "codeowners": ["@pippyn"],
-  "requirements": []
+  "requirements": ["rsa"]
 }
