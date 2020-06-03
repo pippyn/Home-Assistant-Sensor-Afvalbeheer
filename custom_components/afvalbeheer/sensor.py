@@ -29,6 +29,7 @@ Current Version: 4.3.1 20200527 - Pippijn Stortelder
 20200526 - Added option to always show the day names
 20200527 - Support for Omrin
 20200527 - Support for Almere
+20200604 - Add sortibak for Omrin
 
 Example config:
 Configuration.yaml:
@@ -141,6 +142,7 @@ WASTE_TYPE_GLASS = 'glas'
 WASTE_TYPE_GREEN = 'gft'
 WASTE_TYPE_GREENGREY = 'duobak'
 WASTE_TYPE_GREY = 'restafval'
+WASTE_TYPE_SORTI = 'sortibak'
 WASTE_TYPE_KCA = 'chemisch'
 WASTE_TYPE_MILIEUB = 'milieuboer'
 WASTE_TYPE_PAPER_PMD = 'papier-pmd'
@@ -727,7 +729,7 @@ class OmrinCollector(WasteCollector):
         'Biobak': WASTE_TYPE_GREEN,
         # 'GREY': WASTE_TYPE_GREY,
         'KCA': WASTE_TYPE_KCA,
-        # 'Sortibak': WASTE_TYPE_PACKAGES,
+        'Sortibak': WASTE_TYPE_SORTI,
         'Papier': WASTE_TYPE_PAPER,
         # 'REMAINDER': WASTE_TYPE_REMAINDER,
         # 'TEXTILE': WASTE_TYPE_TEXTILE,
