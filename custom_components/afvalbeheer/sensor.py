@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.3.1 20200527 - Pippijn Stortelder
+Current Version: 4.3.2 20200604 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -29,7 +29,7 @@ Current Version: 4.3.1 20200527 - Pippijn Stortelder
 20200526 - Added option to always show the day names
 20200527 - Support for Omrin
 20200527 - Support for Almere
-20200604 - Add sortibak for Omrin
+20200604 - Fix mapping for Omrin
 
 Example config:
 Configuration.yaml:
@@ -727,6 +727,7 @@ class OmrinCollector(WasteCollector):
         # 'BULKYGARDENWASTE': WASTE_TYPE_BULKYGARDENWASTE,
         # 'GLASS': WASTE_TYPE_GLASS,
         'Biobak': WASTE_TYPE_GREEN,
+        'GFT': WASTE_TYPE_GREEN,
         # 'GREY': WASTE_TYPE_GREY,
         'KCA': WASTE_TYPE_KCA,
         'Sortibak': WASTE_TYPE_SORTI,
