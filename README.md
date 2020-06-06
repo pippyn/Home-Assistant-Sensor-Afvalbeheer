@@ -1,4 +1,6 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
+
+[![Buy me a coffee][buymeacoffee-shield]][buymeacoffee]
 ## Home Assisant sensor component for Afvalbeheer
 
 Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API.
@@ -197,6 +199,9 @@ If you want to display the names of the days in dutch. Default is 0.
 
 ## HACS
 You can use HACS to install this sensor. It is included by default.
+
+### Credits
+Omrin API - @Jordi1990
 
 [![Buy me a coffee][buymeacoffee-shield]][buymeacoffee]
 
