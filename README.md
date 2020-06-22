@@ -100,7 +100,6 @@ Some collectors also use some of these options:
   - chemisch
   - sloopafval
   - takken
-  - kca
   - pbd
   - duobak
   - restwagen
