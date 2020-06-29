@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.3.2 20200604 - Pippijn Stortelder
+Current Version: 4.3.3 20200629 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -30,6 +30,7 @@ Current Version: 4.3.2 20200604 - Pippijn Stortelder
 20200527 - Support for Omrin
 20200527 - Support for Almere
 20200604 - Fix mapping for Omrin
+20200629 - Added support for Schouwen-Duiveland
 
 Example config:
 Configuration.yaml:
@@ -117,6 +118,7 @@ OPZET_COLLECTOR_URLS = {
     'peelenmaas': 'https://afvalkalender.peelenmaas.nl',
     'purmerend': 'https://afvalkalender.purmerend.nl',
     'rmn': 'https://inzamelschema.rmn.nl',
+    'schouwen-duiveland': 'https://afvalkalender.schouwen-duiveland.nl',
     'spaarnelanden': 'https://afvalwijzer.spaarnelanden.nl',
     'sudwestfryslan': 'https://afvalkalender.sudwestfryslan.nl',
     'suez': 'https://inzamelwijzer.suez.nl',
