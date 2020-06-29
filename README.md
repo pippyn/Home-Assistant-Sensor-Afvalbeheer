@@ -72,6 +72,7 @@ Choose your collector from this list:
   - RD4
   - ROVA
   - RMN
+  - Schouwen-Duiveland
   - Spaarnelanden
   - SudwestFryslan
   - Twente Milieu
