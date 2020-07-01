@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.3.3 20200629 - Pippijn Stortelder
+Current Version: 4.3.4 20200701 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -31,6 +31,7 @@ Current Version: 4.3.3 20200629 - Pippijn Stortelder
 20200527 - Support for Almere
 20200604 - Fix mapping for Omrin
 20200629 - Added support for Schouwen-Duiveland
+20200701 - Fix mapping for MijnAfvalWijzer
 
 Example config:
 Configuration.yaml:
@@ -438,6 +439,7 @@ class AfvalwijzerCollector(WasteCollector):
         'kca': WASTE_TYPE_KCA,
         'restafval': WASTE_TYPE_GREY,
         'plastic': WASTE_TYPE_PACKAGES,
+        'gkbp': WASTE_TYPE_PACKAGES,
         'papier': WASTE_TYPE_PAPER,
         'textiel': WASTE_TYPE_TEXTILE,
         'kerstbomen': WASTE_TYPE_TREE,
