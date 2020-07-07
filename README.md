@@ -124,6 +124,12 @@ cityname: ?
 ```
 Cityname is only required for Limburg.NET
 
+### Print all available waste fractions
+```yaml
+printwastetypes: 1
+```
+If you set this option the sensor will print a list of all possible waste fractions for your address and waste collector on every restart of your HA system.
+
 ### Upcoming sensor
 ```yaml
 upcomingsensor: 1
