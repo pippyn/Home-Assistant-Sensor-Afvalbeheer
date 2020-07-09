@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.4.0 20200707 - Pippijn Stortelder
+Current Version: 4.4.1 20200709 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -33,6 +33,7 @@ Current Version: 4.4.0 20200707 - Pippijn Stortelder
 20200629 - Added support for Schouwen-Duiveland
 20200701 - Fix mapping for MijnAfvalWijzer
 20200707 - Added option to print out all possible fractions on HA boot
+20200709 - Move messages from error log to persistant notification
 
 Example config:
 Configuration.yaml:
@@ -76,6 +77,7 @@ from homeassistant.const import (CONF_RESOURCES, DEVICE_CLASS_TIMESTAMP)
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import async_track_point_in_utc_time
 from homeassistant.util import dt as dt_util
+from homeassistant.components import persistent_notification
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -104,6 +106,8 @@ ATTR_WASTE_COLLECTOR = 'Wastecollector'
 ATTR_HIDDEN = 'Hidden'
 ATTR_SORT_DATE = 'Sort-date'
 ATTR_DAYS_UNTIL = 'Days-until'
+
+NOTIFICATION_ID = "Afvalbeheer"
 
 OPZET_COLLECTOR_URLS = {
     'alkmaar': 'https://inzamelkalender.stadswerk072.nl/',
@@ -229,12 +233,21 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         date_only = config.get(CONF_DATE_ONLY)
 
     if waste_collector == "cure":
-        _LOGGER.error("Afvalbeheer - Update your config to use Mijnafvalwijzer! You are still using Cure as a wast collector, which is deprecated. It's from now on; Mijnafvalwijzer. Check your automations and lovelace config, as the sensor names may also be changed!")
+        persistent_notification.create(
+                hass,
+                "Update your config to use Mijnafvalwijzer! You are still using Cure as a wast collector, which is deprecated. It's from now on; Mijnafvalwijzer. Check your automations and lovelace config, as the sensor names may also be changed!",
+                'Afvalwijzer', NOTIFICATION_ID)
         waste_collector = "mijnafvalwijzer"
     elif waste_collector == "ximmio":
-        _LOGGER.error("Ximmio - due to more collectors using Ximmio, you need to change your config. Set the wast collector to the actual collector (i.e. Meerlanden, TwenteMilieu , etc.). Using Ximmio in your config, this sensor will asume you meant Meerlanden.")
+        persistent_notification.create(
+                hass,
+                "Due to more collectors using Ximmio, you need to change your config. Set the wast collector to the actual collector (i.e. Meerlanden, TwenteMilieu , etc.). Using Ximmio in your config, this sensor will asume you meant Meerlanden.",
+                'Afvalwijzer', NOTIFICATION_ID)
     elif waste_collector == "area":
-        _LOGGER.error("Area - Update your config to use AreaReiniging as a waste collector.")
+        persistent_notification.create(
+                hass,
+                "Update your config to use AreaReiniging as a waste collector.",
+                'Afvalwijzer', NOTIFICATION_ID)
         waste_collector = "areareiniging"    
     data = WasteData(hass, waste_collector, city_name, postcode, street_name, street_number, suffix, print_waste_type)
 
@@ -343,7 +356,10 @@ class WasteData(object):
         elif self.waste_collector in OPZET_COLLECTOR_URLS.keys():
             self.collector = OpzetCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         else:
-            _LOGGER.error('Waste collector "{}" not found!'.format(self.waste_collector))
+            persistent_notification.create(
+                self.hass,
+                'Waste collector "{}" not found!'.format(self.waste_collector),
+                'Afvalwijzer', NOTIFICATION_ID)
 
     async def schedule_update(self, interval):
         nxt = dt_util.utcnow() + interval
@@ -353,7 +369,10 @@ class WasteData(object):
         await self.collector.update()
         await self.schedule_update(SCHEDULE_UPDATE_INTERVAL)
         if self.print_waste_type:
-            _LOGGER.error('Available waste types: ' + ', '.join(self.collector.collections.get_available_waste_types()))
+            persistent_notification.create(
+                self.hass,
+                'Available waste types: ' + ', '.join(self.collector.collections.get_available_waste_types()),
+                'Afvalwijzer', NOTIFICATION_ID)
             self.print_waste_type = False
 
     @property
