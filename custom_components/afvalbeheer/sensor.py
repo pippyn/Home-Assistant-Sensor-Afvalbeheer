@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.4.1 20200709 - Pippijn Stortelder
+Current Version: 4.4.2 20200715 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -34,6 +34,7 @@ Current Version: 4.4.1 20200709 - Pippijn Stortelder
 20200701 - Fix mapping for MijnAfvalWijzer
 20200707 - Added option to print out all possible fractions on HA boot
 20200709 - Move messages from error log to persistant notification
+20200715 - Hotfix for Suez sll problem
 
 Example config:
 Configuration.yaml:
@@ -919,10 +920,14 @@ class OpzetCollector(WasteCollector):
         super(OpzetCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
         self.main_url = OPZET_COLLECTOR_URLS[self.waste_collector]
         self.bag_id = None
+        if waste_collector == "suez":
+            self._verify = False
+        else:
+            self._verify = True
 
     def __fetch_address(self):
         response = requests.get(
-            "{}/rest/adressen/{}-{}".format(self.main_url, self.postcode, self.street_number)).json()
+            "{}/rest/adressen/{}-{}".format(self.main_url, self.postcode, self.street_number), verify=self._verify).json()
 
         if not response:
             _LOGGER.error('Address not found!')
@@ -934,7 +939,7 @@ class OpzetCollector(WasteCollector):
         get_url = "{}/rest/adressen/{}/afvalstromen".format(
                 self.main_url,
                 self.bag_id)
-        return requests.get(get_url)
+        return requests.get(get_url, verify=self._verify)
 
     async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
