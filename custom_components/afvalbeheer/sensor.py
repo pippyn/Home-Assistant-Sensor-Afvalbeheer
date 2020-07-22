@@ -792,7 +792,7 @@ class OmrinCollector(WasteCollector):
         encryptedRequest = pkcs1.encrypt(json.dumps(requestBody).encode(), rsaPublicKey)
         base64EncodedRequest = b64encode(encryptedRequest).decode("utf-8")
 
-        response = requests.post("{}/FetchAccount/".format(self.main_url) + self.appId, '"' + base64EncodedRequest + '"').json()
+        response = requests.post("{}/FetchAccount/".format(self.main_url) + self.appId, '"' + base64EncodedRequest + '"', timeout=60).json()
         return response['CalendarHomeV2']
 
     async def update(self):
