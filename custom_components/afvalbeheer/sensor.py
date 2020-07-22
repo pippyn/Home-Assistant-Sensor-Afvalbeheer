@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.4.3 20200722 - Pippijn Stortelder
+Current Version: 4.5.0 20200722 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -36,6 +36,7 @@ Current Version: 4.4.3 20200722 - Pippijn Stortelder
 20200709 - Move messages from error log to persistant notification
 20200715 - Hotfix for Suez sll problem
 20200722 - Added Omrin timeout (credits @Jordi1990)
+20200722 - Added AddressID override for Meerlanden
 
 Example config:
 Configuration.yaml:
@@ -91,6 +92,7 @@ CONF_POSTCODE = 'postcode'
 CONF_STREET_NAME = 'streetname'
 CONF_STREET_NUMBER = 'streetnumber'
 CONF_SUFFIX = 'suffix'
+CONF_ADDRESS_ID = 'addressid'
 CONF_DATE_FORMAT = 'dateformat'
 CONF_TODAY_TOMORROW = 'upcomingsensor'
 CONF_DATE_ONLY = 'dateonly'
@@ -192,6 +194,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_CITY_NAME, default=''): cv.string,
     vol.Optional(CONF_STREET_NAME, default=''): cv.string,
     vol.Optional(CONF_SUFFIX, default=''): cv.string,
+    vol.Optional(CONF_ADDRESS_ID, default=''): cv.string,
     vol.Optional(CONF_WASTE_COLLECTOR, default='Cure'): cv.string,
     vol.Optional(CONF_DATE_FORMAT, default='%d-%m-%Y'): cv.string,
     vol.Optional(CONF_TODAY_TOMORROW, default=False): cv.boolean,
@@ -216,6 +219,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     street_name = config.get(CONF_STREET_NAME)
     street_number = config.get(CONF_STREET_NUMBER)
     suffix = config.get(CONF_SUFFIX)
+    address_id = config.get(CONF_ADDRESS_ID)
     waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
     date_format = config.get(CONF_DATE_FORMAT)
     sensor_today = config.get(CONF_TODAY_TOMORROW)
@@ -251,7 +255,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
                 "Update your config to use AreaReiniging as a waste collector.",
                 'Afvalwijzer', NOTIFICATION_ID)
         waste_collector = "areareiniging"    
-    data = WasteData(hass, waste_collector, city_name, postcode, street_name, street_number, suffix, print_waste_type)
+    data = WasteData(hass, waste_collector, city_name, postcode, street_name, street_number, suffix, address_id, print_waste_type)
 
     entities = []
 
@@ -322,7 +326,7 @@ class WasteCollection(object):
 
 class WasteData(object):
 
-    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, print_waste_type):
+    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, address_id, print_waste_type):
         self.hass = hass
         self.waste_collector = waste_collector
         self.city_name = city_name
@@ -330,13 +334,14 @@ class WasteData(object):
         self.street_name = street_name
         self.street_number = street_number
         self.suffix = suffix
+        self.address_id = address_id
         self.print_waste_type = print_waste_type
         self.collector = None
         self.__select_collector()
 
     def __select_collector(self):
         if self.waste_collector in XIMMIO_COLLECTOR_IDS.keys():
-            self.collector = XimmioCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = XimmioCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.address_id)
         elif self.waste_collector in ["mijnafvalwijzer", "afvalstoffendienstkalender"]:
             self.collector = AfvalwijzerCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "afvalalert":
@@ -1125,11 +1130,14 @@ class XimmioCollector(WasteCollector):
         'TREE': WASTE_TYPE_TREE,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, address_id):
         super(XimmioCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
         self.main_url = "https://wasteapi.ximmio.com"
         self.company_code = XIMMIO_COLLECTOR_IDS[self.waste_collector]
-        self.address_id = None
+        if address_id:
+            self.address_id = address_id
+        else:
+            self.address_id = None
 
     def __fetch_address(self):
         data = {
