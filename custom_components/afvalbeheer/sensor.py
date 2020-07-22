@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.4.2 20200715 - Pippijn Stortelder
+Current Version: 4.4.3 20200722 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -35,6 +35,7 @@ Current Version: 4.4.2 20200715 - Pippijn Stortelder
 20200707 - Added option to print out all possible fractions on HA boot
 20200709 - Move messages from error log to persistant notification
 20200715 - Hotfix for Suez sll problem
+20200722 - Added Omrin timeout (credits @Jordi1990)
 
 Example config:
 Configuration.yaml:
