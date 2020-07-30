@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.5.0 20200722 - Pippijn Stortelder
+Current Version: 4.6.0b1 20200730 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -36,7 +36,8 @@ Current Version: 4.5.0 20200722 - Pippijn Stortelder
 20200709 - Move messages from error log to persistant notification
 20200715 - Hotfix for Suez sll problem
 20200722 - Added Omrin timeout (credits @Jordi1990)
-20200722 - Added AddressID override for Meerlanden
+20200722 - Added Address_id override for Meerlanden
+20200730 - Beta support for RecycleApp
 
 Example config:
 Configuration.yaml:
@@ -162,6 +163,7 @@ WASTE_TYPE_PAPER_PMD = 'papier-pmd'
 WASTE_TYPE_PACKAGES = 'pmd'
 WASTE_TYPE_PAPER = 'papier'
 WASTE_TYPE_PLASTIC = 'plastic'
+WASTE_TYPE_SOFT_PLASTIC = 'zacht-plastic'
 WASTE_TYPE_REMAINDER = 'restwagen'
 WASTE_TYPE_TEXTILE = 'textiel'
 WASTE_TYPE_TREE = 'kerstbomen'
@@ -242,19 +244,25 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         persistent_notification.create(
                 hass,
                 "Update your config to use Mijnafvalwijzer! You are still using Cure as a wast collector, which is deprecated. It's from now on; Mijnafvalwijzer. Check your automations and lovelace config, as the sensor names may also be changed!",
-                'Afvalwijzer', NOTIFICATION_ID)
+                'Afvalwijzer', "update_config")
         waste_collector = "mijnafvalwijzer"
     elif waste_collector == "ximmio":
         persistent_notification.create(
                 hass,
                 "Due to more collectors using Ximmio, you need to change your config. Set the wast collector to the actual collector (i.e. Meerlanden, TwenteMilieu , etc.). Using Ximmio in your config, this sensor will asume you meant Meerlanden.",
-                'Afvalwijzer', NOTIFICATION_ID)
+                'Afvalwijzer', "update_config")
     elif waste_collector == "area":
         persistent_notification.create(
                 hass,
                 "Update your config to use AreaReiniging as a waste collector.",
-                'Afvalwijzer', NOTIFICATION_ID)
-        waste_collector = "areareiniging"    
+                'Afvalwijzer', "update_config")
+        waste_collector = "areareiniging"
+    elif waste_collector == "ophaalkalender":
+        persistent_notification.create(
+                hass,
+                "Update your config to use RecycleApp as a waste collector.",
+                'Afvalwijzer', "update_config")
+        waste_collector = "recycleapp"
     data = WasteData(hass, waste_collector, city_name, postcode, street_name, street_number, suffix, address_id, print_waste_type)
 
     entities = []
@@ -354,8 +362,8 @@ class WasteData(object):
             self.collector = LimburgNetCollector(self.hass, self.waste_collector, self.city_name, self.postcode, self.street_name, self.street_number, self.suffix)
         elif self.waste_collector == "omrin":
             self.collector = OmrinCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
-        elif self.waste_collector == "ophaalkalender":
-            self.collector = OphaalkalenderCollector(self.hass, self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix)
+        elif self.waste_collector == "recycleapp":
+            self.collector = RecycleApp(self.hass, self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix)
         elif self.waste_collector == "rd4":
             self.collector = RD4Collector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "rova":
@@ -843,8 +851,7 @@ class OphaalkalenderCollector(WasteCollector):
         'pmd': WASTE_TYPE_PACKAGES,
         'p-k': WASTE_TYPE_PAPER,
         # 'shirt-textiel': WASTE_TYPE_TEXTILE,
-        # 'kerstboom': WASTE_TYPE_TREE,
-        'gemengde plastics': WASTE_TYPE_PLASTIC,
+        # 'kerstboom': WASTE_TYPE_TREE
     }
 
     def __init__(self, hass, waste_collector, postcode, street_name, street_number, suffix):
@@ -860,7 +867,6 @@ class OphaalkalenderCollector(WasteCollector):
         if not response:
             _LOGGER.error('Address not found!')
             return
-
         self.address_id = str(response[0]["Id"])
 
     def __get_data(self):
@@ -1037,6 +1043,108 @@ class RD4Collector(WasteCollector):
                         waste_type=waste_type
                     )
                     self.collections.add(collection)
+
+        except requests.exceptions.RequestException as exc:
+            _LOGGER.error('Error occurred while fetching data: %r', exc)
+            return False
+
+
+class RecycleApp(WasteCollector):
+    WASTE_TYPE_MAPPING = {
+        # 'sloop': WASTE_TYPE_BULKLITTER,
+        # 'glas': WASTE_TYPE_GLASS,
+        # 'duobak': WASTE_TYPE_GREENGREY,
+        # 'groente': WASTE_TYPE_GREEN,
+        'gft': WASTE_TYPE_GREEN,
+        # 'chemisch': WASTE_TYPE_KCA,
+        # 'kca': WASTE_TYPE_KCA,
+        'huisvuil': WASTE_TYPE_GREY,
+        # 'plastic': WASTE_TYPE_PACKAGES,
+        'papier': WASTE_TYPE_PAPER,
+        # 'textiel': WASTE_TYPE_TEXTILE,
+        # 'kerstb': WASTE_TYPE_TREE,
+        'pmd': WASTE_TYPE_PACKAGES,
+        'snoeihout': WASTE_TYPE_BRANCHES,
+        'zachte plastics': WASTE_TYPE_SOFT_PLASTIC
+    }
+
+    def __init__(self, hass, waste_collector, postcode, street_name, street_number, suffix):
+        super(RecycleApp, self).__init__(hass, waste_collector, postcode, street_number, suffix)
+        self.street_name = street_name
+        self.main_url = 'https://recycleapp.be/api/app/v1/'
+        self.xsecret = 'Qp4KmgmK2We1ydc9Hxso5D6K0frz3a9raj2tqLjWN5n53TnEijmmYz78pKlcma54sjKLKogt6f9WdnNUci6Gbujnz6b34hNbYo4DzyYRZL5yzdJyagFHS15PSi2kPUc4v2yMck81yFKhlk2aWCTe93'
+        self.xconsumer = 'recycleapp.be'
+        self.accessToken = ''
+        self.postcode_id = ''
+        self.street_id = ''
+
+    def __get_headers(self):
+        headers = { 
+            'x-secret': self.xsecret,
+            'x-consumer': self.xconsumer,
+            'User-Agent': '',
+            'Authorization': self.accessToken,
+        }
+        return headers
+
+    def __get_access_token(self):
+        response = requests.get("{}access-token".format(self.main_url), headers=self.__get_headers())
+        self.accessToken = response.json()['accessToken']
+    
+    def __get_location_ids(self):
+        response = requests.get("{}zipcodes?q={}".format(self.main_url, self.postcode), headers=self.__get_headers())
+        self.postcode_id = response.json()['items'][0]['id']
+        response = requests.get("{}streets?q={}&zipcodes={}".format(self.main_url, self.street_name, self.postcode_id), headers=self.__get_headers())
+        self.street_id = response.json()['items'][0]['id']
+
+    def __get_data(self):
+        startdate = datetime.now().strftime("%Y-%m-%d")
+        enddate = (datetime.now() + timedelta(days=+60)).strftime("%Y-%m-%d")
+        response = requests.get("{}collections?zipcodeId={}&streetId={}&houseNumber={}&fromDate={}&untilDate={}&size=100".format(
+            self.main_url, 
+            self.postcode_id, 
+            self.street_id, 
+            self.street_number,
+            startdate,
+            enddate), 
+            headers=self.__get_headers())
+        return response
+
+    async def update(self):
+        _LOGGER.debug('Updating Waste collection dates using Rest API')
+
+        self.collections.remove_all()
+
+        try:
+            if not self.accessToken:
+                await self.hass.async_add_executor_job(self.__get_access_token)
+
+            if not self.postcode_id or not self.street_id:
+                await self.hass.async_add_executor_job(self.__get_location_ids)
+
+
+            r = await self.hass.async_add_executor_job(self.__get_data)
+            response = r.json()
+
+            if not response:
+                _LOGGER.error('No Waste data found!')
+                return
+
+            for item in response['items']:
+                if not item['timestamp']:
+                    continue
+                if not item['fraction'] or not 'name' in item['fraction'] or not 'nl' in item['fraction']['name']:
+                    continue
+
+                waste_type = self.map_waste_type(item['fraction']['name']['nl'])
+                if not waste_type:
+                    continue
+
+                collection = WasteCollection.create(
+                    date=datetime.strptime(item['timestamp'], '%Y-%m-%dT%H:%M:%S.000Z'),
+                    waste_type=waste_type
+                )
+                self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
