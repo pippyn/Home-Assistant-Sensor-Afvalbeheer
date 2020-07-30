@@ -979,7 +979,7 @@ class RD4Collector(WasteCollector):
 
 class RecycleApp(WasteCollector):
     WASTE_TYPE_MAPPING = {
-        # 'sloop': WASTE_TYPE_BULKLITTER,
+        'grof': WASTE_TYPE_BULKLITTER,
         # 'glas': WASTE_TYPE_GLASS,
         # 'duobak': WASTE_TYPE_GREENGREY,
         # 'groente': WASTE_TYPE_GREEN,
