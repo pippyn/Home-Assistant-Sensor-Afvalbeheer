@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.6.0b1 20200730 - Pippijn Stortelder
+Current Version: 4.6.0b2 20200730 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -837,78 +837,6 @@ class OmrinCollector(WasteCollector):
             return False
 
 
-class OphaalkalenderCollector(WasteCollector):
-    WASTE_TYPE_MAPPING = {
-        # 'tak-snoeiafval': WASTE_TYPE_BRANCHES,
-        'gemengde plastics': WASTE_TYPE_PLASTIC,
-        'grof huisvuil': WASTE_TYPE_BULKLITTER,
-        'grof huisvuil afroep': WASTE_TYPE_BULKLITTER,
-        # 'tak-snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
-        # 'fles-groen-glas': WASTE_TYPE_GLASS,
-        'tuinafval': WASTE_TYPE_GREEN,
-        # 'batterij': WASTE_TYPE_KCA,
-        'restafval': WASTE_TYPE_GREY,
-        'pmd': WASTE_TYPE_PACKAGES,
-        'p-k': WASTE_TYPE_PAPER,
-        # 'shirt-textiel': WASTE_TYPE_TEXTILE,
-        # 'kerstboom': WASTE_TYPE_TREE
-    }
-
-    def __init__(self, hass, waste_collector, postcode, street_name, street_number, suffix):
-        super(OphaalkalenderCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
-        self.street_name = street_name
-        self.main_url = "https://www.ophaalkalender.be"
-        self.address_id = None
-
-    def __fetch_address(self):
-        response = requests.get('{}/calendar/findstreets/?query={}&zipcode={}'.format(
-            self.main_url, self.street_name, self.postcode)).json()
-
-        if not response:
-            _LOGGER.error('Address not found!')
-            return
-        self.address_id = str(response[0]["Id"])
-
-    def __get_data(self):
-        get_url = '{}/api/rides?id={}&housenumber={}&zipcode={}'.format(
-                self.main_url, self.address_id, self.street_number, self.postcode)
-        return requests.get(get_url)
-
-    async def update(self):
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
-
-        self.collections.remove_all()
-
-        try:
-            if not self.address_id:
-                await self.hass.async_add_executor_job(self.__fetch_address)
-
-            r = await self.hass.async_add_executor_job(self.__get_data)
-            response = r.json()
-
-            if not response:
-                _LOGGER.error('No Waste data found!')
-                return
-
-            for item in response:
-                if not item['start']:
-                    continue
-
-                waste_type = self.map_waste_type(item['title'])
-                if not waste_type:
-                    continue
-
-                collection = WasteCollection.create(
-                    date=datetime.strptime(item['start'], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None),
-                    waste_type=waste_type
-                )
-                self.collections.add(collection)
-
-        except requests.exceptions.RequestException as exc:
-            _LOGGER.error('Error occurred while fetching data: %r', exc)
-            return False
-
-
 class OpzetCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
         'snoeiafval': WASTE_TYPE_BRANCHES,
@@ -1064,6 +992,7 @@ class RecycleApp(WasteCollector):
         # 'textiel': WASTE_TYPE_TEXTILE,
         # 'kerstb': WASTE_TYPE_TREE,
         'pmd': WASTE_TYPE_PACKAGES,
+        'gemengde': WASTE_TYPE_PACKAGES,
         'snoeihout': WASTE_TYPE_BRANCHES,
         'zachte plastics': WASTE_TYPE_SOFT_PLASTIC
     }
@@ -1089,12 +1018,21 @@ class RecycleApp(WasteCollector):
 
     def __get_access_token(self):
         response = requests.get("{}access-token".format(self.main_url), headers=self.__get_headers())
+        if not response.status_code == 200:
+            _LOGGER.error('Invalid response from server for accessToken')
+            return
         self.accessToken = response.json()['accessToken']
     
     def __get_location_ids(self):
         response = requests.get("{}zipcodes?q={}".format(self.main_url, self.postcode), headers=self.__get_headers())
+        if not response.status_code == 200:
+            _LOGGER.error('Invalid response from server for postcode_id')
+            return
         self.postcode_id = response.json()['items'][0]['id']
         response = requests.get("{}streets?q={}&zipcodes={}".format(self.main_url, self.street_name, self.postcode_id), headers=self.__get_headers())
+        if not response.status_code == 200:
+            _LOGGER.error('Invalid response from server for street_id')
+            return
         self.street_id = response.json()['items'][0]['id']
 
     def __get_data(self):
@@ -1113,22 +1051,27 @@ class RecycleApp(WasteCollector):
     async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
-        self.collections.remove_all()
-
         try:
             if not self.accessToken:
                 await self.hass.async_add_executor_job(self.__get_access_token)
 
-            if not self.postcode_id or not self.street_id:
+            if (not self.postcode_id or not self.street_id) and self.accessToken:
                 await self.hass.async_add_executor_job(self.__get_location_ids)
 
+            if not self.postcode_id or not self.street_id or not self.accessToken:
+                return
 
             r = await self.hass.async_add_executor_job(self.__get_data)
+            if not r.status_code == 200:
+                _LOGGER.error('Invalid response from server for collection data')
+                return
             response = r.json()
 
             if not response:
                 _LOGGER.error('No Waste data found!')
                 return
+
+            self.collections.remove_all()
 
             for item in response['items']:
                 if not item['timestamp']:
