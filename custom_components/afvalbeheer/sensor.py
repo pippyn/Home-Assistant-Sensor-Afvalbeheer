@@ -992,7 +992,7 @@ class RecycleApp(WasteCollector):
         # 'textiel': WASTE_TYPE_TEXTILE,
         # 'kerstb': WASTE_TYPE_TREE,
         'pmd': WASTE_TYPE_PACKAGES,
-        'gemengde': WASTE_TYPE_PACKAGES,
+        'gemengde': WASTE_TYPE_PLASTIC,
         'snoeihout': WASTE_TYPE_BRANCHES,
         'zachte plastics': WASTE_TYPE_SOFT_PLASTIC
     }
