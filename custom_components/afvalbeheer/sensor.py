@@ -317,6 +317,7 @@ class WasteCollectionRepository(object):
                 possible_waste_types.append(collection.waste_type)
         return sorted(possible_waste_types, key=str.lower)
 
+
 class WasteCollection(object):
 
     def __init__(self):
