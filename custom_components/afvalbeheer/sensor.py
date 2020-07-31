@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.6.0b3 20200730 - Pippijn Stortelder
+Current Version: 4.6.0b4 20200730 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -1053,8 +1053,7 @@ class RecycleApp(WasteCollector):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         try:
-            if not self.accessToken:
-                await self.hass.async_add_executor_job(self.__get_access_token)
+            await self.hass.async_add_executor_job(self.__get_access_token)
 
             if (not self.postcode_id or not self.street_id) and self.accessToken:
                 await self.hass.async_add_executor_job(self.__get_location_ids)
