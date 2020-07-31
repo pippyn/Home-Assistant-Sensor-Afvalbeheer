@@ -432,7 +432,6 @@ class AfvalAlertCollector(WasteCollector):
         # 'p-k': WASTE_TYPE_PAPER,
         # 'shirt-textiel': WASTE_TYPE_TEXTILE,
         'kerst': WASTE_TYPE_TREE,
-        # 'gemengde plastics': WASTE_TYPE_PLASTIC,
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix):
@@ -692,7 +691,6 @@ class LimburgNetCollector(WasteCollector):
         'Papier': WASTE_TYPE_PAPER,
         'Textiel': WASTE_TYPE_TEXTILE,
         # 'kerstboom': WASTE_TYPE_TREE,
-        # 'gemengde plastics': WASTE_TYPE_PLASTIC,
     }
 
     def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix):
