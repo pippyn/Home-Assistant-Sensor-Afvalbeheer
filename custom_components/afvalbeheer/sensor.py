@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.6.0 20200730 - Pippijn Stortelder
+Current Version: 4.6.1 20200803 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -37,7 +37,8 @@ Current Version: 4.6.0 20200730 - Pippijn Stortelder
 20200715 - Hotfix for Suez sll problem
 20200722 - Added Omrin timeout (credits @Jordi1990)
 20200722 - Added Address_id override for Meerlanden
-20200730 - Beta support for RecycleApp
+20200730 - Support for RecycleApp
+20200803 - Fix mapping for RecycleApp
 
 Example config:
 Configuration.yaml:
@@ -989,6 +990,7 @@ class RecycleApp(WasteCollector):
         # 'chemisch': WASTE_TYPE_KCA,
         # 'kca': WASTE_TYPE_KCA,
         'huisvuil': WASTE_TYPE_GREY,
+        'rest': WASTE_TYPE_GREY,
         # 'plastic': WASTE_TYPE_PACKAGES,
         'papier': WASTE_TYPE_PAPER,
         # 'textiel': WASTE_TYPE_TEXTILE,
