@@ -998,7 +998,8 @@ class RecycleApp(WasteCollector):
         'pmd': WASTE_TYPE_PACKAGES,
         'gemengde': WASTE_TYPE_PLASTIC,
         'snoeihout': WASTE_TYPE_BRANCHES,
-        'zachte plastics': WASTE_TYPE_SOFT_PLASTIC
+        'zachte plastics': WASTE_TYPE_SOFT_PLASTIC,
+        'roze zak': WASTE_TYPE_SOFT_PLASTIC
     }
 
     def __init__(self, hass, waste_collector, postcode, street_name, street_number, suffix):
