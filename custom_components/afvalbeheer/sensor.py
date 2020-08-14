@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.6.2 20200811 - Pippijn Stortelder
+Current Version: 4.6.3 20200814 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -40,6 +40,7 @@ Current Version: 4.6.2 20200811 - Pippijn Stortelder
 20200730 - Support for RecycleApp
 20200803 - Fix mapping for RecycleApp
 20200811 - Fix mapping for RecycleApp and added translations for dutch month names
+20200814 - Fix bug with dateobject and fix mapping for MijnAfvalWijzer
 
 Example config:
 Configuration.yaml:
@@ -1384,7 +1385,7 @@ class WasteTypeSensor(Entity):
         else:
             self._state = None
 
-        if self.dutch_days:
+        if self.dutch_days and not self.date_object:
             for EN_day, NL_day in DUTCH_TRANSLATION_DATES.items():
                 self._state = self._state.replace(EN_day, NL_day)
 
