@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.6.3 20200814 - Pippijn Stortelder
+Current Version: 4.6.4 2020915 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -41,6 +41,7 @@ Current Version: 4.6.3 20200814 - Pippijn Stortelder
 20200803 - Fix mapping for RecycleApp
 20200811 - Fix mapping for RecycleApp and added translations for dutch month names
 20200814 - Fix bug with dateobject and fix mapping for MijnAfvalWijzer
+20200915 - Switch MijnAfvalwijzer to app API
 
 Example config:
 Configuration.yaml:
@@ -536,10 +537,11 @@ class AfvalwijzerCollector(WasteCollector):
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix):
         super(AfvalwijzerCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
+        self.apikey = '5ef443e778f41c4f75c69459eea6e6ae0c2d92de729aa0fc61653815fbd6a8ca'
 
     def __get_data(self):
-        get_url = 'https://json.{}.nl/?method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&langs=nl'.format(
-                self.waste_collector, self.postcode, self.street_number, self.suffix)
+        get_url = 'https://api.{}.nl/webservices/appsinput/?apikey={}&method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&app_name=afvalwijzer&platform=phone&afvaldata={}&langs=nl'.format(
+                self.waste_collector, self.apikey, self.postcode, self.street_number, self.suffix, datetime.today().strftime('%Y-%m-%d'))
         return requests.get(get_url)
 
     async def update(self):
@@ -551,7 +553,7 @@ class AfvalwijzerCollector(WasteCollector):
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
 
-            data = (response['data']['ophaaldagen']['data'] + response['data']['ophaaldagenNext']['data'])
+            data = (response['ophaaldagen']['data'] + response['ophaaldagenNext']['data'])
             if not data:
                 _LOGGER.error('No Waste data found!')
                 return
