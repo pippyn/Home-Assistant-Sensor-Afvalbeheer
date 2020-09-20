@@ -1025,7 +1025,7 @@ class RecycleApp(WasteCollector):
     WASTE_TYPE_MAPPING = {
         'grof': WASTE_TYPE_BULKLITTER,
         # 'glas': WASTE_TYPE_GLASS,
-        'glas (ivago)': WASTE_TYPE_GLASS,
+        'glas': WASTE_TYPE_GLASS,
         # 'duobak': WASTE_TYPE_GREENGREY,
         # 'groente': WASTE_TYPE_GREEN,
         'gft': WASTE_TYPE_GREEN,
