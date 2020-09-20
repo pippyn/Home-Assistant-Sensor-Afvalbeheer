@@ -42,6 +42,7 @@ Current Version: 4.6.4 2020915 - Pippijn Stortelder
 20200811 - Fix mapping for RecycleApp and added translations for dutch month names
 20200814 - Fix bug with dateobject and fix mapping for MijnAfvalWijzer
 20200915 - Switch MijnAfvalwijzer to app API
+20200920 - Update mapping for RecycleApp
 
 Example config:
 Configuration.yaml:
@@ -1024,6 +1025,7 @@ class RecycleApp(WasteCollector):
     WASTE_TYPE_MAPPING = {
         'grof': WASTE_TYPE_BULKLITTER,
         # 'glas': WASTE_TYPE_GLASS,
+        'glas': WASTE_TYPE_GLASS,
         # 'duobak': WASTE_TYPE_GREENGREY,
         # 'groente': WASTE_TYPE_GREEN,
         'gft': WASTE_TYPE_GREEN,
