@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.6.6 2020923 - Pippijn Stortelder
+Current Version: 4.6.7 2020923 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -44,6 +44,7 @@ Current Version: 4.6.6 2020923 - Pippijn Stortelder
 20200915 - Switch MijnAfvalwijzer to app API
 20200920 - Update mapping for RecycleApp
 20200923 - Update mapping for Cranendonck
+20200930 - Fix Ormin date
 
 Example config:
 Configuration.yaml:
@@ -873,7 +874,7 @@ class OmrinCollector(WasteCollector):
                     continue
 
                 collection = WasteCollection.create(
-                    date=datetime.strptime(item['Datum'], '%Y-%m-%dT%H:%M:%S'),
+                    date=datetime.strptime(item['Datum'], '%Y-%m-%dT%H:%M:%S+02:00'),
                     waste_type=waste_type
                 )
                 self.collections.add(collection)
