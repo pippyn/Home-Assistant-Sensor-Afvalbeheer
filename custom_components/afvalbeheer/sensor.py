@@ -874,7 +874,7 @@ class OmrinCollector(WasteCollector):
                     continue
 
                 collection = WasteCollection.create(
-                    date=datetime.strptime(item['Datum'], '%Y-%m-%dT%H:%M:%S+02:00'),
+                    date=datetime.strptime(item['Datum'], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None),
                     waste_type=waste_type
                 )
                 self.collections.add(collection)
