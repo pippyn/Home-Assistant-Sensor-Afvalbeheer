@@ -537,6 +537,7 @@ class AfvalwijzerCollector(WasteCollector):
         'textiel': WASTE_TYPE_TEXTILE,
         'kerstbomen': WASTE_TYPE_TREE,
         'pd': WASTE_TYPE_PACKAGES,
+        'md': WASTE_TYPE_PACKAGES,
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix):
