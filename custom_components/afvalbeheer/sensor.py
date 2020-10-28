@@ -846,7 +846,7 @@ class OmrinCollector(WasteCollector):
         self.publicKey = None
 
     def __fetch_publickey(self):
-        response = requests.post("{}/GetToken/".format(self.main_url), json={'AppId': self.appId, 'AppVersion': '', 'OsVersion': '', 'Platform': ''}).json()
+        response = requests.post("{}/GetToken/".format(self.main_url), json={'AppId': self.appId, 'AppVersion': '', 'OsVersion': '', 'Platform': 'HomeAssistant'}).json()
         self.publicKey = b64decode(response['PublicKey'])
 
     def __get_data(self):
