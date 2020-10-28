@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.6.8 20201010 - Pippijn Stortelder
+Current Version: 4.6.9 20201028 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -47,6 +47,7 @@ Current Version: 4.6.8 20201010 - Pippijn Stortelder
 20200930 - Fix Ormin date
 20201010 - Proper fix to support timezone offset in omrin collection date
 20201010 - Add mapping of `md` to `pmd` for MijnAfvalwijzer
+20201028 - Added platform to Omrin keyrequest
 
 Example config:
 Configuration.yaml:
