@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.6.9 20201028 - Pippijn Stortelder
+Current Version: 4.6.10 20201029 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -48,6 +48,7 @@ Current Version: 4.6.9 20201028 - Pippijn Stortelder
 20201010 - Proper fix to support timezone offset in omrin collection date
 20201010 - Add mapping of `md` to `pmd` for MijnAfvalwijzer
 20201028 - Added platform to Omrin keyrequest
+20201029 - Omrin skip unusable dates
 
 Example config:
 Configuration.yaml:
@@ -871,6 +872,9 @@ class OmrinCollector(WasteCollector):
             self.collections.remove_all()
             for item in response:
                 if not item['Datum']:
+                    continue
+
+                if item['Datum'] == '0001-01-01T00:00:00':
                     continue
 
                 waste_type = self.map_waste_type(item['Omschrijving'])
