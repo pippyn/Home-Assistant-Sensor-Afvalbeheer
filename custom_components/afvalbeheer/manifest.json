@@ -5,7 +5,7 @@
   "dependencies": [],
   "codeowners": ["@pippyn"],
   "requirements": [
-    "rsa==4.0",
-    "pycryptodome==3.9.7"
+    "rsa",
+    "pycryptodome"
   ]
 }
