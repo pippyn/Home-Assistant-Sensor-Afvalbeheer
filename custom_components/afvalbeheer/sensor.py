@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.0 20201102 - Pippijn Stortelder
+Current Version: 4.7.1 20201110 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -50,6 +50,7 @@ Current Version: 4.7.0 20201102 - Pippijn Stortelder
 20201028 - Added platform to Omrin keyrequest
 20201029 - Omrin skip unusable dates
 20201102 - Support for waardlanden
+20201110 - Support for exceptions in RecycleApp
 
 Example config:
 Configuration.yaml:
@@ -1137,6 +1138,8 @@ class RecycleApp(WasteCollector):
                 if not item['timestamp']:
                     continue
                 if not item['fraction'] or not 'name' in item['fraction'] or not 'nl' in item['fraction']['name']:
+                    continue
+                if 'exception' in item and 'replacedBy' in item['exception']:
                     continue
 
                 waste_type = self.map_waste_type(item['fraction']['name']['nl'])
