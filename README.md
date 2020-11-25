@@ -72,6 +72,7 @@ Choose your collector from this list:
   - PeelEnMaas
   - Purmerend
   - RD4
+  - Reinis
   - ROVA
   - RMN
   - Schouwen-Duiveland
