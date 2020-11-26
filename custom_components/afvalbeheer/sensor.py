@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.1 20201110 - Pippijn Stortelder
+Current Version: 4.7.2 20201126 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -51,6 +51,7 @@ Current Version: 4.7.1 20201110 - Pippijn Stortelder
 20201029 - Omrin skip unusable dates
 20201102 - Support for waardlanden
 20201110 - Support for exceptions in RecycleApp
+20201126 - Added support for Reinis (credit @RobinvG)
 
 Example config:
 Configuration.yaml:
