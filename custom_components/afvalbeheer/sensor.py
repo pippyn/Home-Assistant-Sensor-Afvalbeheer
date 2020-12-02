@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.2 20201126 - Pippijn Stortelder
+Current Version: 4.7.3 20201202 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -52,6 +52,7 @@ Current Version: 4.7.2 20201126 - Pippijn Stortelder
 20201102 - Support for waardlanden
 20201110 - Support for exceptions in RecycleApp
 20201126 - Added support for Reinis (credit @RobinvG)
+20201202 - Added support for suffix in Opzetcollector
 
 Example config:
 Configuration.yaml:
@@ -933,7 +934,12 @@ class OpzetCollector(WasteCollector):
             _LOGGER.error('Address not found!')
             return
 
-        self.bag_id = response[0]['bagId']
+        if len(response) > 1 and self.suffix:
+            for item in response:
+                if item['huisletter'] == self.suffix:
+                    self.bag_id = item['bagId']
+        else:
+            self.bag_id = response[0]['bagId']
 
     def __get_data(self):
         get_url = "{}/rest/adressen/{}/afvalstromen".format(
