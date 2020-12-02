@@ -293,7 +293,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         persistent_notification.create(
                 hass,
                 "Update your config to use {}! You are still using {} as a wast collector, which is deprecated. Check your automations and lovelace config, as the sensor names may also be changed!".format(
-                    DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector], 
+                    DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector],
                     waste_collector
                     ),
                 "Afvalbeheer", "update_config")
@@ -323,7 +323,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     for resource in config[CONF_RESOURCES]:
         waste_type = resource.lower()
-        entities.append(WasteTypeSensor(data, waste_type, waste_collector, date_format, date_only, date_object, 
+        entities.append(WasteTypeSensor(data, waste_type, waste_collector, date_format, date_only, date_object,
             name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week, always_show_day))
 
     if sensor_today:
@@ -361,7 +361,7 @@ class WasteCollectionRepository(object):
             return list(filter(lambda x: x.date.date() == date.date() and x.waste_type in waste_types, self.get_sorted()))
         else:
             return list(filter(lambda x: x.date.date() == date.date(), self.get_sorted()))
-    
+
     def get_available_waste_types(self):
         today = datetime.now()
         possible_waste_types = []
@@ -622,11 +622,11 @@ class CirculusBerkelCollector(WasteCollector):
 
         if session_cookie:
             authenticityToken = re.search('__AT=(.*)&___TS=', session_cookie).group(1)
-            data = { 
+            data = {
                 'authenticityToken': authenticityToken,
                 'zipCode': self.postcode,
                 'number': self.street_number,
-                } 
+                }
 
             r = requests.post(
                 '{}/register/zipcode.json'.format(self.main_url), data=data, cookies=cookies
@@ -638,14 +638,14 @@ class CirculusBerkelCollector(WasteCollector):
         if logged_in_cookies:
             startDate = (datetime.today() - timedelta(days=14)).strftime("%Y-%m-%d")
             endDate =  (datetime.today() + timedelta(days=90)).strftime("%Y-%m-%d")
-            
-            headers = { 
+
+            headers = {
                 'Content-Type': 'application/json'
             }
 
             response = requests.get('{}/afvalkalender.json?from={}&till={}'.format(
-                self.main_url, 
-                startDate, 
+                self.main_url,
+                startDate,
                 endDate
                 ), headers=headers, cookies=logged_in_cookies)
             return response
@@ -766,7 +766,7 @@ class LimburgNetCollector(WasteCollector):
         if not response[0]['nisCode']:
             _LOGGER.error('City not found!')
             return
-        
+
         self.city_id = response[0]["nisCode"]
 
         response = requests.get('{}/afval-kalender/gemeente/{}/straten/search?query={}'.format(
@@ -780,11 +780,11 @@ class LimburgNetCollector(WasteCollector):
 
     def __get_data(self):
         data = []
-        
+
         for x in range(0, 3):
             if x == 0:
                 today = datetime.today()
-            else: 
+            else:
                 today = (today.replace(day=1) + timedelta(days=32)).replace(day=1)
             year = today.year
             month = today.month
@@ -933,7 +933,14 @@ class OpzetCollector(WasteCollector):
             _LOGGER.error('Address not found!')
             return
 
-        self.bag_id = response[0]['bagId']
+        if response > 1:
+            letter = self.street_number[-1]
+            if not letter.isdigit():
+                for item in response:
+                    if item['huisletter'] == letter:
+                        self.bag_id = item['bagId']
+        else:
+            self.bag_id = response[0]['bagId']
 
     def __get_data(self):
         get_url = "{}/rest/adressen/{}/afvalstromen".format(
@@ -1072,7 +1079,7 @@ class RecycleApp(WasteCollector):
         self.street_id = ''
 
     def __get_headers(self):
-        headers = { 
+        headers = {
             'x-secret': self.xsecret,
             'x-consumer': self.xconsumer,
             'User-Agent': '',
@@ -1086,7 +1093,7 @@ class RecycleApp(WasteCollector):
             _LOGGER.error('Invalid response from server for accessToken')
             return
         self.accessToken = response.json()['accessToken']
-    
+
     def __get_location_ids(self):
         response = requests.get("{}zipcodes?q={}".format(self.main_url, self.postcode), headers=self.__get_headers())
         if not response.status_code == 200:
@@ -1103,12 +1110,12 @@ class RecycleApp(WasteCollector):
         startdate = datetime.now().strftime("%Y-%m-%d")
         enddate = (datetime.now() + timedelta(days=+60)).strftime("%Y-%m-%d")
         response = requests.get("{}collections?zipcodeId={}&streetId={}&houseNumber={}&fromDate={}&untilDate={}&size=100".format(
-            self.main_url, 
-            self.postcode_id, 
-            self.street_id, 
+            self.main_url,
+            self.postcode_id,
+            self.street_id,
             self.street_number,
             startdate,
-            enddate), 
+            enddate),
             headers=self.__get_headers())
         return response
 
@@ -1184,7 +1191,7 @@ class RovaCollector(WasteCollector):
 
     def __get_data(self):
         response = requests.get(
-            '{}/api/TrashCalendar/GetCalendarItems'.format(self.main_url), params={'portal': 'inwoners'}, 
+            '{}/api/TrashCalendar/GetCalendarItems'.format(self.main_url), params={'portal': 'inwoners'},
             cookies=self.__get_cookies()
             )
         return response
@@ -1318,7 +1325,7 @@ class XimmioCollector(WasteCollector):
 
 class WasteTypeSensor(Entity):
 
-    def __init__(self, data, waste_type, waste_collector, date_format, date_only, date_object, 
+    def __init__(self, data, waste_type, waste_collector, date_format, date_only, date_object,
         name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week, always_show_day):
         self.data = data
         self.waste_type = waste_type
@@ -1484,4 +1491,4 @@ def _format_sensor(name, name_prefix, waste_collector, sensor_type):
         (name + ' ' if name else "") +
         sensor_type
     )
-    
+
