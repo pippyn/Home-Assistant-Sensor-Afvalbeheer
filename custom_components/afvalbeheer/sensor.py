@@ -933,7 +933,7 @@ class OpzetCollector(WasteCollector):
             _LOGGER.error('Address not found!')
             return
 
-        if response > 1:
+        if response.items() > 1:
             letter = self.street_number[-1]
             if not letter.isdigit():
                 for item in response:
