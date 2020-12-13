@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.4 20201202 - Pippijn Stortelder
+Current Version: 4.7.5 20201213 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -54,6 +54,7 @@ Current Version: 4.7.4 20201202 - Pippijn Stortelder
 20201126 - Added support for Reinis (credit @RobinvG)
 20201202 - Added support for suffix in Opzetcollector
 20201207 - Added support for Avri
+20201213 - Added support for Middelburg-Vlissingen
 
 Example config:
 Configuration.yaml:
@@ -142,6 +143,7 @@ OPZET_COLLECTOR_URLS = {
     'denhaag': 'https://huisvuilkalender.denhaag.nl',
     'gad': 'https://inzamelkalender.gad.nl',
     'hvc': 'https://inzamelkalender.hvcgroep.nl',
+    'middelburg-vlissingen': 'https://afvalwijzer.middelburgvlissingen.nl',
     'montfoort': 'https://afvalkalender.cyclusnv.nl',
     'peelenmaas': 'https://afvalkalender.peelenmaas.nl',
     'purmerend': 'https://afvalkalender.purmerend.nl',
