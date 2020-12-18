@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.5 20201213 - Pippijn Stortelder
+Current Version: 4.7.6 20201218 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -55,6 +55,7 @@ Current Version: 4.7.5 20201213 - Pippijn Stortelder
 20201202 - Added support for suffix in Opzetcollector
 20201207 - Added support for Avri
 20201213 - Added support for Middelburg-Vlissingen
+20201218 - Added Community variable to Ximmio request for better data
 
 Example config:
 Configuration.yaml:
@@ -1260,6 +1261,7 @@ class XimmioCollector(WasteCollector):
         super(XimmioCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
         self.main_url = "https://wasteapi.ximmio.com"
         self.company_code = XIMMIO_COLLECTOR_IDS[self.waste_collector]
+        self.community = ""
         if address_id:
             self.address_id = address_id
         else:
@@ -1279,6 +1281,9 @@ class XimmioCollector(WasteCollector):
             _LOGGER.error('Address not found!')
             return
 
+        if response['dataList'][0]['Community']:
+            self.community = response['dataList'][0]['Community']
+
         self.address_id = response['dataList'][0]['UniqueId']
 
     def __get_data(self):
@@ -1287,6 +1292,7 @@ class XimmioCollector(WasteCollector):
             "startDate": datetime.now().strftime('%Y-%m-%d'),
             "endDate": (datetime.now() + timedelta(days=365)).strftime('%Y-%m-%d'),
             "companyCode": self.company_code,
+            "community": self.community,
         }
         response = requests.post(
             "{}/api/GetCalendar".format(self.main_url),
