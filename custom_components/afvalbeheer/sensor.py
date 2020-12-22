@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.6 20201218 - Pippijn Stortelder
+Current Version: 4.7.7 20201222 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -56,6 +56,7 @@ Current Version: 4.7.6 20201218 - Pippijn Stortelder
 20201207 - Added support for Avri
 20201213 - Added support for Middelburg-Vlissingen
 20201218 - Added Community variable to Ximmio request for better data
+20201222 - Better support for address selection in OpzetCollector
 
 Example config:
 Configuration.yaml:
@@ -941,8 +942,11 @@ class OpzetCollector(WasteCollector):
 
         if len(response) > 1 and self.suffix:
             for item in response:
-                if item['huisletter'] == self.suffix:
+                if item['huisletter'] == self.suffix or item['huisnummerToevoeging'] == self.suffix:
                     self.bag_id = item['bagId']
+                    break
+        elif (len(response) > 1):
+            self.bag_id = response[-1]['bagId']
         else:
             self.bag_id = response[0]['bagId']
 
