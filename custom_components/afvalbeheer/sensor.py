@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.7 20201222 - Pippijn Stortelder
+Current Version: 4.7.8 20210112 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -57,6 +57,7 @@ Current Version: 4.7.7 20201222 - Pippijn Stortelder
 20201213 - Added support for Middelburg-Vlissingen
 20201218 - Added Community variable to Ximmio request for better data
 20201222 - Better support for address selection in OpzetCollector
+20210112 - Updated date format for RD4
 
 Example config:
 Configuration.yaml:
@@ -1043,7 +1044,7 @@ class RD4Collector(WasteCollector):
 
                 for item_date in response[item]:
                     collection = WasteCollection.create(
-                        date=datetime.strptime(item_date, "%d-%m-%Y"),
+                        date=datetime.strptime(item_date, "%Y-%m-%d"),
                         waste_type=waste_type
                     )
                     self.collections.add(collection)
