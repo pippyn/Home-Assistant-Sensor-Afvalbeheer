@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.8 20210112 - Pippijn Stortelder
+Current Version: 4.7.9 20210114 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -58,6 +58,7 @@ Current Version: 4.7.8 20210112 - Pippijn Stortelder
 20201218 - Added Community variable to Ximmio request for better data
 20201222 - Better support for address selection in OpzetCollector
 20210112 - Updated date format for RD4
+20210114 - Fixed error made in commit 9d720ec
 
 Example config:
 Configuration.yaml:
@@ -302,27 +303,25 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
                 hass,
                 "Update your config to use {}! You are still using {} as a wast collector, which is deprecated. Check your automations and lovelace config, as the sensor names may also be changed!".format(
                     DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector], 
-                    waste_collector
-                    ),
-                "Afvalbeheer", "update_config")
+                    waste_collector),
+                "Afvalbeheer", 
+                "update_config")
         waste_collector = DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector]
 
     if waste_collector in ['limburg.net'] and not city_name:
         persistent_notification.create(
                 hass,
-                "Config invalid! Cityname is required for {}".format(
-                waste_collector
-                ),
-                "Afvalbeheer", "invalid_config")
+                "Config invalid! Cityname is required for {}".format(waste_collector),
+                "Afvalbeheer", 
+                "invalid_config")
         return
 
     if waste_collector in ['limburg.net', 'recycleapp'] and not street_name:
         persistent_notification.create(
                 hass,
-                "Config invalid! Streetname is required for {}".format(
-                waste_collector
-                ),
-                "Afvalbeheer", "invalid_config")
+                "Config invalid! Streetname is required for {}".format(waste_collector),
+                "Afvalbeheer", 
+                "invalid_config")
         return
 
     data = WasteData(hass, waste_collector, city_name, postcode, street_name, street_number, suffix, address_id, print_waste_type)
@@ -331,12 +330,38 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     for resource in config[CONF_RESOURCES]:
         waste_type = resource.lower()
-        entities.append(WasteTypeSensor(data, waste_type, waste_collector, date_format, date_only, date_object, 
-            name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week, always_show_day))
+        entities.append(WasteTypeSensor(
+            data, 
+            waste_type, 
+            waste_collector, 
+            date_format, 
+            date_only, 
+            date_object, 
+            name, 
+            name_prefix, 
+            built_in_icons, 
+            disable_icons, 
+            dutch_days, 
+            day_of_week, 
+            always_show_day))
 
     if sensor_today:
-        entities.append(WasteDateSensor(data, config[CONF_RESOURCES], waste_collector, timedelta(), dutch_days, name, name_prefix))
-        entities.append(WasteDateSensor(data, config[CONF_RESOURCES], waste_collector, timedelta(days=1), dutch_days, name, name_prefix))
+        entities.append(WasteDateSensor(
+            data, 
+            config[CONF_RESOURCES], 
+            waste_collector, 
+            timedelta(), 
+            dutch_days, 
+            name, 
+            name_prefix))
+        entities.append(WasteDateSensor(
+            data, 
+            config[CONF_RESOURCES], 
+            waste_collector, 
+            timedelta(days=1), 
+            dutch_days, 
+            name, 
+            name_prefix))
 
     async_add_entities(entities)
     await data.schedule_update(timedelta())
@@ -946,8 +971,6 @@ class OpzetCollector(WasteCollector):
                 if item['huisletter'] == self.suffix or item['huisnummerToevoeging'] == self.suffix:
                     self.bag_id = item['bagId']
                     break
-        elif (len(response) > 1):
-            self.bag_id = response[-1]['bagId']
         else:
             self.bag_id = response[0]['bagId']
 
@@ -1505,4 +1528,4 @@ def _format_sensor(name, name_prefix, waste_collector, sensor_type):
         (name + ' ' if name else "") +
         sensor_type
     )
-    
+
