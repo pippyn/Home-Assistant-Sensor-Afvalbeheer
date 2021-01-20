@@ -1,11 +1,52 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
 ## Home Assisant sensor component for Afvalbeheer
 
-Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API. This sensor works with the following waste collectors: Blink, Cure, Suez, ACV, Twente Milieu, Hellendoorn, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Schouwen-Duiveland, Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, SudwestFryslan, Montfoort, GAD, Cranendonck, ROVA, RD4, Limburg.NET, Afval Alert, RecycleApp, DeAfvalApp, Alkmaar, AreaReiniging, Almere, Waardlanden, Reinis, Avri, Omrin and Middelburg-Vlissingen.
-
-Cure users should switch to the waste collector MijnAfvalwijzer
-
-Ophaalkalender users should switch to the waste collector RecycleApp
+Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API. 
+This sensor works with the following waste collectors:
+  - ACV
+  - Afvalstoffendienstkalender
+  - AfvalAlert
+  - Alkmaar
+  - Almere
+  - AlphenAanDenRijn
+  - AreaReiniging
+  - Avalex
+  - Avri
+  - BAR
+  - Berkelland
+  - Blink
+  - Circulus-Berkel
+  - Cranendonck
+  - Cure (use MijnAfvalwijzer)
+  - Cyclus
+  - DAR
+  - DeAfvalApp
+  - DenHaag
+  - GAD
+  - Hellendoorn
+  - HVC
+  - Limburg.NET (don't forget the streetname and cityname option)
+  - Meerlanden
+  - Meppel
+  - Middelburg-Vlissingen
+  - MijnAfvalwijzer
+  - Montfoort
+  - Omrin
+  - RecycleApp (don't forget the streetname option)
+  - PeelEnMaas
+  - Purmerend
+  - RD4
+  - Reinis
+  - ROVA
+  - RMN
+  - Schouwen-Duiveland
+  - Spaarnelanden
+  - SudwestFryslan
+  - Twente Milieu
+  - Venray
+  - Waalre
+  - Waardlanden
+  - ZRD
 
 ![alt text](https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/example.png)
 
