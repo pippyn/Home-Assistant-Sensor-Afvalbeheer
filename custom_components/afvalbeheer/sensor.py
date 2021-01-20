@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.9 20210114 - Pippijn Stortelder
+Current Version: 4.7.10 20210120 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -59,6 +59,8 @@ Current Version: 4.7.9 20210114 - Pippijn Stortelder
 20201222 - Better support for address selection in OpzetCollector
 20210112 - Updated date format for RD4
 20210114 - Fixed error made in commit 9d720ec
+20210120 - Enabled textile for RecycleApp
+20210120 - Added support for wastcollectors BAR and Meppel
 
 Example config:
 Configuration.yaml:
@@ -167,8 +169,11 @@ XIMMIO_COLLECTOR_IDS = {
     'almere': '53d8db94-7945-42fd-9742-9bbc71dbe4c1',
     'areareiniging': 'adc418da-d19b-11e5-ab30-625662870761',
     'avri': '78cd4156-394b-413d-8936-d407e334559a',
+    'bar': 'bb58e633-de14-4b2a-9941-5bc419f1c4b0',
     'hellendoorn': '24434f5b-7244-412b-9306-3a2bd1e22bc1',
     'meerlanden': '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
+    'meppel': 'b7a594c7-2490-4413-88f9-94749a3ec62a',
+    # 'rad': '13a2cad9-36d0-4b01-b877-efcb421a864d', API is not responding normal for some reason
     'twentemilieu': '8d97bb56-5afd-4cbc-a651-b4f7314264b4',
     'waardlanden': '942abcf6-3775-400d-ae5d-7380d728b23c',
     'ximmio': '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
