@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.10 20210120 - Pippijn Stortelder
+Current Version: 4.7.11 20210129 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -61,6 +61,7 @@ Current Version: 4.7.10 20210120 - Pippijn Stortelder
 20210114 - Fixed error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
 20210120 - Added support for wastcollectors BAR and Meppel
+20210129 - Fix RecycleApp API access
 
 Example config:
 Configuration.yaml:
@@ -1109,7 +1110,7 @@ class RecycleApp(WasteCollector):
         super(RecycleApp, self).__init__(hass, waste_collector, postcode, street_number, suffix)
         self.street_name = street_name
         self.main_url = 'https://recycleapp.be/api/app/v1/'
-        self.xsecret = 'Qp4KmgmK2We1ydc9Hxso5D6K0frz3a9raj2tqLjWN5n53TnEijmmYz78pKlcma54sjKLKogt6f9WdnNUci6Gbujnz6b34hNbYo4DzyYRZL5yzdJyagFHS15PSi2kPUc4v2yMck81yFKhlk2aWCTe93'
+        self.xsecret = '8a9pIQlfYpgmJZD15KdK70MCTR2xyD0EAvOmi9HCBfiBUY4n34ytxQmqo3AP2OET6tssYy6R4Be6N2M2GtiX3AcbiNxR8G7pOalN45dXPZ4emKE2c1nimx9B1YFciutJwFZHYHI2Qpzo0E0GCDHkg5'
         self.xconsumer = 'recycleapp.be'
         self.accessToken = ''
         self.postcode_id = ''
