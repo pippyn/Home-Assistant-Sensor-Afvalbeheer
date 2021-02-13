@@ -1291,9 +1291,16 @@ class XimmioCollector(WasteCollector):
         'TREE': WASTE_TYPE_TREE,
     }
 
+    XIMMIO_URLS = {
+        'meerlanden': "https://wasteprod2api.ximmio.com"
+    }
+
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, address_id):
         super(XimmioCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
-        self.main_url = "https://wasteapi.ximmio.com"
+        if self.waste_collector in self.XIMMIO_URLS.keys():
+            self.main_url = self.XIMMIO_URLS[self.waste_collector]
+        else:
+            self.main_url = "https://wasteapi.ximmio.com"
         self.company_code = XIMMIO_COLLECTOR_IDS[self.waste_collector]
         self.community = ""
         if address_id:
