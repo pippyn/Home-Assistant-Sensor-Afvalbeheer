@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.11 20210129 - Pippijn Stortelder
+Current Version: 4.7.12 20210213 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -62,6 +62,7 @@ Current Version: 4.7.11 20210129 - Pippijn Stortelder
 20210120 - Enabled textile for RecycleApp
 20210120 - Added support for wastcollectors BAR and Meppel
 20210129 - Fix RecycleApp API access
+20210213 - Fix Meerlanden API url
 
 Example config:
 Configuration.yaml:
