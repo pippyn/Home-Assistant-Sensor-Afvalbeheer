@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.12 20210213 - Pippijn Stortelder
+Current Version: 4.7.13 20210219 - Pippijn Stortelder
 20200419 - Major code refactor (credits @basschipper)
 20200420 - Add sensor even though not in mapping
 20200420 - Added support for DeAfvalApp
@@ -63,6 +63,7 @@ Current Version: 4.7.12 20210213 - Pippijn Stortelder
 20210120 - Added support for wastcollectors BAR and Meppel
 20210129 - Fix RecycleApp API access
 20210213 - Fix Meerlanden API url
+20210219 - Changed GFT mapping for RecycleApp
 
 Example config:
 Configuration.yaml:
@@ -1090,7 +1091,7 @@ class RecycleApp(WasteCollector):
         # 'glas': WASTE_TYPE_GLASS,
         'glas': WASTE_TYPE_GLASS,
         # 'duobak': WASTE_TYPE_GREENGREY,
-        # 'groente': WASTE_TYPE_GREEN,
+        'groente': WASTE_TYPE_GREEN,
         'gft': WASTE_TYPE_GREEN,
         # 'chemisch': WASTE_TYPE_KCA,
         # 'kca': WASTE_TYPE_KCA,
