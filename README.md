@@ -113,6 +113,7 @@ Some collectors also use some of these options:
   - duobak
   - restwagen
   - sortibak
+  - kerstbomen
 
 ### Postcode
 Postcode is required and is your own postcode
