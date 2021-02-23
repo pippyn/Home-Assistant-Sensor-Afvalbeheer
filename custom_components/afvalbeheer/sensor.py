@@ -1,70 +1,16 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.14 20210220 - Pippijn Stortelder
-20200419 - Major code refactor (credits @basschipper)
-20200420 - Add sensor even though not in mapping
-20200420 - Added support for DeAfvalApp
-20200421 - Fix for OpzetCollector PMD
-20200422 - Add wastecollector sudwestfryslan
-20200428 - Restore sort_date function
-20200428 - Option added to disable daynames (dayofweek)
-20200428 - Fixed waste type mapping
-20200430 - Fix for the "I/O inside the event loop" warning
-20200501 - Fetch address more efficient
-20200502 - Support for ACV, Hellendoorn and Twente Milieu
-20200503 - Switched Circulus-Berkel to new API
-20200503 - Added new Rova API
-20200505 - Fix Circulus-Berkel Mapping
-20200505 - Added support for RD4
-20200506 - Support for Limburg.NET and AfvalAlert
-20200512 - Fix fraction mapping for Circulus Berkel
-20200513 - Add attribute days_until
-20200514 - Fix fraction mapping for MijnAfvalWijzer
-20200515 - Fix fraction mapping for Limburg.NET
-20200519 - Fix fraction mapping for Circulus-Berkel
-20200523 - Support for Area Reiniging
-20200525 - Fix for Area Reiniging
-20200526 - Fix mapping for Area Reiniging
-20200526 - Added option to always show the day names
-20200527 - Support for Omrin
-20200527 - Support for Almere
-20200604 - Fix mapping for Omrin
-20200629 - Added support for Schouwen-Duiveland
-20200701 - Fix mapping for MijnAfvalWijzer
-20200707 - Added option to print out all possible fractions on HA boot
-20200709 - Move messages from error log to persistant notification
-20200715 - Hotfix for Suez sll problem
-20200722 - Added Omrin timeout (credits @Jordi1990)
-20200722 - Added Address_id override for Meerlanden
-20200730 - Support for RecycleApp
-20200803 - Fix mapping for RecycleApp
-20200811 - Fix mapping for RecycleApp and added translations for dutch month names
-20200814 - Fix bug with dateobject and fix mapping for MijnAfvalWijzer
-20200915 - Switch MijnAfvalwijzer to app API
-20200920 - Update mapping for RecycleApp
-20200923 - Update mapping for Cranendonck
-20200930 - Fix Ormin date
-20201010 - Proper fix to support timezone offset in omrin collection date
-20201010 - Add mapping of `md` to `pmd` for MijnAfvalwijzer
-20201028 - Added platform to Omrin keyrequest
-20201029 - Omrin skip unusable dates
-20201102 - Support for waardlanden
-20201110 - Support for exceptions in RecycleApp
-20201126 - Added support for Reinis (credit @RobinvG)
-20201202 - Added support for suffix in Opzetcollector
-20201207 - Added support for Avri
-20201213 - Added support for Middelburg-Vlissingen
-20201218 - Added Community variable to Ximmio request for better data
-20201222 - Better support for address selection in OpzetCollector
+Current Version: 4.7.15 20210223 - Pippijn Stortelder
 20210112 - Updated date format for RD4
-20210114 - Fixed error made in commit 9d720ec
+20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
 20210120 - Added support for wastcollectors BAR and Meppel
 20210129 - Fix RecycleApp API access
 20210213 - Fix Meerlanden API url
 20210219 - Changed GFT mapping for RecycleApp
 20210220 - Fix wrong RecycleApp streetId
+20210223 - Added 'ordures ménagères' mapping for RecycleApp
 
 Example config:
 Configuration.yaml:
@@ -1098,6 +1044,7 @@ class RecycleApp(WasteCollector):
         # 'kca': WASTE_TYPE_KCA,
         'huisvuil': WASTE_TYPE_GREY,
         'rest': WASTE_TYPE_GREY,
+        'ordures ménagères': WASTE_TYPE_GREY,
         # 'plastic': WASTE_TYPE_PACKAGES,
         'papier': WASTE_TYPE_PAPER,
         'textiel': WASTE_TYPE_TEXTILE,
