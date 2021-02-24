@@ -71,6 +71,7 @@ CONF_DATE_FORMAT = 'dateformat'
 CONF_TODAY_TOMORROW = 'upcomingsensor'
 CONF_DATE_ONLY = 'dateonly'
 CONF_DATE_OBJECT = 'dateobject'
+CONF_LANGUAGE = 'language'
 CONF_NAME = 'name'
 CONF_NAME_PREFIX = 'nameprefix'
 CONF_BUILT_IN_ICONS = 'builtinicons'
@@ -216,6 +217,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_DATE_ONLY, default=False): cv.boolean,
     vol.Optional(CONF_DATE_OBJECT, default=False): cv.boolean,
     vol.Optional(CONF_NAME, default=''): cv.string,
+    vol.Optional(CONF_LANGUAGE, default='nl'): cv.string,    
     vol.Optional(CONF_NAME_PREFIX, default=True): cv.boolean,
     vol.Optional(CONF_BUILT_IN_ICONS, default=False): cv.boolean,
     vol.Optional(CONF_DISABLE_ICONS, default=False): cv.boolean,
@@ -240,6 +242,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     sensor_today = config.get(CONF_TODAY_TOMORROW)
     date_object = config.get(CONF_DATE_OBJECT)
     name = config.get(CONF_NAME)
+    language = config.get(CONF_LANGUAGE)
     name_prefix = config.get(CONF_NAME_PREFIX)
     built_in_icons = config.get(CONF_BUILT_IN_ICONS)
     disable_icons = config.get(CONF_DISABLE_ICONS)
@@ -279,7 +282,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
                 "invalid_config")
         return
 
-    data = WasteData(hass, waste_collector, city_name, postcode, street_name, street_number, suffix, address_id, print_waste_type)
+    data = WasteData(hass, waste_collector, city_name, postcode, street_name, street_number, suffix, address_id, print_waste_type, language)
 
     entities = []
 
@@ -296,9 +299,10 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             name_prefix, 
             built_in_icons, 
             disable_icons, 
-            dutch_days, 
+            dutch_days,
             day_of_week, 
-            always_show_day))
+            always_show_day,
+            language))
 
     if sensor_today:
         entities.append(WasteDateSensor(
@@ -308,7 +312,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             timedelta(), 
             dutch_days, 
             name, 
-            name_prefix))
+            name_prefix,
+            language))
         entities.append(WasteDateSensor(
             data, 
             config[CONF_RESOURCES], 
@@ -316,7 +321,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             timedelta(days=1), 
             dutch_days, 
             name, 
-            name_prefix))
+            name_prefix,
+            language))
 
     async_add_entities(entities)
     await data.schedule_update(timedelta())
@@ -377,7 +383,7 @@ class WasteCollection(object):
 
 class WasteData(object):
 
-    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, address_id, print_waste_type):
+    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, address_id, print_waste_type, language):
         self.hass = hass
         self.waste_collector = waste_collector
         self.city_name = city_name
@@ -387,6 +393,7 @@ class WasteData(object):
         self.suffix = suffix
         self.address_id = address_id
         self.print_waste_type = print_waste_type
+        self.language = language
         self.collector = None
         self.__select_collector()
 
@@ -406,7 +413,7 @@ class WasteData(object):
         elif self.waste_collector == "omrin":
             self.collector = OmrinCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "recycleapp":
-            self.collector = RecycleApp(self.hass, self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix)
+            self.collector = RecycleApp(self.hass, self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix, self.language)
         elif self.waste_collector == "rd4":
             self.collector = RD4Collector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "rova":
@@ -440,12 +447,13 @@ class WasteData(object):
 
 class WasteCollector(metaclass=abc.ABCMeta):
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, language):
         self.hass = hass
         self.waste_collector = waste_collector
         self.postcode = postcode
         self.street_number = street_number
         self.suffix = suffix
+        self.language = language
         self.collections = WasteCollectionRepository()
 
     @abc.abstractmethod
@@ -1044,7 +1052,7 @@ class RecycleApp(WasteCollector):
         # 'kca': WASTE_TYPE_KCA,
         'huisvuil': WASTE_TYPE_GREY,
         'rest': WASTE_TYPE_GREY,
-        'ordures ménagères': WASTE_TYPE_GREY,
+        # 'ordures ménagères': WASTE_TYPE_GREY,
         # 'plastic': WASTE_TYPE_PACKAGES,
         'papier': WASTE_TYPE_PAPER,
         'textiel': WASTE_TYPE_TEXTILE,
@@ -1056,9 +1064,10 @@ class RecycleApp(WasteCollector):
         'roze zak': WASTE_TYPE_SOFT_PLASTIC
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_name, street_number, suffix):
-        super(RecycleApp, self).__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_name, street_number, suffix, language):
+        super(RecycleApp, self).__init__(hass, waste_collector, postcode, street_number, suffix, language)
         self.street_name = street_name
+        self.language = language
         self.main_url = 'https://recycleapp.be/api/app/v1/'
         self.xsecret = '8a9pIQlfYpgmJZD15KdK70MCTR2xyD0EAvOmi9HCBfiBUY4n34ytxQmqo3AP2OET6tssYy6R4Be6N2M2GtiX3AcbiNxR8G7pOalN45dXPZ4emKE2c1nimx9B1YFciutJwFZHYHI2Qpzo0E0GCDHkg5'
         self.xconsumer = 'recycleapp.be'
@@ -1138,12 +1147,12 @@ class RecycleApp(WasteCollector):
             for item in response['items']:
                 if not item['timestamp']:
                     continue
-                if not item['fraction'] or not 'name' in item['fraction'] or not 'nl' in item['fraction']['name']:
+                if not item['fraction'] or not 'name' in item['fraction'] or not self.language in item['fraction']['name']:
                     continue
                 if 'exception' in item and 'replacedBy' in item['exception']:
                     continue
 
-                waste_type = self.map_waste_type(item['fraction']['name']['nl'])
+                waste_type = self.map_waste_type(item['fraction']['name'][self.language])
                 if not waste_type:
                     continue
 
@@ -1330,7 +1339,7 @@ class XimmioCollector(WasteCollector):
 class WasteTypeSensor(Entity):
 
     def __init__(self, data, waste_type, waste_collector, date_format, date_only, date_object, 
-        name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week, always_show_day):
+        name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week, always_show_day, language):
         self.data = data
         self.waste_type = waste_type
         self.waste_collector = waste_collector
@@ -1343,9 +1352,13 @@ class WasteTypeSensor(Entity):
         self.dutch_days = dutch_days
         self.day_of_week = day_of_week
         self.always_show_day = always_show_day
+        self.language = language
         if self.dutch_days:
             self._today = "Vandaag, "
             self._tomorrow = "Morgen, "
+        elif self.language == 'fr':
+            self._today = "Aujourd'hui, "
+            self._tomorrow = "Demain, "
         else:
             self._today = "Today, "
             self._tomorrow = "Tomorrow, "
@@ -1438,16 +1451,17 @@ class WasteTypeSensor(Entity):
 
 class WasteDateSensor(Entity):
 
-    def __init__(self, data, waste_types, waste_collector, date_delta, dutch_days, name, name_prefix):
+    def __init__(self, data, waste_types, waste_collector, date_delta, dutch_days, name, name_prefix, language):
         self.data = data
         self.waste_types = waste_types
         self.waste_collector = waste_collector
         self.date_delta = date_delta
         self.dutch_days = dutch_days
+        self.language = language
         if date_delta.days == 0:
-            day = 'vandaag'
+            day = 'today'
         elif date_delta.days == 1:
-            day = 'morgen'
+            day = 'tomorrow'
         else:
             day = ''
         self._name = _format_sensor(name, name_prefix, waste_collector, day)
