@@ -169,35 +169,35 @@ FRACTION_ICONS = {
 }
 
 DUTCH_TRANSLATION_DATES = {
-    'Monday': 'Maandag',
-    'Tuesday': 'Dinsdag',
-    'Wednesday': 'Woensdag',
-    'Thursday': 'Donderdag',
-    'Friday': 'Vrijdag',
-    'Saturday': 'Zaterdag',
-    'Sunday': 'Zondag',
-    'January': 'Januari',
-    'February': 'Februari',
-    'March': 'Maart',
-    'April': 'April',
-    'May': 'Mei',
-    'June': 'Juni',
-    'July': 'Juli',
-    'August': 'Augustus',
-    'September': 'September',
-    'October': 'Oktober',
-    'November': 'November',
-    'December': 'December',
+    'Monday': 'Lundi',
+    'Tuesday': 'Mardi',
+    'Wednesday': 'Mercredi',
+    'Thursday': 'Jeudi',
+    'Friday': 'Vendredi',
+    'Saturday': 'Samedi',
+    'Sunday': 'Dimanche',
+    'January': 'Janvier',
+    'February': 'Février',
+    'March': 'Mars',
+    'April': 'Avril',
+    'May': 'Mai',
+    'June': 'Juin',
+    'July': 'Juillet',
+    'August': 'Août',
+    'September': 'Septembre',
+    'October': 'Octobre',
+    'November': 'Novembre',
+    'December': 'Décembre',
     'Jan': 'Jan',
-    'Feb': 'Feb',
-    'Mar': 'Mrt',
-    'Apr': 'Apr',
-    'May': 'Mei',
-    'Jun': 'Jun',
-    'Jul': 'Jul',
-    'Aug': 'Aug',
+    'Feb': 'Fev',
+    'Mar': 'Mar',
+    'Apr': 'Avr',
+    'May': 'Mai',
+    'Jun': 'Ju',
+    'Jul': 'Jui',
+    'Aug': 'Aou',
     'Sept': 'Sep',
-    'Oct': 'Okt',
+    'Oct': 'Oct',
     'Nov': 'Nov',
     'Dec': 'Dec',
 }
@@ -1344,8 +1344,8 @@ class WasteTypeSensor(Entity):
         self.day_of_week = day_of_week
         self.always_show_day = always_show_day
         if self.dutch_days:
-            self._today = "Vandaag, "
-            self._tomorrow = "Morgen, "
+            self._today = "Aujourd'hui, "
+            self._tomorrow = "Demain, "
         else:
             self._today = "Today, "
             self._tomorrow = "Tomorrow, "
@@ -1445,9 +1445,9 @@ class WasteDateSensor(Entity):
         self.date_delta = date_delta
         self.dutch_days = dutch_days
         if date_delta.days == 0:
-            day = 'vandaag'
+            day = "aujourd'hui"
         elif date_delta.days == 1:
-            day = 'morgen'
+            day = 'demain'
         else:
             day = ''
         self._name = _format_sensor(name, name_prefix, waste_collector, day)
@@ -1479,7 +1479,7 @@ class WasteDateSensor(Entity):
 
         if not collections:
             self._hidden = True
-            self._state = "Geen" if self.dutch_days else "None"
+            self._state = "Rien" if self.dutch_days else "None"
             return
 
         self._hidden = False
