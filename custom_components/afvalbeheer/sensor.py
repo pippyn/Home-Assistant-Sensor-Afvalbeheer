@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.16 20210302 - Pippijn Stortelder
+Current Version: 4.7.17 20210302 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -12,6 +12,7 @@ Current Version: 4.7.16 20210302 - Pippijn Stortelder
 20210220 - Fix wrong RecycleApp streetId
 20210223 - Added 'ordures ménagères' mapping for RecycleApp
 20210302 - Updated RecycleApp x-secret
+20210304 - Added version to manifest
 
 Example config:
 Configuration.yaml:
