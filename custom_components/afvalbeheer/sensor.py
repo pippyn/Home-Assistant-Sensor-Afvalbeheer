@@ -13,6 +13,7 @@ Current Version: 4.7.17 20210302 - Pippijn Stortelder
 20210223 - Added 'ordures ménagères' mapping for RecycleApp
 20210302 - Updated RecycleApp x-secret
 20210304 - Added version to manifest
+20210307 - Added 'déchets organiques' and 'omb' mapping for RecycleApp
 
 Example config:
 Configuration.yaml:
@@ -1055,7 +1056,9 @@ class RecycleApp(WasteCollector):
         'gemengde': WASTE_TYPE_PLASTIC,
         'snoeihout': WASTE_TYPE_BRANCHES,
         'zachte plastics': WASTE_TYPE_SOFT_PLASTIC,
-        'roze zak': WASTE_TYPE_SOFT_PLASTIC
+        'roze zak': WASTE_TYPE_SOFT_PLASTIC,
+        'déchets organiques': WASTE_TYPE_GREEN,
+        'omb': WASTE_TYPE_GREY,
     }
 
     def __init__(self, hass, waste_collector, postcode, street_name, street_number, suffix):
