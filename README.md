@@ -223,6 +223,12 @@ dutch: 1
 ```
 If you want to display the names of the days in dutch. Default is 0.
 
+### Update interval
+```yaml
+updateinterval: 12
+```
+If you want to adjust the update interval, you can set this option to the desired hours. Default is 1.
+
 ## HACS
 You can use HACS to install this sensor. It is included by default.
 
