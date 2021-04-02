@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.18 20210326 - Pippijn Stortelder
+Current Version: 4.7.19 20210402- Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -15,6 +15,7 @@ Current Version: 4.7.18 20210326 - Pippijn Stortelder
 20210304 - Added version to manifest
 20210326 - Added option to set update interval
 20210326 - Minor fix
+20210402 - Fix syntax warning
 
 Example config:
 Configuration.yaml:
@@ -433,7 +434,7 @@ class WasteData(object):
 
     async def async_update(self, *_):
         await self.collector.update()
-        if self.update_interval is not 0:
+        if self.update_interval != 0:
             await self.schedule_update(timedelta(hours=self.update_interval))
         else:
             await self.schedule_update(SCHEDULE_UPDATE_INTERVAL)
