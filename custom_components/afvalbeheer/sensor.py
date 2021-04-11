@@ -86,10 +86,10 @@ CONF_ALWAYS_SHOW_DAY = 'alwaysshowday'
 CONF_PRINT_AVAILABLE_WASTE_TYPES = 'printwastetypes'
 CONF_UPDATE_INTERVAL = 'updateinterval'
 
-ATTR_WASTE_COLLECTOR = 'Wastecollector'
-ATTR_HIDDEN = 'Hidden'
-ATTR_SORT_DATE = 'Sort-date'
-ATTR_DAYS_UNTIL = 'Days-until'
+ATTR_WASTE_COLLECTOR = 'wastecollector'
+ATTR_HIDDEN = 'hidden'
+ATTR_SORT_DATE = 'sortdate'
+ATTR_DAYS_UNTIL = 'daysuntil'
 
 NOTIFICATION_ID = "Afvalbeheer"
 
