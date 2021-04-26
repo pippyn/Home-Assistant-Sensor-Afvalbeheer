@@ -1,8 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.19 20210402- Pippijn Stortelder
-20210426 - Fix RAD API url
+Current Version: 4.7.20 20210426- Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -17,6 +16,7 @@ Current Version: 4.7.19 20210402- Pippijn Stortelder
 20210326 - Added option to set update interval
 20210326 - Minor fix
 20210402 - Fix syntax warning
+20210426 - Added support for RAD
 
 Example config:
 Configuration.yaml:
