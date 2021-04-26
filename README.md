@@ -72,6 +72,7 @@ Choose your collector from this list:
   - MijnAfvalwijzer
   - Montfoort
   - Omrin
+  - RAD
   - RecycleApp (don't forget the streetname option)
   - PeelEnMaas
   - Purmerend
