@@ -32,9 +32,10 @@ This sensor works with the following waste collectors:
   - MijnAfvalwijzer
   - Montfoort
   - Omrin
-  - RecycleApp (don't forget the streetname option)
   - PeelEnMaas
   - Purmerend
+  - RAD
+  - RecycleApp (don't forget the streetname option)
   - RD4
   - Reinis
   - ROVA

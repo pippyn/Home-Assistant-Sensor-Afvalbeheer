@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.19 20210402- Pippijn Stortelder
+Current Version: 4.7.20 20210426- Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -16,6 +16,7 @@ Current Version: 4.7.19 20210402- Pippijn Stortelder
 20210326 - Added option to set update interval
 20210326 - Minor fix
 20210402 - Fix syntax warning
+20210426 - Added support for RAD
 
 Example config:
 Configuration.yaml:
@@ -129,7 +130,7 @@ XIMMIO_COLLECTOR_IDS = {
     'hellendoorn': '24434f5b-7244-412b-9306-3a2bd1e22bc1',
     'meerlanden': '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
     'meppel': 'b7a594c7-2490-4413-88f9-94749a3ec62a',
-    # 'rad': '13a2cad9-36d0-4b01-b877-efcb421a864d', API is not responding normal for some reason
+    'rad': '13a2cad9-36d0-4b01-b877-efcb421a864d',
     'twentemilieu': '8d97bb56-5afd-4cbc-a651-b4f7314264b4',
     'waardlanden': '942abcf6-3775-400d-ae5d-7380d728b23c',
     'ximmio': '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
@@ -1260,7 +1261,8 @@ class XimmioCollector(WasteCollector):
     }
 
     XIMMIO_URLS = {
-        'meerlanden': "https://wasteprod2api.ximmio.com"
+        'meerlanden': "https://wasteprod2api.ximmio.com",
+        'rad': "https://wasteprod2api.ximmio.com"
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, address_id):
