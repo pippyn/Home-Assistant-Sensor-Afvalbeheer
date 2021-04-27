@@ -912,6 +912,7 @@ class OpzetCollector(WasteCollector):
         'rest': WASTE_TYPE_GREY,
         'plastic': WASTE_TYPE_PACKAGES,
         'papier': WASTE_TYPE_PAPER,
+        'papier en karton': WASTE_TYPE_PAPER,
         'textiel': WASTE_TYPE_TEXTILE,
         'kerstb': WASTE_TYPE_TREE,
         'pmd': WASTE_TYPE_PACKAGES,
