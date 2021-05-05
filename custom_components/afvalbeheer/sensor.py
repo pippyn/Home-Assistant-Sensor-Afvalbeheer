@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.20 20210426- Pippijn Stortelder
+Current Version: 4.7.21 20210505 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -17,6 +17,7 @@ Current Version: 4.7.20 20210426- Pippijn Stortelder
 20210326 - Minor fix
 20210402 - Fix syntax warning
 20210426 - Added support for RAD
+20210505 - Fixed Limburg.net mapping
 
 Example config:
 Configuration.yaml:
@@ -740,6 +741,7 @@ class LimburgNetCollector(WasteCollector):
         # 'gemengde plastics': WASTE_TYPE_PLASTIC,
         'Grofvuil': WASTE_TYPE_BULKLITTER,
         'Groenafval': WASTE_TYPE_BULKYGARDENWASTE,
+        'Tuin- En Snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
         # 'grof huisvuil afroep': WASTE_TYPE_BULKLITTER,
         # 'tak-snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
         'Glas': WASTE_TYPE_GLASS,
