@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.21 20210505 - Pippijn Stortelder
+Current Version: 4.7.22 20210601 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -18,6 +18,7 @@ Current Version: 4.7.21 20210505 - Pippijn Stortelder
 20210402 - Fix syntax warning
 20210426 - Added support for RAD
 20210505 - Fixed Limburg.net mapping
+20210601 - Fix for ROVA
 
 Example config:
 Configuration.yaml:
@@ -119,7 +120,6 @@ OPZET_COLLECTOR_URLS = {
     'venray': 'https://afvalkalender.venray.nl',
     'waalre': 'https://afvalkalender.waalre.nl',
     'zrd': 'https://afvalkalender.zrd.nl',
-    'rova': 'https://inzamelkalender.rova.nl',
 }
 
 XIMMIO_COLLECTOR_IDS = {
@@ -404,7 +404,7 @@ class WasteData(object):
     def __select_collector(self):
         if self.waste_collector in XIMMIO_COLLECTOR_IDS.keys():
             self.collector = XimmioCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.address_id)
-        elif self.waste_collector in ["mijnafvalwijzer", "afvalstoffendienstkalender"]:
+        elif self.waste_collector in ["mijnafvalwijzer", "afvalstoffendienstkalender"] or self.waste_collector == "rova":
             self.collector = AfvalwijzerCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector == "afvalalert":
             self.collector = AfvalAlertCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
@@ -420,8 +420,6 @@ class WasteData(object):
             self.collector = RecycleApp(self.hass, self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix)
         elif self.waste_collector == "rd4":
             self.collector = RD4Collector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
-        elif self.waste_collector == "rova":
-            self.collector = RovaCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         elif self.waste_collector in OPZET_COLLECTOR_URLS.keys():
             self.collector = OpzetCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
         else:
@@ -554,10 +552,14 @@ class AfvalwijzerCollector(WasteCollector):
     def __init__(self, hass, waste_collector, postcode, street_number, suffix):
         super(AfvalwijzerCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
         self.apikey = '5ef443e778f41c4f75c69459eea6e6ae0c2d92de729aa0fc61653815fbd6a8ca'
+        if self.waste_collector == "rova":
+            self.waste_collector_url = "inzamelkalender." + self.waste_collector
+        else:
+            self.waste_collector_url = self.waste_collector
 
     def __get_data(self):
         get_url = 'https://api.{}.nl/webservices/appsinput/?apikey={}&method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&app_name=afvalwijzer&platform=phone&afvaldata={}&langs=nl'.format(
-                self.waste_collector, self.apikey, self.postcode, self.street_number, self.suffix, datetime.today().strftime('%Y-%m-%d'))
+                self.waste_collector_url, self.apikey, self.postcode, self.street_number, self.suffix, datetime.today().strftime('%Y-%m-%d'))
         return requests.get(get_url)
 
     async def update(self):
