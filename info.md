@@ -33,6 +33,7 @@ This sensor works with the following waste collectors:
   - Montfoort
   - Omrin
   - PeelEnMaas
+  - PreZero
   - Purmerend
   - RAD
   - RecycleApp (don't forget the streetname option)

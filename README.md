@@ -4,7 +4,7 @@
 ## Home Assisant sensor component for Afvalbeheer
 
 Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API.
-This sensor works with the following waste collectors: Blink, Cure, Suez, ACV, Twente Milieu, Hellendoorn, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Schouwen-Duiveland, Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, SudwestFryslan, Montfoort, GAD, Cranendonck, ROVA, RD4, Limburg.NET, Afval Alert, RecycleApp, DeAfvalApp, Alkmaar, AreaReiniging, Almere, Waardlanden, Reinis, Avri, Omrin, BAR, RAD, Meppel and Middelburg-Vlissingen.
+This sensor works with the following waste collectors: Blink, Cure, Suez, ACV, Twente Milieu, Hellendoorn, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Schouwen-Duiveland, Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, SudwestFryslan, Montfoort, GAD, Cranendonck, ROVA, RD4, Limburg.NET, Afval Alert, RecycleApp, DeAfvalApp, Alkmaar, AreaReiniging, Almere, Waardlanden, Reinis, Avri, Omrin, BAR, RAD, Meppel, PreZero and Middelburg-Vlissingen.
 
 Cure users should switch to the waste collector MijnAfvalwijzer
 
@@ -73,6 +73,7 @@ Choose your collector from this list:
   - Montfoort
   - Omrin
   - PeelEnMaas
+  - PreZero
   - Purmerend
   - RAD
   - RecycleApp (don't forget the streetname option)
