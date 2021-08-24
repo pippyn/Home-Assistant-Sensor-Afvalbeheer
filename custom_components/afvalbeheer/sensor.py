@@ -840,12 +840,15 @@ class OmrinCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
         # 'BRANCHES': WASTE_TYPE_BRANCHES,
         'Grofvuil': WASTE_TYPE_BULKLITTER,
+        'Grofvuil en elektrische apparaten': WASTE_TYPE_BULKLITTER,
         # 'BULKYGARDENWASTE': WASTE_TYPE_BULKYGARDENWASTE,
         # 'GLASS': WASTE_TYPE_GLASS,
+        'Biobak op afroep': WASTE_TYPE_GREEN,
         'Biobak': WASTE_TYPE_GREEN,
         'GFT': WASTE_TYPE_GREEN,
         # 'GREY': WASTE_TYPE_GREY,
         'KCA': WASTE_TYPE_KCA,
+        'Chemisch afval': WASTE_TYPE_KCA,
         'Sortibak': WASTE_TYPE_SORTI,
         'Papier': WASTE_TYPE_PAPER,
         # 'REMAINDER': WASTE_TYPE_REMAINDER,
@@ -871,7 +874,7 @@ class OmrinCollector(WasteCollector):
         base64EncodedRequest = b64encode(encryptedRequest).decode("utf-8")
 
         response = requests.post("{}/FetchAccount/".format(self.main_url) + self.appId, '"' + base64EncodedRequest + '"', timeout=60).json()
-        return response['CalendarHomeV2']
+        return response['CalendarV2']
 
     async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
