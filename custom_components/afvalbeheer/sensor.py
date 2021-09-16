@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.24 20210826 - Pippijn Stortelder
+Current Version: 4.7.25 20210916 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -21,6 +21,8 @@ Current Version: 4.7.24 20210826 - Pippijn Stortelder
 20210601 - Fix for ROVA
 20210816 - Changed Suez to PreZero
 20210826 - Bugfix for CirculusBerkel
+20210916 - More waste types for Omrin
+20210916 - Fix dutch translation for September
 
 Example config:
 Configuration.yaml:
@@ -179,7 +181,7 @@ FRACTION_ICONS = {
     'restafval': 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8IS0tIENyZWF0b3I6IENvcmVsRFJBVyBYNiAtLT4NCjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWw6c3BhY2U9InByZXNlcnZlIiB3aWR0aD0iNS4zMzMzM2luIiBoZWlnaHQ9IjUuMzMzMzNpbiIgdmVyc2lvbj0iMS4xIiBzdHlsZT0ic2hhcGUtcmVuZGVyaW5nOmdlb21ldHJpY1ByZWNpc2lvbjsgdGV4dC1yZW5kZXJpbmc6Z2VvbWV0cmljUHJlY2lzaW9uOyBpbWFnZS1yZW5kZXJpbmc6b3B0aW1pemVRdWFsaXR5OyBmaWxsLXJ1bGU6ZXZlbm9kZDsgY2xpcC1ydWxlOmV2ZW5vZGQiDQp2aWV3Qm94PSIwIDAgNTMzMyA1MzMzIg0KIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiA8ZGVmcz4NCiAgPHN0eWxlIHR5cGU9InRleHQvY3NzIj4NCiAgIDwhW0NEQVRBWw0KICAgIC5zdHIwIHtzdHJva2U6IzIzMUYyMDtzdHJva2Utd2lkdGg6MTExLjExfQ0KICAgIC5maWwwIHtmaWxsOm5vbmU7ZmlsbC1ydWxlOm5vbnplcm99DQogICBdXT4NCiAgPC9zdHlsZT4NCiA8L2RlZnM+DQogPGcgaWQ9IkxheWVyX3gwMDIwXzEiPg0KICA8bWV0YWRhdGEgaWQ9IkNvcmVsQ29ycElEXzBDb3JlbC1MYXllciIvPg0KICA8cGF0aCBjbGFzcz0iZmlsMCBzdHIwIiBkPSJNNDUyNCA0MjQxYzQ4LC0zOTggMTksLTU1OCAtMTM4LC04MDMgLTE1NiwtMjQ1IC0xMDczLC0xMzEyIC0xMDczLC0xMzEybDM5MSAxMDA5IC01MjYgLTg0NiAtMjAzIDExMzUgLTExIC0xMTU0IC05MDEgNDMyIDk1MSAtNjQxIDMzOSA3NCAxMDEzIC01NDIgLTY5NSAtMTU2IC0yNzcgNDc3IDg3IC0xMDMzIC02ODkgNjAxIDEzNyAtMjM3IC01OTYgLTMwOSA0NTEgOTQzIC0xOTc0IDkyMyAtMjE3IDUyMyAyMTYgNTIwIC0xNjEgLTY3IC0xNTEgMzQwbTM5ODMgNDIxYzIwLC0xMjcgMzUsLTIzMSA0MywtMjk5Ii8+DQogIDxwYXRoIGNsYXNzPSJmaWwwIHN0cjAiIGQ9Ik01Mjc1IDI2NjVjMCwxNDQxIC0xMTY4LDI2MTAgLTI2MTAsMjYxMCAtMTQ0MSwwIC0yNjEwLC0xMTY4IC0yNjEwLC0yNjEwIDAsLTE0NDEgMTE2OCwtMjYxMCAyNjEwLC0yNjEwIDE0NDEsMCAyNjEwLDExNjggMjYxMCwyNjEwem0wIDB6Ii8+DQogPC9nPg0KPC9zdmc+DQo=',
 }
 
-DUTCH_TRANSLATION_DATES = {
+DUTCH_TRANSLATION_DAYS = {
     'Monday': 'Maandag',
     'Tuesday': 'Dinsdag',
     'Wednesday': 'Woensdag',
@@ -187,6 +189,9 @@ DUTCH_TRANSLATION_DATES = {
     'Friday': 'Vrijdag',
     'Saturday': 'Zaterdag',
     'Sunday': 'Zondag',
+}
+
+DUTCH_TRANSLATION_MONTHS = {
     'January': 'Januari',
     'February': 'Februari',
     'March': 'Maart',
@@ -198,7 +203,10 @@ DUTCH_TRANSLATION_DATES = {
     'September': 'September',
     'October': 'Oktober',
     'November': 'November',
-    'December': 'December',
+    'December': 'December'
+}
+
+DUTCH_TRANSLATION_MONTHS_SHORT = {
     'Jan': 'Jan',
     'Feb': 'Feb',
     'Mar': 'Mrt',
@@ -1367,7 +1375,9 @@ class WasteTypeSensor(Entity):
             self._state = collection.date.strftime(self.date_format)
         elif date_diff > 1:
             if self.day_of_week:
-                self._state = collection.date.strftime('%A, ' + self.date_format)
+                if "%A"  not in self.date_format:
+                    self.date_format = '%A, ' + self.date_format
+                self._state = collection.date.strftime(self.date_format)
             else:
                 self._state = collection.date.strftime(self.date_format)
         elif date_diff == 1:
@@ -1378,8 +1388,15 @@ class WasteTypeSensor(Entity):
             self._state = None
 
         if self.dutch_days and not self.date_object:
-            for EN_day, NL_day in DUTCH_TRANSLATION_DATES.items():
-                self._state = self._state.replace(EN_day, NL_day)
+            if "%b" in self.date_format:
+                for EN_day, NL_day in DUTCH_TRANSLATION_MONTHS_SHORT.items():
+                    self._state = self._state.replace(EN_day, NL_day)
+            if "%B" in self.date_format:
+                for EN_day, NL_day in DUTCH_TRANSLATION_MONTHS.items():
+                    self._state = self._state.replace(EN_day, NL_day)
+            if "%A" in self.date_format:
+                for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
+                    self._state = self._state.replace(EN_day, NL_day)
 
     def __set_sort_date(self, collection):
         self._sort_date = int(collection.date.strftime('%Y%m%d'))
