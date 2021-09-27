@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.27 20210927 - Pippijn Stortelder
+Current Version: 4.7.28 20210927 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -1386,10 +1386,11 @@ class WasteTypeSensor(Entity):
         elif date_diff > 1:
             if self.day_of_week:
                 if self.day_of_week_only:
-                    self._state = collection.date.strftime("%A")
+                    self.date_format = "%A"
+                    self._state = collection.date.strftime(self.date_format)
                 else:
                     if "%A"  not in self.date_format:
-                        self.date_format = '%A, ' + self.date_format
+                        self.date_format = "%A, " + self.date_format
                     self._state = collection.date.strftime(self.date_format)
             else:
                 self._state = collection.date.strftime(self.date_format)
