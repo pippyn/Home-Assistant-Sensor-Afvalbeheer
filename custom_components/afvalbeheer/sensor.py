@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.25 20210916 - Pippijn Stortelder
+Current Version: 4.7.26 20210927 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -23,6 +23,8 @@ Current Version: 4.7.25 20210916 - Pippijn Stortelder
 20210826 - Bugfix for CirculusBerkel
 20210916 - More waste types for Omrin
 20210916 - Fix dutch translation for September
+20210927 - Added support for Westland
+20210927 - Fix for Alkmaar
 
 Example config:
 Configuration.yaml:
@@ -101,7 +103,7 @@ ATTR_DAYS_UNTIL = 'Days-until'
 NOTIFICATION_ID = "Afvalbeheer"
 
 OPZET_COLLECTOR_URLS = {
-    'alkmaar': 'https://inzamelkalender.stadswerk072.nl/',
+    'alkmaar': 'https://www.stadswerk072.nl/',
     'alphenaandenrijn': 'https://afvalkalender.alphenaandenrijn.nl',
     'avalex': 'https://www.avalex.nl',
     'berkelland': 'https://afvalkalender.gemeenteberkelland.nl',
@@ -139,6 +141,7 @@ XIMMIO_COLLECTOR_IDS = {
     'rad': '13a2cad9-36d0-4b01-b877-efcb421a864d',
     'twentemilieu': '8d97bb56-5afd-4cbc-a651-b4f7314264b4',
     'waardlanden': '942abcf6-3775-400d-ae5d-7380d728b23c',
+    'westland': '6fc75608-126a-4a50-9241-a002ce8c8a6c',
     'ximmio': '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
     'reinis': '9dc25c8a-175a-4a41-b7a1-83f237a80b77',
 }

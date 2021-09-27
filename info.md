@@ -48,6 +48,7 @@ This sensor works with the following waste collectors:
   - Venray
   - Waalre
   - Waardlanden
+  - Westland
   - ZRD
 
 ![alt text](https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/example.png)
