@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.26 20210927 - Pippijn Stortelder
+Current Version: 4.7.27 20210927 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -25,6 +25,7 @@ Current Version: 4.7.26 20210927 - Pippijn Stortelder
 20210916 - Fix dutch translation for September
 20210927 - Added support for Westland
 20210927 - Fix for Alkmaar
+20210927 - Added option 'dayofweekonly' to only show day name in state
 
 Example config:
 Configuration.yaml:
@@ -91,6 +92,7 @@ CONF_BUILT_IN_ICONS = 'builtinicons'
 CONF_DISABLE_ICONS = 'disableicons'
 CONF_TRANSLATE_DAYS = 'dutch'
 CONF_DAY_OF_WEEK = 'dayofweek'
+CONF_DAY_OF_WEEK_ONLY = 'dayofweekonly'
 CONF_ALWAYS_SHOW_DAY = 'alwaysshowday'
 CONF_PRINT_AVAILABLE_WASTE_TYPES = 'printwastetypes'
 CONF_UPDATE_INTERVAL = 'updateinterval'
@@ -243,6 +245,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_DISABLE_ICONS, default=False): cv.boolean,
     vol.Optional(CONF_TRANSLATE_DAYS, default=False): cv.boolean,
     vol.Optional(CONF_DAY_OF_WEEK, default=True): cv.boolean,
+    vol.Optional(CONF_DAY_OF_WEEK_ONLY, default=False): cv.boolean,
     vol.Optional(CONF_ALWAYS_SHOW_DAY, default=False): cv.boolean,
     vol.Optional(CONF_PRINT_AVAILABLE_WASTE_TYPES, default=False): cv.boolean,
     vol.Optional(CONF_UPDATE_INTERVAL, default=0): cv.positive_int,
@@ -268,6 +271,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     disable_icons = config.get(CONF_DISABLE_ICONS)
     dutch_days = config.get(CONF_TRANSLATE_DAYS)
     day_of_week = config.get(CONF_DAY_OF_WEEK)
+    day_of_week_only = config.get(CONF_DAY_OF_WEEK_ONLY)
     always_show_day = config.get(CONF_ALWAYS_SHOW_DAY)
     print_waste_type = config.get(CONF_PRINT_AVAILABLE_WASTE_TYPES)
     update_interval = config.get(CONF_UPDATE_INTERVAL)
@@ -322,6 +326,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             disable_icons, 
             dutch_days, 
             day_of_week, 
+            day_of_week_only, 
             always_show_day))
 
     if sensor_today:
@@ -1215,7 +1220,8 @@ class XimmioCollector(WasteCollector):
 
     XIMMIO_URLS = {
         'meerlanden': "https://wasteprod2api.ximmio.com",
-        'rad': "https://wasteprod2api.ximmio.com"
+        'rad': "https://wasteprod2api.ximmio.com",
+        'westland': "https://wasteprod2api.ximmio.com",
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, address_id):
@@ -1299,7 +1305,7 @@ class XimmioCollector(WasteCollector):
 class WasteTypeSensor(Entity):
 
     def __init__(self, data, waste_type, waste_collector, date_format, date_only, date_object, 
-        name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week, always_show_day):
+        name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week, day_of_week_only, always_show_day):
         self.data = data
         self.waste_type = waste_type
         self.waste_collector = waste_collector
@@ -1311,13 +1317,14 @@ class WasteTypeSensor(Entity):
         self.disable_icons = disable_icons
         self.dutch_days = dutch_days
         self.day_of_week = day_of_week
+        self.day_of_week_only = day_of_week_only
         self.always_show_day = always_show_day
         if self.dutch_days:
-            self._today = "Vandaag, "
-            self._tomorrow = "Morgen, "
+            self._today = "Vandaag"
+            self._tomorrow = "Morgen"
         else:
-            self._today = "Today, "
-            self._tomorrow = "Tomorrow, "
+            self._today = "Today"
+            self._tomorrow = "Tomorrow"
         self._days_until = None
         self._unit = ''
         self._sort_date = 0
@@ -1378,15 +1385,24 @@ class WasteTypeSensor(Entity):
             self._state = collection.date.strftime(self.date_format)
         elif date_diff > 1:
             if self.day_of_week:
-                if "%A"  not in self.date_format:
-                    self.date_format = '%A, ' + self.date_format
-                self._state = collection.date.strftime(self.date_format)
+                if self.day_of_week_only:
+                    self._state = collection.date.strftime("%A")
+                else:
+                    if "%A"  not in self.date_format:
+                        self.date_format = '%A, ' + self.date_format
+                    self._state = collection.date.strftime(self.date_format)
             else:
                 self._state = collection.date.strftime(self.date_format)
         elif date_diff == 1:
-            self._state = collection.date.strftime(self._tomorrow + self.date_format)
+            if self.day_of_week_only:
+                self._state = collection.date.strftime(self._tomorrow)
+            else:
+                self._state = collection.date.strftime(self._tomorrow + ", " + self.date_format)
         elif date_diff == 0:
-            self._state = collection.date.strftime(self._today + self.date_format)
+            if self.day_of_week_only:
+                self._state = collection.date.strftime(self._today)
+            else:
+                self._state = collection.date.strftime(self._today + ", " + self.date_format)
         else:
             self._state = None
 

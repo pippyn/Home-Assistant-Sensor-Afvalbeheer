@@ -170,11 +170,17 @@ dateonly: 1
 ```
 If you don't want to add dayname, tomorrow or today in front of date activate this option. Default is 0.
 
-### Date of week
+### Day of week
 ```yaml
 dayofweek: 1
 ```
 This option adds the name of the day to the state of the sensor when the date is within 7 days. Default is 1.
+
+### Day of week only
+```yaml
+dayofweek: 1
+```
+This option removes the date from the sensor if `dayofweek` is active. Default is 0.
 
 ### Always show day
 ```yaml
