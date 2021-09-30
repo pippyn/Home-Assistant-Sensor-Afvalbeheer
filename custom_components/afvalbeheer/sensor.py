@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.28 20210927 - Pippijn Stortelder
+Current Version: 4.7.29 20210930 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -26,6 +26,7 @@ Current Version: 4.7.28 20210927 - Pippijn Stortelder
 20210927 - Added support for Westland
 20210927 - Fix for Alkmaar
 20210927 - Added option 'dayofweekonly' to only show day name in state
+20210930 - Fix for Alkmaar
 
 Example config:
 Configuration.yaml:
@@ -105,7 +106,7 @@ ATTR_DAYS_UNTIL = 'Days-until'
 NOTIFICATION_ID = "Afvalbeheer"
 
 OPZET_COLLECTOR_URLS = {
-    'alkmaar': 'https://www.stadswerk072.nl/',
+    'alkmaar': 'https://www.stadswerk072.nl',
     'alphenaandenrijn': 'https://afvalkalender.alphenaandenrijn.nl',
     'avalex': 'https://www.avalex.nl',
     'berkelland': 'https://afvalkalender.gemeenteberkelland.nl',
