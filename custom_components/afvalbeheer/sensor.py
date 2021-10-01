@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.29 20210930 - Pippijn Stortelder
+Current Version: 4.7.30 20211001 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -27,6 +27,7 @@ Current Version: 4.7.29 20210930 - Pippijn Stortelder
 20210927 - Fix for Alkmaar
 20210927 - Added option 'dayofweekonly' to only show day name in state
 20210930 - Fix for Alkmaar
+20211001 - Switch Avalex tot Ximmio
 
 Example config:
 Configuration.yaml:
@@ -108,7 +109,6 @@ NOTIFICATION_ID = "Afvalbeheer"
 OPZET_COLLECTOR_URLS = {
     'alkmaar': 'https://www.stadswerk072.nl',
     'alphenaandenrijn': 'https://afvalkalender.alphenaandenrijn.nl',
-    'avalex': 'https://www.avalex.nl',
     'berkelland': 'https://afvalkalender.gemeenteberkelland.nl',
     'blink': 'https://mijnblink.nl',
     'cranendonck': 'https://afvalkalender.cranendonck.nl',
@@ -136,6 +136,7 @@ XIMMIO_COLLECTOR_IDS = {
     'acv': 'f8e2844a-095e-48f9-9f98-71fceb51d2c3',
     'almere': '53d8db94-7945-42fd-9742-9bbc71dbe4c1',
     'areareiniging': 'adc418da-d19b-11e5-ab30-625662870761',
+    'avalex': 'f7a74ad1-fdbf-4a43-9f91-44644f4d4222',
     'avri': '78cd4156-394b-413d-8936-d407e334559a',
     'bar': 'bb58e633-de14-4b2a-9941-5bc419f1c4b0',
     'hellendoorn': '24434f5b-7244-412b-9306-3a2bd1e22bc1',
@@ -1220,6 +1221,7 @@ class XimmioCollector(WasteCollector):
     }
 
     XIMMIO_URLS = {
+        'avalex': "https://wasteprod2api.ximmio.com",
         'meerlanden': "https://wasteprod2api.ximmio.com",
         'rad': "https://wasteprod2api.ximmio.com",
         'westland': "https://wasteprod2api.ximmio.com",
