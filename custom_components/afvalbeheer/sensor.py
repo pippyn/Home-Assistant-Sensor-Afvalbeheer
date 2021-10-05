@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.30 20211001 - Pippijn Stortelder
+Current Version: 4.7.31 20211005 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -28,6 +28,7 @@ Current Version: 4.7.30 20211001 - Pippijn Stortelder
 20210927 - Added option 'dayofweekonly' to only show day name in state
 20210930 - Fix for Alkmaar
 20211001 - Switch Avalex tot Ximmio
+20211005 - Small bug fix
 
 Example config:
 Configuration.yaml:
@@ -1380,44 +1381,45 @@ class WasteTypeSensor(Entity):
     def __set_state(self, collection):
         date_diff = (collection.date - datetime.now()).days + 1
         self._days_until = date_diff
+        date_format = self.date_format
         if self.date_object:
             self._state = collection.date
         elif self.date_only:
-            self._state = collection.date.strftime(self.date_format)
+            self._state = collection.date.strftime(date_format)
         elif date_diff >= 8 and not self.always_show_day:
-            self._state = collection.date.strftime(self.date_format)
+            self._state = collection.date.strftime(date_format)
         elif date_diff > 1:
             if self.day_of_week:
                 if self.day_of_week_only:
-                    self.date_format = "%A"
-                    self._state = collection.date.strftime(self.date_format)
+                    date_format = "%A"
+                    self._state = collection.date.strftime(date_format)
                 else:
                     if "%A"  not in self.date_format:
-                        self.date_format = "%A, " + self.date_format
-                    self._state = collection.date.strftime(self.date_format)
+                        date_format = "%A, " + date_format
+                    self._state = collection.date.strftime(date_format)
             else:
-                self._state = collection.date.strftime(self.date_format)
+                self._state = collection.date.strftime(date_format)
         elif date_diff == 1:
             if self.day_of_week_only:
                 self._state = collection.date.strftime(self._tomorrow)
             else:
-                self._state = collection.date.strftime(self._tomorrow + ", " + self.date_format)
+                self._state = collection.date.strftime(self._tomorrow + ", " + date_format)
         elif date_diff == 0:
             if self.day_of_week_only:
                 self._state = collection.date.strftime(self._today)
             else:
-                self._state = collection.date.strftime(self._today + ", " + self.date_format)
+                self._state = collection.date.strftime(self._today + ", " + date_format)
         else:
             self._state = None
 
         if self.dutch_days and not self.date_object:
-            if "%b" in self.date_format:
+            if "%b" in date_format:
                 for EN_day, NL_day in DUTCH_TRANSLATION_MONTHS_SHORT.items():
                     self._state = self._state.replace(EN_day, NL_day)
-            if "%B" in self.date_format:
+            if "%B" in date_format:
                 for EN_day, NL_day in DUTCH_TRANSLATION_MONTHS.items():
                     self._state = self._state.replace(EN_day, NL_day)
-            if "%A" in self.date_format:
+            if "%A" in date_format:
                 for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
                     self._state = self._state.replace(EN_day, NL_day)
 
