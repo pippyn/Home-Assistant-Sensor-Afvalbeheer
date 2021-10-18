@@ -659,6 +659,16 @@ class CirculusBerkelCollector(WasteCollector):
             r = requests.post(
                 '{}/register/zipcode.json'.format(self.main_url), data=data, cookies=cookies
             )
+
+            json_response_data = r.json()
+            if self.suffix != "" and json_response_data["flashMessage"] != "":
+                authenticationUrl = ""
+                for address in json_response_data["customData"]["addresses"]:
+                    if re.search(' '+self.street_number+' '+self.suffix.lower(), address["address"]) != None:
+                        authenticationUrl = address["authenticationUrl"]
+                        break
+                r = requests.get(self.main_url+authenticationUrl, cookies=cookies)
+
             logged_in_cookies = r.cookies
         else:
             _LOGGER.error("Unable to get Session Cookie")

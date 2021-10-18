@@ -66,6 +66,7 @@ This sensor works with the following waste collectors:
         - pmd
       postcode: 1111AA                 (required)
       streetnumber: 1                  (required)
+      suffix: a                        (optional)
       upcomingsensor: 0                (optional)
       dateformat: '%d-%m-%Y'           (optional)
       dateonly: 0                      (optional)
