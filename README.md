@@ -28,6 +28,7 @@ Example config:
         - pmd
       postcode: 1111AA                 (required)
       streetnumber: 1                  (required)
+      suffix: a                        (optional)
       upcomingsensor: 0                (optional)
       dateformat: '%d-%m-%Y'           (optional)
       dateonly: 0                      (optional)
@@ -122,6 +123,12 @@ Postcode is required and is your own postcode
 
 ### Streetnumber
 Streetnumber is required and is your own street number
+
+### Suffix
+```yaml
+suffix: a
+```
+Optional streetnumber suffix
 
 ### Streetname
 ```yaml
