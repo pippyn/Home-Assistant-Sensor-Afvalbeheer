@@ -185,7 +185,7 @@ This option adds the name of the day to the state of the sensor when the date is
 
 ### Day of week only
 ```yaml
-dayofweek: 1
+dayofweekonly: 1
 ```
 This option removes the date from the sensor if `dayofweek` is active. Default is 0.
 
