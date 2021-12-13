@@ -104,8 +104,8 @@ CONF_UPDATE_INTERVAL = 'updateinterval'
 
 ATTR_WASTE_COLLECTOR = 'Wastecollector'
 ATTR_HIDDEN = 'Hidden'
-ATTR_SORT_DATE = 'Sort-date'
-ATTR_DAYS_UNTIL = 'Days-until'
+ATTR_SORT_DATE = 'Sort_date'
+ATTR_DAYS_UNTIL = 'Days_until'
 
 NOTIFICATION_ID = "Afvalbeheer"
 
