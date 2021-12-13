@@ -31,6 +31,7 @@ Current Version: 4.7.33 20211022 - Pippijn Stortelder
 20211005 - Small bug fix
 20211019 - Add support for housenumber additions on the Circulus Berkel API
 20211022 - Update Mijnafvalwijzer mapping
+20211212 - Replace device_state_attributes with extra_state_attributes
 
 Example config:
 Configuration.yaml:
@@ -1363,7 +1364,7 @@ class WasteTypeSensor(Entity):
         return self._state
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         return {
             ATTR_WASTE_COLLECTOR: self.waste_collector,
             ATTR_HIDDEN: self._hidden,
@@ -1478,7 +1479,7 @@ class WasteDateSensor(Entity):
         return self._state
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         return {
             ATTR_HIDDEN: self._hidden
         }
