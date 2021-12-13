@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.7.33 20211022 - Pippijn Stortelder
+Current Version: 4.8.0 20211213 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -32,6 +32,7 @@ Current Version: 4.7.33 20211022 - Pippijn Stortelder
 20211019 - Add support for housenumber additions on the Circulus Berkel API
 20211022 - Update Mijnafvalwijzer mapping
 20211212 - Replace device_state_attributes with extra_state_attributes
+20211213 - Breaking change: replaced - with _ in Days_until and Days_until
 
 Example config:
 Configuration.yaml:
