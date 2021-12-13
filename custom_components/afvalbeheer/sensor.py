@@ -1333,6 +1333,7 @@ class WasteTypeSensor(Entity):
         self.date_only = date_only
         self.date_object = date_object
         self._name = _format_sensor(name, name_prefix, waste_collector, self.waste_type)
+        self._attr_unique_id = _format_sensor(name, name_prefix, waste_collector, self.waste_type)
         self.built_in_icons = built_in_icons
         self.disable_icons = disable_icons
         self.dutch_days = dutch_days
@@ -1467,6 +1468,7 @@ class WasteDateSensor(Entity):
         else:
             day = ''
         self._name = _format_sensor(name, name_prefix, waste_collector, day)
+        self._attr_unique_id = _format_sensor(name, name_prefix, waste_collector, day)
         self._unit = ''
         self._hidden = False
         self._state = None
