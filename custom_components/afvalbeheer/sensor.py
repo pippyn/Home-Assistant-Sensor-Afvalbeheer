@@ -34,6 +34,7 @@ Current Version: 4.8.1 20211213 - Pippijn Stortelder
 20211212 - Replace device_state_attributes with extra_state_attributes
 20211213 - Breaking change: replaced - with _ in Days_until and Days_until
 20211213 - Add unique ids to all sensors
+20211219 - Add More RD4 Garbage Types
 
 Example config:
 Configuration.yaml:
@@ -1034,7 +1035,7 @@ class OpzetCollector(WasteCollector):
 
 class RD4Collector(WasteCollector):
     WASTE_TYPE_MAPPING = {
-        # 'snoeiafval': WASTE_TYPE_BRANCHES,
+        'SNOEIAFVAL_OP_AFSPRAAK': WASTE_TYPE_BRANCHES,
         # 'sloop': WASTE_TYPE_BULKLITTER,
         # 'glas': WASTE_TYPE_GLASS,
         # 'duobak': WASTE_TYPE_GREENGREY,
@@ -1046,7 +1047,7 @@ class RD4Collector(WasteCollector):
         # 'plastic': WASTE_TYPE_PACKAGES,
         'papier': WASTE_TYPE_PAPER,
         # 'textiel': WASTE_TYPE_TEXTILE,
-        # 'kerstb': WASTE_TYPE_TREE,
+        'KERSTBOOM': WASTE_TYPE_TREE,
         'pmd': WASTE_TYPE_PACKAGES,
     }
 
