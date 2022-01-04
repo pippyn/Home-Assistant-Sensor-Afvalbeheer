@@ -32,7 +32,7 @@ Current Version: 4.8.1 20211213 - Pippijn Stortelder
 20211019 - Add support for housenumber additions on the Circulus Berkel API
 20211022 - Update Mijnafvalwijzer mapping
 20211212 - Replace device_state_attributes with extra_state_attributes
-20211213 - Breaking change: replaced - with _ in Days_until and Days_until
+20211213 - Breaking change: replaced - with _ in Days-until and Sort-date
 20211213 - Add unique ids to all sensors
 
 Example config:
