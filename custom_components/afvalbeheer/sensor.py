@@ -643,7 +643,7 @@ class CirculusBerkelCollector(WasteCollector):
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix):
         super(CirculusBerkelCollector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
-        self.main_url = "https://mijn.circulus-berkel.nl"
+        self.main_url = "https://mijn.circulus.nl"
 
     def __get_data(self):
         r = requests.get(self.main_url)
