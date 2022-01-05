@@ -134,6 +134,7 @@ OPZET_COLLECTOR_URLS = {
     'sudwestfryslan': 'https://afvalkalender.sudwestfryslan.nl',
     'suez': 'https://inzamelwijzer.prezero.nl',
     'venray': 'https://afvalkalender.venray.nl',
+    'voorschoten': 'https://afvalkalender.voorschoten.nl',
     'waalre': 'https://afvalkalender.waalre.nl',
     'zrd': 'https://afvalkalender.zrd.nl',
 }
