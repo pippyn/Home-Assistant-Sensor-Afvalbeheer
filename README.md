@@ -4,7 +4,7 @@
 ## Home Assisant sensor component for Afvalbeheer
 
 Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API.
-This sensor works with the following waste collectors: Blink, Cure, Suez, ACV, Twente Milieu, Hellendoorn, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Schouwen-Duiveland, Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, SudwestFryslan, Montfoort, GAD, Cranendonck, ROVA, RD4, Limburg.NET, Afval Alert, RecycleApp, DeAfvalApp, Alkmaar, AreaReiniging, Almere, Waardlanden, Reinis, Avri, Omrin, BAR, RAD, Meppel, PreZero, Westland and Middelburg-Vlissingen.
+This sensor works with the following waste collectors: Blink, Cure, Suez, ACV, Twente Milieu, Hellendoorn, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Schouwen-Duiveland, Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, SudwestFryslan, Montfoort, GAD, Cranendonck, ROVA, RD4, Limburg.NET, Afval Alert, RecycleApp, DeAfvalApp, Alkmaar, AreaReiniging, Almere, Waardlanden, Reinis, Avri, Omrin, BAR, RAD, Meppel, PreZero, Voorschoten, Westland and Middelburg-Vlissingen.
 
 Cure users should switch to the waste collector MijnAfvalwijzer
 
@@ -87,6 +87,7 @@ Choose your collector from this list:
   - SudwestFryslan
   - Twente Milieu
   - Venray
+  - Voorschoten
   - Waalre
   - Waardlanden
   - Westland
@@ -244,6 +245,12 @@ If you want to display the names of the days in dutch. Default is 0.
 updateinterval: 12
 ```
 If you want to adjust the update interval, you can set this option to the desired hours. Default is 1.
+
+### Customer ID for Ximmio commercial address
+```yaml
+customerid: 123456
+```
+If you use have a commercial address (and use one of the Ximmio waste collectors), you need to input your Customer ID. Default is empty.
 
 ## HACS
 You can use HACS to install this sensor. It is included by default.

@@ -46,6 +46,7 @@ This sensor works with the following waste collectors:
   - SudwestFryslan
   - Twente Milieu
   - Venray
+  - Voorschoten
   - Waalre
   - Waardlanden
   - Westland
