@@ -301,7 +301,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     if waste_collector in DEPRECATED_AND_NEW_WASTECOLLECTORS:
         persistent_notification.create(
                 hass,
-                "Update your config to use {}! You are still using {} as a wast collector, which is deprecated. Check your automations and lovelace config, as the sensor names may also be changed!".format(
+                "Update your config to use {}! You are still using {} as a waste collector, which is deprecated. Check your automations and lovelace config, as the sensor names may also be changed!".format(
                     DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector], 
                     waste_collector),
                 "Afvalbeheer", 
