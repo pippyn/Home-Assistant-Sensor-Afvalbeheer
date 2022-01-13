@@ -37,6 +37,7 @@ Current Version: 4.9.0 20220106 - Pippijn Stortelder
 20220105 - Changed collector circulus-berkel to circulus
 20220105 - Added support for wastcollector Voorschoten
 20220106 - Added support for Ximmio commercial address (option added customerid)
+20220113 - Added support for wastcollector Lingewaard
 
 Example config:
 Configuration.yaml:
