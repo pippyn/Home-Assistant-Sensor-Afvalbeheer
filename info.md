@@ -26,6 +26,7 @@ This sensor works with the following waste collectors:
   - Hellendoorn
   - HVC
   - Limburg.NET (don't forget the streetname and cityname option)
+  - Lingewaard
   - Meerlanden
   - Meppel
   - Middelburg-Vlissingen
