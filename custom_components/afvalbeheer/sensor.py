@@ -876,7 +876,7 @@ class LimburgNetCollector(WasteCollector):
                     continue
 
                 collection = WasteCollection.create(
-                    date=datetime.strptime(item['date'], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None),
+                    date=datetime.fromisoformat(item['date']),
                     waste_type=waste_type
                 )
                 self.collections.add(collection)
@@ -1417,7 +1417,7 @@ class WasteTypeSensor(Entity):
         self.__set_picture(collection)
 
     def __set_state(self, collection):
-        date_diff = (collection.date - datetime.now()).days + 1
+        date_diff = (collection.date - dt_util.utcnow()).days + 1
         self._days_until = date_diff
         date_format = self.date_format
         if self.date_object:
