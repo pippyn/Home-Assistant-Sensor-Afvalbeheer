@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.9.1 20220113 - Pippijn Stortelder
+Current Version: 4.9.2 20220118 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -38,6 +38,7 @@ Current Version: 4.9.1 20220113 - Pippijn Stortelder
 20220105 - Added support for wastcollector Voorschoten
 20220106 - Added support for Ximmio commercial address (option added customerid)
 20220113 - Added support for wastcollector Lingewaard
+20220118 - Fix Cranendonck mapping
 
 Example config:
 Configuration.yaml:
@@ -967,6 +968,7 @@ class OpzetCollector(WasteCollector):
         'gft': WASTE_TYPE_GREEN,
         'chemisch': WASTE_TYPE_KCA,
         'kca': WASTE_TYPE_KCA,
+        'tariefzak restafval': WASTE_TYPE_GREY_BAGS,
         'restafvalzakken': WASTE_TYPE_GREY_BAGS,
         'rest': WASTE_TYPE_GREY,
         'plastic': WASTE_TYPE_PACKAGES,
