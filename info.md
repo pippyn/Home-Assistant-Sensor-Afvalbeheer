@@ -1,4 +1,5 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/custom-components/hacs)
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/pippyn)
 ## Home Assisant sensor component for Afvalbeheer
 
 Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API. 
@@ -77,10 +78,6 @@ This sensor works with the following waste collectors:
       builtinicons: 0                  (optional)
       dutch: 0                         (optional)
 ```
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/pippyn)
+
 [For more information visit the repository](https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/)
-
-[![Buy me a coffee][buymeacoffee-shield]][buymeacoffee]
-
-
-[buymeacoffee-shield]: https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-2.svg
-[buymeacoffee]: https://www.buymeacoffee.com/pippyn
