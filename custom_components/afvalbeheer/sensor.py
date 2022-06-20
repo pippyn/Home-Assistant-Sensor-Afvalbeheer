@@ -960,6 +960,7 @@ class OmrinCollector(WasteCollector):
 
 class OpzetCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
+        'pbd/papier': WASTE_TYPE_PAPER_PMD,
         'snoeiafval': WASTE_TYPE_BRANCHES,
         'sloop': WASTE_TYPE_BULKLITTER,
         'glas': WASTE_TYPE_GLASS,
@@ -976,6 +977,7 @@ class OpzetCollector(WasteCollector):
         'textiel': WASTE_TYPE_TEXTILE,
         'kerstb': WASTE_TYPE_TREE,
         'pmd': WASTE_TYPE_PACKAGES,
+        'pbd': WASTE_TYPE_PACKAGES,
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix):
