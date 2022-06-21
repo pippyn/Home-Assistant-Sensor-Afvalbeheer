@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.9.3 20220621 - Pippijn Stortelder
+Current Version: 4.9.4 20220621 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -1061,7 +1061,7 @@ class RD4Collector(WasteCollector):
         # 'kca': WASTE_TYPE_KCA,
         'residual': WASTE_TYPE_GREY,
         # 'plastic': WASTE_TYPE_PACKAGES,
-        'papier': WASTE_TYPE_PAPER,
+        'paper': WASTE_TYPE_PAPER,
         'best_bag': "best-tas",
         'christmas_trees': WASTE_TYPE_TREE,
         'pmd': WASTE_TYPE_PACKAGES,
@@ -1089,7 +1089,7 @@ class RD4Collector(WasteCollector):
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
-            _LOGGER.error(response)
+
             if not response:
                 _LOGGER.error('No Waste data found!')
                 return
