@@ -41,7 +41,7 @@ Current Version: 4.9.5 20220629 - Pippijn Stortelder
 20220118 - Fix Cranendonck mapping
 20220620 - Fix Spaarnelanden mapping
 20220621 - Changed RD4 to new API
-20220629 - Depricated Alkmaar, new waste collector is HVC
+20220629 - Deprecated Alkmaar, new waste collector is HVC
 20220629 - Fix for rate limiting with RecycleApp API
 20220629 - Default time interval is now 12 hours
 
