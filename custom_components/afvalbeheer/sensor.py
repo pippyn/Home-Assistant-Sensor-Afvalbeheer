@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.9.4 20220621 - Pippijn Stortelder
+Current Version: 4.9.5 20220629 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -41,6 +41,9 @@ Current Version: 4.9.4 20220621 - Pippijn Stortelder
 20220118 - Fix Cranendonck mapping
 20220620 - Fix Spaarnelanden mapping
 20220621 - Changed RD4 to new API
+20220629 - Depricated Alkmaar, new waste collector is HVC
+20220629 - Fix for rate limiting with RecycleApp API
+20220629 - Default time interval is now 12 hours
 
 Example config:
 Configuration.yaml:
@@ -88,7 +91,7 @@ from homeassistant.components import persistent_notification
 
 _LOGGER = logging.getLogger(__name__)
 
-SCHEDULE_UPDATE_INTERVAL = timedelta(hours=1)
+SCHEDULE_UPDATE_INTERVAL = timedelta(hours=12)
 
 CONF_WASTE_COLLECTOR = 'wastecollector'
 CONF_CITY_NAME = 'cityname'
@@ -121,7 +124,6 @@ ATTR_DAYS_UNTIL = 'Days_until'
 NOTIFICATION_ID = "Afvalbeheer"
 
 OPZET_COLLECTOR_URLS = {
-    'alkmaar': 'https://www.stadswerk072.nl',
     'alphenaandenrijn': 'https://afvalkalender.alphenaandenrijn.nl',
     'berkelland': 'https://afvalkalender.gemeenteberkelland.nl',
     'blink': 'https://mijnblink.nl',
@@ -171,6 +173,7 @@ DEPRECATED_AND_NEW_WASTECOLLECTORS = {
     'area': 'areareiniging',
     'ophaalkalender': 'recycleapp',
     'circulus-berkel': 'circulus',
+    'alkmaar': 'hvc',
 }
 
 WASTE_TYPE_BRANCHES = 'takken'
@@ -1164,19 +1167,22 @@ class RecycleApp(WasteCollector):
 
     def __get_access_token(self):
         response = requests.get("{}access-token".format(self.main_url), headers=self.__get_headers())
-        if not response.status_code == 200:
+        if response.status_code != 200:
             _LOGGER.error('Invalid response from server for accessToken')
             return
         self.accessToken = response.json()['accessToken']
     
     def __get_location_ids(self):
         response = requests.get("{}zipcodes?q={}".format(self.main_url, self.postcode), headers=self.__get_headers())
-        if not response.status_code == 200:
+        if response.status_code == 401:
+            self.__get_access_token()
+            response = requests.get("{}zipcodes?q={}".format(self.main_url, self.postcode), headers=self.__get_headers())
+        if response.status_code != 200:
             _LOGGER.error('Invalid response from server for postcode_id')
             return
         self.postcode_id = response.json()['items'][0]['id']
         response = requests.get("{}streets?q={}&zipcodes={}".format(self.main_url, self.street_name, self.postcode_id), headers=self.__get_headers())
-        if not response.status_code == 200:
+        if response.status_code != 200:
             _LOGGER.error('Invalid response from server for street_id')
             return
         for item in response.json()['items']:
@@ -1202,7 +1208,8 @@ class RecycleApp(WasteCollector):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         try:
-            await self.hass.async_add_executor_job(self.__get_access_token)
+            if (not self.accessToken):
+                await self.hass.async_add_executor_job(self.__get_access_token)
 
             if (not self.postcode_id or not self.street_id) and self.accessToken:
                 await self.hass.async_add_executor_job(self.__get_location_ids)
@@ -1211,7 +1218,7 @@ class RecycleApp(WasteCollector):
                 return
 
             r = await self.hass.async_add_executor_job(self.__get_data)
-            if not r.status_code == 200:
+            if r.status_code != 200:
                 _LOGGER.error('Invalid response from server for collection data')
                 return
             response = r.json()

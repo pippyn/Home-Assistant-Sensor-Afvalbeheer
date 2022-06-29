@@ -245,7 +245,7 @@ If you want to display the names of the days in dutch. Default is 0.
 ```yaml
 updateinterval: 12
 ```
-If you want to adjust the update interval, you can set this option to the desired hours. Default is 1.
+If you want to adjust the update interval, you can set this option to the desired hours. Default is 12.
 
 ### Customer ID for Ximmio commercial address
 ```yaml
