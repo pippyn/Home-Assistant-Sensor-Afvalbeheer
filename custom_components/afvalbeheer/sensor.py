@@ -1149,7 +1149,7 @@ class RecycleApp(WasteCollector):
     def __init__(self, hass, waste_collector, postcode, street_name, street_number, suffix):
         super(RecycleApp, self).__init__(hass, waste_collector, postcode, street_number, suffix)
         self.street_name = street_name
-        self.main_url = 'https://recycleapp.be/api/app/v1/'
+        self.main_url = 'https://api.recycleapp.be/api/app/v1/'
         self.xsecret = 'Crgja3EGWe8jdapyr4EEoMBgZACYYjRRcRpaMQrLDW9HJBvmgkfGQyYqLgeXPavAGvnJqkV87PBB2b8zx43q46sUgzqio4yRZbABhtKeagkVKypTEDjKfPgGycjLyJTtLHYpzwJgp4YmmCuJZN9ZmJY8CGEoFs8MKfdJpU9RjkEVfngmmk2LYD4QzFegLNKUbcCeAdEW'
         self.xconsumer = 'recycleapp.be'
         self.accessToken = ''
