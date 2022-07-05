@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 4.9.5 20220629 - Pippijn Stortelder
+Current Version: 4.9.6 20220705 - Pippijn Stortelder
 20210112 - Updated date format for RD4
 20210114 - Fix error made in commit 9d720ec
 20210120 - Enabled textile for RecycleApp
@@ -44,6 +44,7 @@ Current Version: 4.9.5 20220629 - Pippijn Stortelder
 20220629 - Deprecated Alkmaar, new waste collector is HVC
 20220629 - Fix for rate limiting with RecycleApp API
 20220629 - Default time interval is now 12 hours
+20220705 - Update RecycleApp API address
 
 Example config:
 Configuration.yaml:
