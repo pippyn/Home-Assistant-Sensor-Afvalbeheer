@@ -1,7 +1,10 @@
 from datetime import timedelta
 
+DOMAIN = "Afvalbeheer"
+
 SCHEDULE_UPDATE_INTERVAL = timedelta(hours=12)
 
+CONF_ID = "id"
 CONF_WASTE_COLLECTOR = 'wastecollector'
 CONF_CITY_NAME = 'cityname'
 CONF_POSTCODE = 'postcode'

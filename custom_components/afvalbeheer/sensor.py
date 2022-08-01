@@ -71,10 +71,7 @@ sensor:
 import logging
 from datetime import datetime
 from datetime import timedelta
-import voluptuous as vol
 
-from homeassistant.components.sensor import PLATFORM_SCHEMA
-import homeassistant.helpers.config_validation as cv
 from homeassistant.const import (CONF_RESOURCES, DEVICE_CLASS_TIMESTAMP)
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import async_track_point_in_utc_time
@@ -88,36 +85,25 @@ from .API import Get_WasteData_From_Config
 _LOGGER = logging.getLogger(__name__)
 
 
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Required(CONF_RESOURCES, default=[]): cv.ensure_list,
-    vol.Required(CONF_POSTCODE, default='1111AA'): cv.string,
-    vol.Required(CONF_STREET_NUMBER, default='1'): cv.string,
-    vol.Optional(CONF_CITY_NAME, default=''): cv.string,
-    vol.Optional(CONF_STREET_NAME, default=''): cv.string,
-    vol.Optional(CONF_SUFFIX, default=''): cv.string,
-    vol.Optional(CONF_ADDRESS_ID, default=''): cv.string,
-    vol.Optional(CONF_WASTE_COLLECTOR, default='Cure'): cv.string,
-    vol.Optional(CONF_DATE_FORMAT, default='%d-%m-%Y'): cv.string,
-    vol.Optional(CONF_TODAY_TOMORROW, default=False): cv.boolean,
-    vol.Optional(CONF_DATE_ONLY, default=False): cv.boolean,
-    vol.Optional(CONF_DATE_OBJECT, default=False): cv.boolean,
-    vol.Optional(CONF_NAME, default=''): cv.string,
-    vol.Optional(CONF_NAME_PREFIX, default=True): cv.boolean,
-    vol.Optional(CONF_BUILT_IN_ICONS, default=False): cv.boolean,
-    vol.Optional(CONF_DISABLE_ICONS, default=False): cv.boolean,
-    vol.Optional(CONF_TRANSLATE_DAYS, default=False): cv.boolean,
-    vol.Optional(CONF_DAY_OF_WEEK, default=True): cv.boolean,
-    vol.Optional(CONF_DAY_OF_WEEK_ONLY, default=False): cv.boolean,
-    vol.Optional(CONF_ALWAYS_SHOW_DAY, default=False): cv.boolean,
-    vol.Optional(CONF_PRINT_AVAILABLE_WASTE_TYPES, default=False): cv.boolean,
-    vol.Optional(CONF_UPDATE_INTERVAL, default=0): cv.positive_int,
-    vol.Optional(CONF_CUSTOMER_ID, default=''): cv.string,
-})
-
-
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+    # Without breaking existing config to load using sensor as component you get a direct call with the config to here.
+    # sensor:
+    #   platform: afvalbeheer
+    #   ....
+    # This function could be simplified and non async function when depricating this way of accessing.
+    # New way of the config should be:
+    # Afvalbeheer:
+    #   .... 
+    
     _LOGGER.debug('Setup of sensor platform Afvalbeheer')
     
+    schedule_update = False
+
+    if discovery_info and "config" in discovery_info:
+        config = discovery_info["config"]
+        data = hass.data[DOMAIN].get(config[CONF_ID], None)
+    else:
+        schedule_update = True
     data = Get_WasteData_From_Config(hass, config)
 
     waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
