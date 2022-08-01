@@ -82,7 +82,7 @@ from homeassistant.util import dt as dt_util
 from homeassistant.components import persistent_notification
 
 from .const import *
-from .API import WasteData
+from .API import Get_WasteData_From_Config
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -116,14 +116,10 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    _LOGGER.debug('Setup Rest API retriever')
+    _LOGGER.debug('Setup of sensor platform Afvalbeheer')
+    
+    data = Get_WasteData_From_Config(hass, config)
 
-    city_name = config.get(CONF_CITY_NAME)
-    postcode = config.get(CONF_POSTCODE)
-    street_name = config.get(CONF_STREET_NAME)
-    street_number = config.get(CONF_STREET_NUMBER)
-    suffix = config.get(CONF_SUFFIX)
-    address_id = config.get(CONF_ADDRESS_ID)
     waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
     date_format = config.get(CONF_DATE_FORMAT)
     sensor_today = config.get(CONF_TODAY_TOMORROW)
@@ -137,41 +133,11 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     day_of_week_only = config.get(CONF_DAY_OF_WEEK_ONLY)
     always_show_day = config.get(CONF_ALWAYS_SHOW_DAY)
     print_waste_type = config.get(CONF_PRINT_AVAILABLE_WASTE_TYPES)
-    update_interval = config.get(CONF_UPDATE_INTERVAL)
-    customer_id = config.get(CONF_CUSTOMER_ID)
 
     if date_object == True:
         date_only = 1
     else:
         date_only = config.get(CONF_DATE_ONLY)
-
-    if waste_collector in DEPRECATED_AND_NEW_WASTECOLLECTORS:
-        persistent_notification.create(
-                hass,
-                "Update your config to use {}! You are still using {} as a waste collector, which is deprecated. Check your automations and lovelace config, as the sensor names may also be changed!".format(
-                    DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector], 
-                    waste_collector),
-                "Afvalbeheer", 
-                "update_config")
-        waste_collector = DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector]
-
-    if waste_collector in ['limburg.net'] and not city_name:
-        persistent_notification.create(
-                hass,
-                "Config invalid! Cityname is required for {}".format(waste_collector),
-                "Afvalbeheer", 
-                "invalid_config")
-        return
-
-    if waste_collector in ['limburg.net', 'recycleapp'] and not street_name:
-        persistent_notification.create(
-                hass,
-                "Config invalid! Streetname is required for {}".format(waste_collector),
-                "Afvalbeheer", 
-                "invalid_config")
-        return
-
-    data = WasteData(hass, waste_collector, city_name, postcode, street_name, street_number, suffix, address_id, print_waste_type, update_interval, customer_id)
 
     entities = []
 

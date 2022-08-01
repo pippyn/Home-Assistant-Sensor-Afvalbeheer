@@ -1005,3 +1005,68 @@ class XimmioCollector(WasteCollector):
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
             return False
+
+
+def Get_WasteData_From_Config(hass, config):
+    _LOGGER.debug("Get Rest API retriever")
+    city_name = config.get(CONF_CITY_NAME)
+    postcode = config.get(CONF_POSTCODE)
+    street_name = config.get(CONF_STREET_NAME)
+    street_number = config.get(CONF_STREET_NUMBER)
+    suffix = config.get(CONF_SUFFIX)
+    address_id = config.get(CONF_ADDRESS_ID)
+    waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
+
+    print_waste_type = config.get(CONF_PRINT_AVAILABLE_WASTE_TYPES)
+
+    update_interval = config.get(CONF_UPDATE_INTERVAL)
+    customer_id = config.get(CONF_CUSTOMER_ID)
+
+    config["id"] = _format_id(waste_collector, postcode, street_number)
+
+    if waste_collector in DEPRECATED_AND_NEW_WASTECOLLECTORS:
+        persistent_notification.create(
+            hass,
+            "Update your config to use {}! You are still using {} as a waste collector, which is deprecated. Check your automations and lovelace config, as the sensor names may also be changed!".format(
+                DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector], waste_collector
+            ),
+            "Afvalbeheer",
+            "update_config",
+        )
+        waste_collector = DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector]
+
+    if waste_collector in ["limburg.net"] and not city_name:
+        persistent_notification.create(
+            hass,
+            "Config invalid! Cityname is required for {}".format(waste_collector),
+            "Afvalbeheer",
+            "invalid_config",
+        )
+        return
+
+    if waste_collector in ["limburg.net", "recycleapp"] and not street_name:
+        persistent_notification.create(
+            hass,
+            "Config invalid! Streetname is required for {}".format(waste_collector),
+            "Afvalbeheer",
+            "invalid_config",
+        )
+        return
+
+    return WasteData(
+        hass,
+        waste_collector,
+        city_name,
+        postcode,
+        street_name,
+        street_number,
+        suffix,
+        address_id,
+        print_waste_type,
+        update_interval,
+        customer_id,
+    )
+
+
+def _format_id(waste_collector, postcode, house_number):
+    return waste_collector + "-" + postcode + "-" + str(house_number)
