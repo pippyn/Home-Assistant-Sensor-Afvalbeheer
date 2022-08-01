@@ -25,6 +25,13 @@ class WasteCollectionRepository(object):
     def __init__(self):
         self.collections = []
 
+    def __iter__(self):
+        for collection in self.collections:
+            yield collection
+
+    def __len__(self):
+        return len(self.collections)
+
     def add(self, collection):
         self.collections.append(collection)
 

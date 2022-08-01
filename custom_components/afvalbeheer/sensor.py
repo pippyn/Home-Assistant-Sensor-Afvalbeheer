@@ -129,42 +129,53 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     for resource in config[CONF_RESOURCES]:
         waste_type = resource.lower()
-        entities.append(WasteTypeSensor(
-            data, 
-            waste_type, 
-            waste_collector, 
-            date_format, 
-            date_only, 
-            date_object, 
-            name, 
-            name_prefix, 
-            built_in_icons, 
-            disable_icons, 
-            dutch_days, 
-            day_of_week, 
-            day_of_week_only, 
-            always_show_day))
+        entities.append(
+            WasteTypeSensor(
+                data,
+                waste_type,
+                waste_collector,
+                date_format,
+                date_only,
+                date_object,
+                name,
+                name_prefix,
+                built_in_icons,
+                disable_icons,
+                dutch_days,
+                day_of_week,
+                day_of_week_only,
+                always_show_day,
+            )
+        )
 
     if sensor_today:
-        entities.append(WasteDateSensor(
-            data, 
-            config[CONF_RESOURCES], 
-            waste_collector, 
-            timedelta(), 
-            dutch_days, 
-            name, 
-            name_prefix))
-        entities.append(WasteDateSensor(
-            data, 
-            config[CONF_RESOURCES], 
-            waste_collector, 
-            timedelta(days=1), 
-            dutch_days, 
-            name, 
-            name_prefix))
+        entities.append(
+            WasteDateSensor(
+                data,
+                config[CONF_RESOURCES],
+                waste_collector,
+                timedelta(),
+                dutch_days,
+                name,
+                name_prefix,
+            )
+        )
+        entities.append(
+            WasteDateSensor(
+                data,
+                config[CONF_RESOURCES],
+                waste_collector,
+                timedelta(days=1),
+                dutch_days,
+                name,
+                name_prefix,
+            )
+        )
 
     async_add_entities(entities)
-    await data.schedule_update(timedelta())
+
+    if schedule_update: 
+        await data.schedule_update(timedelta())
 
 
 class WasteTypeSensor(Entity):

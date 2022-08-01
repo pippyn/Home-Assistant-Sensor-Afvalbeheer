@@ -69,6 +69,11 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
         Platform.SENSOR, DOMAIN, {"config": conf}, config
     )
 
+    # if you add boolean to config you could disable calendar entities from here
+    hass.helpers.discovery.load_platform(
+        Platform.CALENDAR, DOMAIN, {"config": conf}, config
+    )
+
     await data.schedule_update(timedelta())
 
     return True
