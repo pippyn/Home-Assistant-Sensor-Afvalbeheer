@@ -43,7 +43,7 @@ class AfvalbeheerCalendar(CalendarEntity):
         WasteData: WasteData,
         config,
     ) -> None:
-        """Initialize the Twente Milieu entity."""
+        """Initialize the Afvalbeheer entity."""
         self.WasteData = WasteData
 
         self._event = None
