@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-DOMAIN = "Afvalbeheer"
+DOMAIN = "afvalbeheer"
 
 SCHEDULE_UPDATE_INTERVAL = timedelta(hours=12)
 
