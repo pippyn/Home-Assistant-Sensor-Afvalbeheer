@@ -42,9 +42,7 @@ PLATFORM_SCHEMA = vol.Schema(
         vol.Optional(CONF_DAY_OF_WEEK, default=True): cv.boolean,
         vol.Optional(CONF_DAY_OF_WEEK_ONLY, default=False): cv.boolean,
         vol.Optional(CONF_ALWAYS_SHOW_DAY, default=False): cv.boolean,
-        vol.Optional(
-            CONF_PRINT_AVAILABLE_WASTE_TYPES, default=False
-        ): cv.boolean,
+        vol.Optional(CONF_PRINT_AVAILABLE_WASTE_TYPES, default=False): cv.boolean,
         vol.Optional(CONF_UPDATE_INTERVAL, default=0): cv.positive_int,
         vol.Optional(CONF_CUSTOMER_ID, default=""): cv.string,
     }
@@ -57,9 +55,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
     config = config.get(DOMAIN, None)
 
     if config is None:
-        # This is nesseceary to keep the 'old' config methode using sensor and platform working.
+        # This should not be nesseceary to keep the 'old' config methode using sensor and platform working.
         # If using sensor there is no DOMAIN entry in config but Platform function will be called from sensor.
-        # Deprecation notification could be added here.
         return True
 
     if not isinstance(config, list):
@@ -72,15 +69,14 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
         hass.data.setdefault(DOMAIN, {})[conf["id"]] = data
 
         await hass.helpers.discovery.async_load_platform(
-            Platform.SENSOR, DOMAIN, {"config": conf}, config
+            Platform.SENSOR, DOMAIN, {"config": conf}, conf
         )
 
         # if you add boolean to config you could disable calendar entities from here
         hass.helpers.discovery.load_platform(
-            Platform.CALENDAR, DOMAIN, {"config": conf}, config
+            Platform.CALENDAR, DOMAIN, {"config": conf}, conf
         )
 
         await data.schedule_update(timedelta())
 
     return True
-

@@ -93,10 +93,10 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     # This function could be simplified and non async function when depricating this way of accessing.
     # New way of the config should be:
     # Afvalbeheer:
-    #   .... 
-    
-    _LOGGER.debug('Setup of sensor platform Afvalbeheer')
-    
+    #   ....
+
+    _LOGGER.debug("Setup of sensor platform Afvalbeheer")
+
     schedule_update = False
 
     if discovery_info and "config" in discovery_info:
@@ -104,7 +104,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         data = hass.data[DOMAIN].get(config[CONF_ID], None)
     else:
         schedule_update = True
-    data = Get_WasteData_From_Config(hass, config)
+        data = Get_WasteData_From_Config(hass, config)
 
     waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
     date_format = config.get(CONF_DATE_FORMAT)
