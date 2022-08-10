@@ -3,7 +3,7 @@ from datetime import datetime
 from datetime import timedelta
 from typing import Optional, List
 
-from homeassistant.components.aa_test.API import WasteData
+from .API import WasteData
 
 
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
