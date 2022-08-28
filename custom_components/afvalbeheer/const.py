@@ -1,4 +1,8 @@
 from datetime import timedelta
+import voluptuous as vol
+
+import homeassistant.helpers.config_validation as cv
+from homeassistant.const import CONF_RESOURCES
 
 DOMAIN = "afvalbeheer"
 
@@ -27,6 +31,34 @@ CONF_ALWAYS_SHOW_DAY = 'alwaysshowday'
 CONF_PRINT_AVAILABLE_WASTE_TYPES = 'printwastetypes'
 CONF_UPDATE_INTERVAL = 'updateinterval'
 CONF_CUSTOMER_ID = 'customerid'
+
+PLATFORM_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_RESOURCES, default=[]): cv.ensure_list,
+        vol.Required(CONF_POSTCODE, default="1111AA"): cv.string,
+        vol.Required(CONF_STREET_NUMBER, default="1"): cv.string,
+        vol.Optional(CONF_CITY_NAME, default=""): cv.string,
+        vol.Optional(CONF_STREET_NAME, default=""): cv.string,
+        vol.Optional(CONF_SUFFIX, default=""): cv.string,
+        vol.Optional(CONF_ADDRESS_ID, default=""): cv.string,
+        vol.Optional(CONF_WASTE_COLLECTOR, default="Cure"): cv.string,
+        vol.Optional(CONF_DATE_FORMAT, default="%d-%m-%Y"): cv.string,
+        vol.Optional(CONF_TODAY_TOMORROW, default=False): cv.boolean,
+        vol.Optional(CONF_DATE_ONLY, default=False): cv.boolean,
+        vol.Optional(CONF_DATE_OBJECT, default=False): cv.boolean,
+        vol.Optional(CONF_NAME, default=""): cv.string,
+        vol.Optional(CONF_NAME_PREFIX, default=True): cv.boolean,
+        vol.Optional(CONF_BUILT_IN_ICONS, default=False): cv.boolean,
+        vol.Optional(CONF_DISABLE_ICONS, default=False): cv.boolean,
+        vol.Optional(CONF_TRANSLATE_DAYS, default=False): cv.boolean,
+        vol.Optional(CONF_DAY_OF_WEEK, default=True): cv.boolean,
+        vol.Optional(CONF_DAY_OF_WEEK_ONLY, default=False): cv.boolean,
+        vol.Optional(CONF_ALWAYS_SHOW_DAY, default=False): cv.boolean,
+        vol.Optional(CONF_PRINT_AVAILABLE_WASTE_TYPES, default=False): cv.boolean,
+        vol.Optional(CONF_UPDATE_INTERVAL, default=0): cv.positive_int,
+        vol.Optional(CONF_CUSTOMER_ID, default=""): cv.string,
+    }, extra=vol.ALLOW_EXTRA  # Allow extra required due when validating config as sensor (platform key is added to config)
+)
 
 ATTR_WASTE_COLLECTOR = 'Wastecollector'
 ATTR_HIDDEN = 'Hidden'

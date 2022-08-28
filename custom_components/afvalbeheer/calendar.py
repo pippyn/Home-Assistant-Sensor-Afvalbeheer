@@ -9,7 +9,7 @@ from .API import WasteData
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.core import HomeAssistant
 
-from .const import *
+from .const import DOMAIN, CONF_ID
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,7 +35,6 @@ def setup_platform(hass, config, async_add_entities, discovery_info=None):
 class AfvalbeheerCalendar(CalendarEntity):
     """Defines a Afvalbeheer calendar."""
 
-    _attr_name = "Afvalbeheer"
     _attr_icon = "mdi:delete-empty"
 
     def __init__(
@@ -45,6 +44,9 @@ class AfvalbeheerCalendar(CalendarEntity):
     ) -> None:
         """Initialize the Afvalbeheer entity."""
         self.WasteData = WasteData
+
+        self._attr_name = f"{DOMAIN.capitalize()} {WasteData.waste_collector}"
+        self._attr_unique_id = f"{DOMAIN}_{config[CONF_ID]}"
 
         self._event = None
 

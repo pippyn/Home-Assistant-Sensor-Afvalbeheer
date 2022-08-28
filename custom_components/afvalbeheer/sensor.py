@@ -72,7 +72,7 @@ import logging
 from datetime import datetime
 from datetime import timedelta
 
-from homeassistant.const import (CONF_RESOURCES, DEVICE_CLASS_TIMESTAMP)
+from homeassistant.const import CONF_RESOURCES, DEVICE_CLASS_TIMESTAMP
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.event import async_track_point_in_utc_time
 from homeassistant.util import dt as dt_util
