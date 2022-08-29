@@ -5,7 +5,6 @@ from typing import Optional, List
 
 from .API import WasteData
 
-
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.core import HomeAssistant
 

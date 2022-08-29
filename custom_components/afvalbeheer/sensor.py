@@ -1,82 +1,9 @@
-"""
-Sensor component for waste pickup dates from dutch and belgium waste collectors
-Original Author: Pippijn Stortelder
-Current Version: 4.9.6 20220705 - Pippijn Stortelder
-20210112 - Updated date format for RD4
-20210114 - Fix error made in commit 9d720ec
-20210120 - Enabled textile for RecycleApp
-20210120 - Added support for wastcollectors BAR and Meppel
-20210129 - Fix RecycleApp API access
-20210213 - Fix Meerlanden API url
-20210219 - Changed GFT mapping for RecycleApp
-20210220 - Fix wrong RecycleApp streetId
-20210223 - Added 'ordures ménagères' mapping for RecycleApp
-20210302 - Updated RecycleApp x-secret
-20210304 - Added version to manifest
-20210326 - Added option to set update interval
-20210326 - Minor fix
-20210402 - Fix syntax warning
-20210426 - Added support for RAD
-20210505 - Fixed Limburg.net mapping
-20210601 - Fix for ROVA
-20210816 - Changed Suez to PreZero
-20210826 - Bugfix for CirculusBerkel
-20210916 - More waste types for Omrin
-20210916 - Fix dutch translation for September
-20210927 - Added support for Westland
-20210927 - Fix for Alkmaar
-20210927 - Added option 'dayofweekonly' to only show day name in state
-20210930 - Fix for Alkmaar
-20211001 - Switch Avalex tot Ximmio
-20211005 - Small bug fix
-20211019 - Add support for housenumber additions on the Circulus Berkel API
-20211022 - Update Mijnafvalwijzer mapping
-20211212 - Replace device_state_attributes with extra_state_attributes
-20211213 - Breaking change: replaced - with _ in Days-until and Sort-date
-20211213 - Add unique ids to all sensors
-20220105 - Changed collector circulus-berkel to circulus
-20220105 - Added support for wastcollector Voorschoten
-20220106 - Added support for Ximmio commercial address (option added customerid)
-20220113 - Added support for wastcollector Lingewaard
-20220118 - Fix Cranendonck mapping
-20220620 - Fix Spaarnelanden mapping
-20220621 - Changed RD4 to new API
-20220629 - Deprecated Alkmaar, new waste collector is HVC
-20220629 - Fix for rate limiting with RecycleApp API
-20220629 - Default time interval is now 12 hours
-20220705 - Update RecycleApp API address
-
-Example config:
-Configuration.yaml:
-sensor:
-- platform: afvalbeheer
-    wastecollector: Blink            (required)
-    resources:                       (at least 1 required)
-    - restafval
-    - gft
-    - papier
-    - pmd
-    postcode: 1111AA                 (required)
-    streetnumber: 1                  (required)
-    upcomingsensor: 0                (optional)
-    dateformat: '%d-%m-%Y'           (optional)
-    dateonly: 0                      (optional)
-    dateobject: 0                    (optional)
-    dayofweek: 1                     (optional)
-    name: ''                         (optional)
-    nameprefix: 1                    (optional)
-    builtinicons: 0                  (optional)
-"""
-
 import logging
 from datetime import datetime
 from datetime import timedelta
 
 from homeassistant.const import CONF_RESOURCES, DEVICE_CLASS_TIMESTAMP
 from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.event import async_track_point_in_utc_time
-from homeassistant.util import dt as dt_util
-from homeassistant.components import persistent_notification
 
 from .const import *
 from .API import Get_WasteData_From_Config
@@ -181,8 +108,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 class WasteTypeSensor(Entity):
 
     def __init__(self, data, waste_type, waste_collector, date_format, date_only, date_object,
-                 name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week,
-                 day_of_week_only, always_show_day):
+                name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week,
+                day_of_week_only, always_show_day):
         self.data = data
         self.waste_type = waste_type
         self.waste_collector = waste_collector

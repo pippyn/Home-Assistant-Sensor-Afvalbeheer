@@ -1,3 +1,31 @@
+"""
+Sensor component for waste pickup dates from dutch and belgium waste collectors
+Original Author: Pippijn Stortelder
+Current Version: 5.0.0 202200829
+20220829 - Major change: Added Calendar support (credits @WouterTuinstra)
+20220829 - Give persistant notifications unique id's
+
+Example config:
+Configuration.yaml:
+afvalbeheer:
+    wastecollector: Blink
+    resources:
+    - restafval
+    - gft
+    - papier
+    - pmd
+    postcode: 1111AA
+    streetnumber: 1
+    upcomingsensor: 0                # (optional)
+    dateformat: '%d-%m-%Y'           # (optional)
+    dateonly: 0                      # (optional)
+    dateobject: 0                    # (optional)
+    dayofweek: 1                     # (optional)
+    name: ''                         # (optional)
+    nameprefix: 1                    # (optional)
+    builtinicons: 0                  # (optional)
+"""
+
 import logging
 from datetime import datetime
 from datetime import timedelta
@@ -11,7 +39,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
 from .API import Get_WasteData_From_Config
 
 
-__version__ = "4.9.6"
+__version__ = "5.0.0"
 
 
 _LOGGER = logging.getLogger(__name__)

@@ -59,24 +59,23 @@ This sensor works with the following waste collectors:
 ### Example config:
 
 ```yaml
-  sensor:
-    - platform: afvalbeheer
-      wastecollector: Blink            (required)
-      resources:                       (at least 1 required)
+  afvalbeheer:
+      wastecollector: Blink
+      resources:
         - restafval
         - gft
         - papier
         - pmd
-      postcode: 1111AA                 (required)
-      streetnumber: 1                  (required)
-      suffix: a                        (optional)
-      upcomingsensor: 0                (optional)
-      dateformat: '%d-%m-%Y'           (optional)
-      dateonly: 0                      (optional)
-      name: ""                         (optional)
-      nameprefix: 1                    (optional)
-      builtinicons: 0                  (optional)
-      dutch: 0                         (optional)
+      postcode: 1111AA
+      streetnumber: 1
+      suffix: a                        # (optional)
+      upcomingsensor: 0                # (optional)
+      dateformat: '%d-%m-%Y'           # (optional)
+      dateonly: 0                      # (optional)
+      name: ""                         # (optional)
+      nameprefix: 1                    # (optional)
+      builtinicons: 0                  # (optional)
+      dutch: 0                         # (optional)
 ```
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/pippyn)
 

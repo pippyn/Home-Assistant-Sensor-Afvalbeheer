@@ -19,24 +19,22 @@ Example config:
 
 ```yaml
   afvalbeheer:
-      wastecollector: Blink            (required)
-      resources:                       (at least 1 required)
+      wastecollector: Blink
+      resources:
         - restafval
         - gft
         - papier
         - pmd
-      postcode: 1111AA                 (required)
-      streetnumber: 1                  (required)
-      suffix: a                        (optional)
-      upcomingsensor: 0                (optional)
-      dateformat: '%d-%m-%Y'           (optional)
-      dateonly: 0                      (optional)
-      dateobject: 0                    (optional)
-      name: ''                         (optional)
-      nameprefix: 1                    (optional)
-      builtinicons: 0                  (optional)
-      disableicons: 0                  (optional)
-      dutch: 0                         (optional)
+      postcode: 1111AA
+      streetnumber: 1
+      suffix: a                        # (optional)
+      upcomingsensor: 0                # (optional)
+      dateformat: '%d-%m-%Y'           # (optional)
+      dateonly: 0                      # (optional)
+      name: ""                         # (optional)
+      nameprefix: 1                    # (optional)
+      builtinicons: 0                  # (optional)
+      dutch: 0                         # (optional)
 ```
 ### Wastecollector
 ```
