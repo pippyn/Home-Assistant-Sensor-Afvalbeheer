@@ -18,8 +18,7 @@ Copy the files in the /custom_components/afvalbeheer/ folder to: [homeassistant]
 Example config:
 
 ```yaml
-  sensor:
-    - platform: afvalbeheer
+  afvalbeheer:
       wastecollector: Blink            (required)
       resources:                       (at least 1 required)
         - restafval
