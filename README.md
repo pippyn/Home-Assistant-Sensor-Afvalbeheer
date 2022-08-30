@@ -12,10 +12,13 @@ Ophaalkalender users should switch to the waste collector RecycleApp
 
 ![alt text](https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/example.png)
 
-### Install:
+## Install:
+### HACS
+You can use HACS to install this sensor. It is included by default.
+### Manual
 Copy the files in the /custom_components/afvalbeheer/ folder to: [homeassistant]/config/custom_components/afvalbeheer/
 
-Example config:
+## Example config:
 
 ```yaml
   afvalbeheer:
@@ -249,9 +252,6 @@ If you want to adjust the update interval, you can set this option to the desire
 customerid: 123456
 ```
 If you use have a commercial address (and use one of the Ximmio waste collectors), you need to input your Customer ID. Default is empty.
-
-## HACS
-You can use HACS to install this sensor. It is included by default.
 
 ### Credits
 Omrin API - @Jordi1990
