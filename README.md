@@ -18,26 +18,46 @@ You can use HACS to install this sensor. It is included by default.
 ### Manual
 Copy the files in the /custom_components/afvalbeheer/ folder to: [homeassistant]/config/custom_components/afvalbeheer/
 
-## Example config:
-
+## Example configs:
+### Single instance
 ```yaml
-  afvalbeheer:
-      wastecollector: Blink
-      resources:
-        - restafval
-        - gft
-        - papier
-        - pmd
-      postcode: 1111AA
-      streetnumber: 1
-      suffix: a                        # (optional)
-      upcomingsensor: 0                # (optional)
-      dateformat: '%d-%m-%Y'           # (optional)
-      dateonly: 0                      # (optional)
-      name: ""                         # (optional)
-      nameprefix: 1                    # (optional)
-      builtinicons: 0                  # (optional)
-      dutch: 0                         # (optional)
+afvalbeheer:
+  wastecollector: Blink
+  resources:
+    - restafval
+    - gft
+    - papier
+    - pmd
+  postcode: 1111AA
+  streetnumber: 1
+  suffix: a                        # (optional)
+  upcomingsensor: 0                # (optional)
+  dateformat: '%d-%m-%Y'           # (optional)
+  dateonly: 0                      # (optional)
+  name: ""                         # (optional)
+  nameprefix: 1                    # (optional)
+  builtinicons: 0                  # (optional)
+  dutch: 0                         # (optional)
+```
+### Multiple instances
+```yaml
+afvalbeheer:
+  - wastecollector: Blink
+    resources:
+      - restafval
+      - gft
+      - papier
+      - pmd
+    postcode: 1111AA
+    streetnumber: 1
+  - wastecollector: Blink
+    resources:
+      - restafval
+      - gft
+      - papier
+      - pmd
+    postcode: 1111AA
+    streetnumber: 2
 ```
 ### Wastecollector
 ```
