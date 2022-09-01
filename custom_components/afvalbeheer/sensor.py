@@ -45,7 +45,6 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     day_of_week = config.get(CONF_DAY_OF_WEEK)
     day_of_week_only = config.get(CONF_DAY_OF_WEEK_ONLY)
     always_show_day = config.get(CONF_ALWAYS_SHOW_DAY)
-    print_waste_type = config.get(CONF_PRINT_AVAILABLE_WASTE_TYPES)
 
     if date_object == True:
         date_only = 1

@@ -10,12 +10,8 @@ from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN, CONF_ID
 
-_LOGGER = logging.getLogger(__name__)
 
-ATTR_WASTE_COLLECTOR = "Wastecollector"
-ATTR_HIDDEN = "Hidden"
-ATTR_SORT_DATE = "Sort_date"
-ATTR_DAYS_UNTIL = "Days_until"
+_LOGGER = logging.getLogger(__name__)
 
 
 def setup_platform(hass, config, async_add_entities, discovery_info=None):
