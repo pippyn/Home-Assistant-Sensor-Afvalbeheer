@@ -245,9 +245,9 @@ class WasteDateSensor(Entity):
         self.date_delta = date_delta
         self.dutch_days = dutch_days
         if date_delta.days == 0:
-            day = 'vandaag'
+            day = 'vandaag' if self.dutch_days else "today"
         elif date_delta.days == 1:
-            day = 'morgen'
+            day = 'morgen' if self.dutch_days else "tomorrow"
         else:
             day = ''
         self._name = _format_sensor(name, name_prefix, waste_collector, day)
