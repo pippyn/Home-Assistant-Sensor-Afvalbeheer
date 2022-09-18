@@ -634,6 +634,7 @@ class OpzetCollector(WasteCollector):
         'kerstb': WASTE_TYPE_TREE,
         'pmd': WASTE_TYPE_PACKAGES,
         'pbd': WASTE_TYPE_PACKAGES,
+        'duocontainer pbd/papier': WASTE_TYPE_PAPER_PMD,
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix):
