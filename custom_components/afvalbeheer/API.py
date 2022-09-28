@@ -6,7 +6,7 @@ import json
 import requests
 import re
 import uuid
-from rsa import key, common, pkcs1
+from rsa import pkcs1
 from Crypto.PublicKey import RSA
 from base64 import b64decode, b64encode
 
@@ -122,7 +122,8 @@ class WasteData(object):
             persistent_notification.create(
                 self.hass,
                 'Waste collector "{}" not found!'.format(self.waste_collector),
-                'Afvalwijzer' + " " + self.waste_collector, NOTIFICATION_ID + "_" + self.waste_collector)
+                'Afvalwijzer' + " " + self.waste_collector, 
+                NOTIFICATION_ID + "_collectornotfound_" + self.waste_collector)
 
     async def schedule_update(self, interval):
         nxt = dt_util.utcnow() + interval
@@ -138,7 +139,8 @@ class WasteData(object):
             persistent_notification.create(
                 self.hass,
                 'Available waste types: ' + ', '.join(self.collector.collections.get_available_waste_types()),
-                'Afvalwijzer' + " " + self.waste_collector, NOTIFICATION_ID + "_" + self.waste_collector)
+                'Afvalwijzer' + " " + self.waste_collector, 
+                NOTIFICATION_ID + "_availablewastetypes_" + self.waste_collector)
             self.print_waste_type = False
 
     @property
@@ -1038,7 +1040,7 @@ def Get_WasteData_From_Config(hass, config):
                 DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector], waste_collector
             ),
             "Afvalbeheer" + " " + waste_collector,
-            "update_config" + "_" + waste_collector,
+            NOTIFICATION_ID + "_update_config_" + waste_collector,
         )
         waste_collector = DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector]
 
@@ -1047,7 +1049,7 @@ def Get_WasteData_From_Config(hass, config):
             hass,
             "Config invalid! Cityname is required for {}".format(waste_collector),
             "Afvalbeheer" + " " + waste_collector,
-            "invalid_config" + "_" + waste_collector,
+            NOTIFICATION_ID + "_invalid_config_" + waste_collector,
         )
         return
 
@@ -1056,7 +1058,7 @@ def Get_WasteData_From_Config(hass, config):
             hass,
             "Config invalid! Streetname is required for {}".format(waste_collector),
             "Afvalbeheer" + " " + waste_collector,
-            "invalid_config" + "_" + waste_collector,
+            NOTIFICATION_ID + "_invalid_config_" + waste_collector,
         )
         return
 
