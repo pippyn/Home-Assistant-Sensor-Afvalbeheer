@@ -6,6 +6,7 @@ Current Version: 5.0.2 202200913
 20220829 - Give persistant notifications unique id's
 20220901 - Code cleanup
 20220913 - Fix: translate today and tomorrow sensor
+20221010 - Restoring an entity and attributes on Home Assistant Restart
 
 Example config:
 Configuration.yaml:
