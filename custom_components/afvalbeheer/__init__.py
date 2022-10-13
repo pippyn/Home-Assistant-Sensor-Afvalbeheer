@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 5.0.2 202200913
+Current Version: 5.0.3 202201010
 20220829 - Major change: Added Calendar support (credits @WouterTuinstra)
 20220829 - Give persistant notifications unique id's
 20220901 - Code cleanup
@@ -42,7 +42,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
 from .API import Get_WasteData_From_Config
 
 
-__version__ = "5.0.2"
+__version__ = "5.0.3"
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -54,8 +54,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
     config = config.get(DOMAIN, None)
 
     if config is None:
-        # This should not be nesseceary to keep the 'old' config methode using sensor and platform working.
-        # If using sensor there is no DOMAIN entry in config but Platform function will be called from sensor.
         return True
 
     if not isinstance(config, list):
@@ -71,7 +69,6 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
             Platform.SENSOR, DOMAIN, {"config": conf}, conf
         )
 
-        # if you add boolean to config you could disable calendar entities from here
         hass.helpers.discovery.load_platform(
             Platform.CALENDAR, DOMAIN, {"config": conf}, conf
         )
