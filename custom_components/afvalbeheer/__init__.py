@@ -1,12 +1,13 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 5.0.3 202201010
+Current Version: 5.0.4 202201010
 20220829 - Major change: Added Calendar support (credits @WouterTuinstra)
 20220829 - Give persistant notifications unique id's
 20220901 - Code cleanup
 20220913 - Fix: translate today and tomorrow sensor
 20221010 - Restoring an entity and attributes on Home Assistant Restart
+20221015 - Fix Meerlanden
 
 Example config:
 Configuration.yaml:
@@ -42,7 +43,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
 from .API import Get_WasteData_From_Config
 
 
-__version__ = "5.0.3"
+__version__ = "5.0.4"
 
 
 _LOGGER = logging.getLogger(__name__)
