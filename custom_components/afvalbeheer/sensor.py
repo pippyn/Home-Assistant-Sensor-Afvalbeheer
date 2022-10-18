@@ -169,6 +169,8 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
         self._state = state.state
 
         if ATTR_WASTE_COLLECTOR in state.attributes:
+            if 'entity_picture' in state.attributes.keys():
+                self._entity_picture = state.attributes['entity_picture']
             self._attrs = {
             ATTR_WASTE_COLLECTOR: state.attributes[ATTR_WASTE_COLLECTOR],
             ATTR_HIDDEN: state.attributes[ATTR_HIDDEN],

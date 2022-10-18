@@ -8,6 +8,7 @@ Current Version: 5.0.4 202201010
 20220913 - Fix: translate today and tomorrow sensor
 20221010 - Restoring an entity and attributes on Home Assistant Restart
 20221015 - Fix Meerlanden
+20221018 - Restore entity picture
 
 Example config:
 Configuration.yaml:
