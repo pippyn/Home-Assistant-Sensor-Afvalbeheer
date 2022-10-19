@@ -249,6 +249,8 @@ For now only these fractions are supported:
 - pbd
 - restafval
 
+![Screenshot 2022-10-19 at 09 23 13](https://user-images.githubusercontent.com/7591990/196623891-bf169e71-9f65-4d32-bade-befecb1263d8.jpg)
+
 ### Use new built in icons
 ```yaml
 builtiniconsnew: 1
@@ -269,6 +271,8 @@ For now only these fractions are supported:
 - kerstbomen
 - grofvuil
 - tuinafval
+
+![Screenshot 2022-10-19 at 09 21 50](https://user-images.githubusercontent.com/7591990/196623742-002840d9-6ecc-4100-9609-1b1f7302f86d.jpg)
 
 ### Disable the use of entity_picture
 ```yaml
