@@ -249,6 +249,27 @@ For now only these fractions are supported:
 - pbd
 - restafval
 
+### Use new built in icons
+```yaml
+builtiniconsnew: 1
+```
+Set this option if you want to use the new built in icons. Option `builtinicons` has to be 1.  Default is 0.
+For now only these fractions are supported:
+- gft
+- gftgratis
+- glas
+- papier
+- pmd
+- pbd
+- plastic
+- zacht-plastic
+- restafval
+- kca
+- textiel
+- kerstbomen
+- grofvuil
+- tuinafval
+
 ### Disable the use of entity_picture
 ```yaml
 disableicons: 1

@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 5.0.4 202201010
+Current Version: 5.0.5 202201019
 20220829 - Major change: Added Calendar support (credits @WouterTuinstra)
 20220829 - Give persistant notifications unique id's
 20220901 - Code cleanup
@@ -9,6 +9,7 @@ Current Version: 5.0.4 202201010
 20221010 - Restoring an entity and attributes on Home Assistant Restart
 20221015 - Fix Meerlanden
 20221018 - Restore entity picture
+20221019 - Add new icons
 
 Example config:
 Configuration.yaml:
@@ -44,7 +45,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
 from .API import Get_WasteData_From_Config
 
 
-__version__ = "5.0.4"
+__version__ = "5.0.5"
 
 
 _LOGGER = logging.getLogger(__name__)

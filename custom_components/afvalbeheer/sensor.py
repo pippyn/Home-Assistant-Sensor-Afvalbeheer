@@ -32,6 +32,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     name = config.get(CONF_NAME)
     name_prefix = config.get(CONF_NAME_PREFIX)
     built_in_icons = config.get(CONF_BUILT_IN_ICONS)
+    built_in_icons_new = config.get(CONF_BUILT_IN_ICONS_NEW)
     disable_icons = config.get(CONF_DISABLE_ICONS)
     dutch_days = config.get(CONF_TRANSLATE_DAYS)
     day_of_week = config.get(CONF_DAY_OF_WEEK)
@@ -58,6 +59,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
                 name,
                 name_prefix,
                 built_in_icons,
+                built_in_icons_new,
                 disable_icons,
                 dutch_days,
                 day_of_week,
@@ -99,8 +101,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 class WasteTypeSensor(RestoreEntity, SensorEntity):
 
     def __init__(self, data, waste_type, waste_collector, date_format, date_only, date_object,
-                name, name_prefix, built_in_icons, disable_icons, dutch_days, day_of_week,
-                day_of_week_only, always_show_day):
+                name, name_prefix, built_in_icons, built_in_icons_new,disable_icons, dutch_days, 
+                day_of_week, day_of_week_only, always_show_day):
         self.data = data
         self.waste_type = waste_type
         self.waste_collector = waste_collector
@@ -110,6 +112,7 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
         self._name = _format_sensor(name, name_prefix, waste_collector, self.waste_type)
         self._attr_unique_id = _format_sensor(name, name_prefix, waste_collector, self.waste_type)
         self.built_in_icons = built_in_icons
+        self.built_in_icons_new = built_in_icons_new
         self.disable_icons = disable_icons
         self.dutch_days = dutch_days
         self.day_of_week = day_of_week
@@ -135,6 +138,11 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
 
     @property
     def entity_picture(self):
+        if self.built_in_icons and not self.disable_icons:
+            if self.built_in_icons_new and self.waste_type in FRACTION_ICONS_NEW:
+                self._entity_picture = FRACTION_ICONS_NEW[self.waste_type]
+            elif self.waste_type in FRACTION_ICONS:
+                self._entity_picture = FRACTION_ICONS[self.waste_type]
         return self._entity_picture
 
     @property
@@ -169,7 +177,7 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
         self._state = state.state
 
         if ATTR_WASTE_COLLECTOR in state.attributes:
-            if 'entity_picture' in state.attributes.keys():
+            if not self.disable_icons and 'entity_picture' in state.attributes.keys():
                 self._entity_picture = state.attributes['entity_picture']
             self._attrs = {
             ATTR_WASTE_COLLECTOR: state.attributes[ATTR_WASTE_COLLECTOR],
@@ -239,12 +247,7 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
         self._sort_date = int(collection.date.strftime('%Y%m%d'))
 
     def __set_picture(self, collection):
-        if self.disable_icons:
-            return
-
-        if self.built_in_icons and self.waste_type in FRACTION_ICONS:
-            self._entity_picture = FRACTION_ICONS[self.waste_type]
-        elif collection.icon_data:
+        if collection.icon_data and not self.disable_icons:
             self._entity_picture = collection.icon_data
 
 
