@@ -620,6 +620,7 @@ class OpzetCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
         'pbd/papier': WASTE_TYPE_PAPER_PMD,
         'snoeiafval': WASTE_TYPE_BRANCHES,
+        'tuinafval': WASTE_TYPE_BRANCHES,
         'sloop': WASTE_TYPE_BULKLITTER,
         'glas': WASTE_TYPE_GLASS,
         'duobak': WASTE_TYPE_GREENGREY,
@@ -632,6 +633,8 @@ class OpzetCollector(WasteCollector):
         'rest': WASTE_TYPE_GREY,
         'plastic': WASTE_TYPE_PACKAGES,
         'papier': WASTE_TYPE_PAPER,
+        'vereniging': WASTE_TYPE_PAPER,
+        'stichting': WASTE_TYPE_PAPER,
         'textiel': WASTE_TYPE_TEXTILE,
         'kerstb': WASTE_TYPE_TREE,
         'pmd': WASTE_TYPE_PACKAGES,
