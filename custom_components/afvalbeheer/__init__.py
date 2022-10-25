@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 5.0.7 202201021
+Current Version: 5.0.8 202201025
 20220829 - Major change: Added Calendar support (credits @WouterTuinstra)
 20220829 - Give persistant notifications unique id's
 20220901 - Code cleanup
@@ -11,6 +11,7 @@ Current Version: 5.0.7 202201021
 20221018 - Restore entity picture
 20221019 - Add new icons
 20221021 - Fix for Mijn AfvalWijzer
+20221025 - Update RecycleApp token
 
 Example config:
 Configuration.yaml:
@@ -46,7 +47,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
 from .API import Get_WasteData_From_Config
 
 
-__version__ = "5.0.7"
+__version__ = "5.0.8"
 
 
 _LOGGER = logging.getLogger(__name__)
