@@ -125,7 +125,6 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
             self._today = "Today"
             self._tomorrow = "Tomorrow"
         self._days_until = None
-        self._unit = ''
         self._sort_date = 0
         self._hidden = False
         self._entity_picture = None
@@ -163,10 +162,6 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
     def device_class(self):
         if self.date_object == True:
             return DEVICE_CLASS_TIMESTAMP
-
-    @property
-    def unit_of_measurement(self):
-        return self._unit
 
     async def async_added_to_hass(self):
         """Call when entity is about to be added to Home Assistant."""
@@ -267,7 +262,6 @@ class WasteDateSensor(RestoreEntity, SensorEntity):
             day = ''
         self._name = _format_sensor(name, name_prefix, waste_collector, day)
         self._attr_unique_id = _format_sensor(name, name_prefix, waste_collector, day)
-        self._unit = ''
         self._hidden = False
         self._state = None
         self._attrs = {}
@@ -286,10 +280,6 @@ class WasteDateSensor(RestoreEntity, SensorEntity):
             ATTR_HIDDEN: self._hidden
         }
         return self._attrs
-
-    @property
-    def unit_of_measurement(self):
-        return self._unit
 
     async def async_added_to_hass(self):
         """Call when entity is about to be added to Home Assistant."""
