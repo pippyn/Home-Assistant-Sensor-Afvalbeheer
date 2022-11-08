@@ -795,6 +795,7 @@ class RecycleApp(WasteCollector):
         'snoeihout': WASTE_TYPE_BRANCHES,
         'zachte plastics': WASTE_TYPE_SOFT_PLASTIC,
         'roze zak': WASTE_TYPE_SOFT_PLASTIC,
+        'déchets résiduels': WASTE_TYPE_GREY,
         'déchets organiques': WASTE_TYPE_GREEN,
         'omb': WASTE_TYPE_GREY,
     }
