@@ -727,15 +727,47 @@ class RD4Collector(WasteCollector):
         super(RD4Collector, self).__init__(hass, waste_collector, postcode, street_number, suffix)
         self.main_url = 'https://data.rd4.nl/api/v1/waste-calendar'
         self.postcode_split = re.search(r"(\d\d\d\d) ?([A-z][A-z])", self.postcode)
-        self.postcode = self.postcode_split.group(1) + '+' + self.postcode_split.group(2).upper()
+        # api response to wrong postal code contains a hint:
+        # {'errors': {'postal_code': ['Postcode is niet geldig (de juiste schrijfwijze is 1234 AB).']}}
+        self.postcode = f'{self.postcode_split[1]} {self.postcode_split[2].upper()}'
 
     def __get_data(self):
+        result = []
         self.today = datetime.today()
-        self.year = self.today.year
-        response = requests.get(
-            '{}?postal_code={}&house_number={}&house_number_extension={}&year={}'.format(self.main_url, self.postcode, self.street_number, self.suffix, self.year)
-        )
-        return response
+        self.query = {
+            'postal_code': self.postcode,
+            'house_number' : self.street_number,
+            'house_number_extension': self.suffix,
+            'year': self.today.year,
+        }
+
+        r = requests.get(self.main_url, params=self.query)
+        data = r.json()
+
+        if not data:
+            _LOGGER.debug('No json response: %s', r.url)
+            _LOGGER.error('No waste data found!')
+            return
+
+        if not data["success"]:
+            # something went wrong
+            _LOGGER.error(data["message"])
+            # expand error if possible
+            if data["data"]["errors"]:
+                _LOGGER.error(data["data"]["errors"])
+            return
+
+        result += data["data"]["items"][0]
+
+        # extra call in case we reached end of the year
+        if self.today.month == 12:
+            self.next_year = self.today.year + 1
+            self.query.update({'year': self.next_year})
+            r = requests.get(self.main_url, params=self.query)
+            d = r.json()
+            result += d["data"]["items"][0]
+
+        return result
 
     async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
@@ -743,18 +775,9 @@ class RD4Collector(WasteCollector):
         self.collections.remove_all()
 
         try:
-            r = await self.hass.async_add_executor_job(self.__get_data)
-            response = r.json()
+            data = await self.hass.async_add_executor_job(self.__get_data)
 
-            if not response:
-                _LOGGER.error('No Waste data found!')
-                return
-
-            if not response["success"]:
-                _LOGGER.error('Address not found!')
-                return
-
-            for item in response["data"]["items"][0]:
+            for item in data:
 
                 waste_type = self.map_waste_type(item["type"])
                 date = item["date"]
