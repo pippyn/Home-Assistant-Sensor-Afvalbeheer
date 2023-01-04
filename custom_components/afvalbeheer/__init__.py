@@ -14,6 +14,7 @@ Current Version: 5.0.10 202201108
 20221025 - Update RecycleApp token
 20221107 - Remove Unit of measurement for better history
 20221108 - Fix RecycleApp mapping
+20230104 - Remove deprecated DEVICE_CLASS_*
 
 Example config:
 Configuration.yaml:

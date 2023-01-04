@@ -2,8 +2,8 @@ import logging
 from datetime import datetime
 from datetime import timedelta
 
-from homeassistant.const import CONF_RESOURCES, DEVICE_CLASS_TIMESTAMP
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.const import CONF_RESOURCES
+from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import *
@@ -161,7 +161,7 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
     @property
     def device_class(self):
         if self.date_object == True:
-            return DEVICE_CLASS_TIMESTAMP
+            return SensorDeviceClass.TIMESTAMP
 
     async def async_added_to_hass(self):
         """Call when entity is about to be added to Home Assistant."""
