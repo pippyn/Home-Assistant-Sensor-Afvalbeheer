@@ -236,6 +236,7 @@ class AfvalwijzerCollector(WasteCollector):
         'tuinafval': WASTE_TYPE_BULKYGARDENWASTE,
         'glas': WASTE_TYPE_GLASS,
         'gft': WASTE_TYPE_GREEN,
+        'keukenafval': WASTE_TYPE_GREEN,
         'kcalocatie': WASTE_TYPE_KCA_LOCATION,
         'kca': WASTE_TYPE_KCA,
         'restafval': WASTE_TYPE_GREY,
