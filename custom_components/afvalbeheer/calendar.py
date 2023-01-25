@@ -5,6 +5,7 @@ from typing import Optional, List
 
 from .API import WasteData
 
+from homeassistant.const import CONF_RESOURCES
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.core import HomeAssistant
 
@@ -39,6 +40,7 @@ class AfvalbeheerCalendar(CalendarEntity):
     ) -> None:
         """Initialize the Afvalbeheer entity."""
         self.WasteData = WasteData
+        self.config = config
 
         self._attr_name = f"{DOMAIN.capitalize()} {WasteData.waste_collector}"
         self._attr_unique_id = f"{DOMAIN}_{config[CONF_ID]}"
@@ -64,12 +66,13 @@ class AfvalbeheerCalendar(CalendarEntity):
         for waste_items in self.WasteData.collections:
             if start_date.date() <= waste_items.date.date() <= end_date.date():
                 # Summary below will define the name of event in calendar
-                events.append(
-                    CalendarEvent(
-                        summary=waste_items.waste_type,
-                        start=waste_items.date.date(),
-                        end=waste_items.date.date(),
+                if waste_items.waste_type in self.config[CONF_RESOURCES]:
+                    events.append(
+                        CalendarEvent(
+                            summary=waste_items.waste_type,
+                            start=waste_items.date.date(),
+                            end=waste_items.date.date(),
+                        )
                     )
-                )
 
         return events
