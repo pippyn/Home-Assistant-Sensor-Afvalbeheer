@@ -182,6 +182,16 @@ DUTCH_TRANSLATION_DAYS = {
     'Sunday':       'Zondag',
 }
 
+DUTCH_TRANSLATION_DAYS_SHORT = {
+    'Mon':  'Maa',
+    'Tue':  'Din',
+    'Wed':  'Woe',
+    'Thu':  'Don',
+    'Fri':  'Vri',
+    'Sat':  'Zat',
+    'Sun':  'Zon',
+}
+
 DUTCH_TRANSLATION_MONTHS = {
     'January':      'Januari',
     'February':     'Februari',

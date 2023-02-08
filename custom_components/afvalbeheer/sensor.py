@@ -234,6 +234,9 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
             if "%B" in date_format:
                 for EN_day, NL_day in DUTCH_TRANSLATION_MONTHS.items():
                     self._state = self._state.replace(EN_day, NL_day)
+            if "%a" in date_format:
+                for EN_day, NL_day in DUTCH_TRANSLATION_DAYS_SHORT.items():
+                    self._state = self._state.replace(EN_day, NL_day)
             if "%A" in date_format:
                 for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
                     self._state = self._state.replace(EN_day, NL_day)

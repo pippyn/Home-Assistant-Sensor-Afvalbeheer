@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 5.0.13 20230125
+Current Version: 5.0.14 20230208
 20220829 - Major change: Added Calendar support (credits @WouterTuinstra)
 20220829 - Give persistant notifications unique id's
 20220901 - Code cleanup
@@ -17,6 +17,7 @@ Current Version: 5.0.13 20230125
 20230104 - Remove deprecated DEVICE_CLASS_*
 20230123 - Change mapping for Afvalwijzer
 20230125 - Only add requested fractions to calendar
+20230208 - Add Dutch day abbreviations
 
 Example config:
 Configuration.yaml:
@@ -52,7 +53,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
 from .API import Get_WasteData_From_Config
 
 
-__version__ = "5.0.13"
+__version__ = "5.0.14"
 
 
 _LOGGER = logging.getLogger(__name__)
