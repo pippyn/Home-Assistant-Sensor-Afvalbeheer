@@ -228,17 +228,17 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
             self._state = None
 
         if self.dutch_days and not self.date_object:
-            if "%b" in date_format:
-                for EN_day, NL_day in DUTCH_TRANSLATION_MONTHS_SHORT.items():
-                    self._state = self._state.replace(EN_day, NL_day)
             if "%B" in date_format:
                 for EN_day, NL_day in DUTCH_TRANSLATION_MONTHS.items():
                     self._state = self._state.replace(EN_day, NL_day)
-            if "%a" in date_format:
-                for EN_day, NL_day in DUTCH_TRANSLATION_DAYS_SHORT.items():
+            if "%b" in date_format:
+                for EN_day, NL_day in DUTCH_TRANSLATION_MONTHS_SHORT.items():
                     self._state = self._state.replace(EN_day, NL_day)
             if "%A" in date_format:
                 for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
+                    self._state = self._state.replace(EN_day, NL_day)
+            if "%a" in date_format:
+                for EN_day, NL_day in DUTCH_TRANSLATION_DAYS_SHORT.items():
                     self._state = self._state.replace(EN_day, NL_day)
 
     def __set_sort_date(self, collection):
