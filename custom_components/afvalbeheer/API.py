@@ -47,7 +47,7 @@ class WasteCollectionRepository(object):
     
     def get_first_upcoming(self):
         upcoming = self.get_upcoming()
-        first_item = upcoming[0]
+        first_item = upcoming[0] if upcoming else None
         return list(filter(lambda x: x.date.date() == first_item.date.date(), upcoming))
     
     def get_upcoming_by_type(self, waste_type):
@@ -279,7 +279,14 @@ class AfvalwijzerCollector(WasteCollector):
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
 
-            data = (response['ophaaldagen']['data'] + response['ophaaldagenNext']['data'])
+            data = []
+            
+            if 'ophaaldagen' in response:
+                data = data + response['ophaaldagen']['data']
+            
+            if 'ophaaldagenNext' in response:
+                data = data + response['ophaaldagenNext']['data']
+            
             if not data:
                 _LOGGER.error('No Waste data found!')
                 return
