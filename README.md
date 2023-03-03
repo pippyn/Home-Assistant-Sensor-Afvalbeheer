@@ -174,9 +174,10 @@ If you set this option the sensor will print a list of all possible waste fracti
 ```yaml
 upcomingsensor: 1
 ```
-If you activate this option you'll get 2 extra sensors (today and tomorrow) which are handy for automations.
+If you activate this option you'll get 3 extra sensors (today, tomorrow and next upcoming) which are handy for automations.
 The today sensor will display the fractions collected today.
 The tomorrow sensor will display the fractions collected tomorrow.
+The next upcoming sensor will display the date and fractions closest in the future.
 Default is 0.
 
 ### Date format
