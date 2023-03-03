@@ -41,6 +41,15 @@ class WasteCollectionRepository(object):
     def get_sorted(self):
         return sorted(self.collections, key=lambda x: x.date)
 
+    def get_upcoming(self):
+        today = datetime.now()
+        return list(filter(lambda x: x.date.date() >= today.date(), self.get_sorted()))
+    
+    def get_first_upcoming(self):
+        upcoming = self.get_upcoming()
+        first_item = upcoming[0]
+        return list(filter(lambda x: x.date.date() == first_item.date.date(), upcoming))
+    
     def get_upcoming_by_type(self, waste_type):
         today = datetime.now()
         return list(filter(lambda x: x.date.date() >= today.date() and x.waste_type == waste_type, self.get_sorted()))
@@ -1017,7 +1026,7 @@ class XimmioCollector(WasteCollector):
             return False
 
 
-def Get_WasteData_From_Config(hass, config):
+def get_wastedata_from_config(hass, config):
     _LOGGER.debug("Get Rest API retriever")
     city_name = config.get(CONF_CITY_NAME)
     postcode = config.get(CONF_POSTCODE)

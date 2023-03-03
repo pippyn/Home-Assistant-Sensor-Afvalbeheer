@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 5.0.16 20230228
+Current Version: 5.1.0 20230303
 20220829 - Major change: Added Calendar support (credits @WouterTuinstra)
 20220829 - Give persistant notifications unique id's
 20220901 - Code cleanup
@@ -19,6 +19,7 @@ Current Version: 5.0.16 20230228
 20230125 - Only add requested fractions to calendar
 20230208 - Add Dutch day abbreviations
 20230228 - Code refactor
+20230303 - New next upcoming sensor
 
 Example config:
 Configuration.yaml:
@@ -51,10 +52,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
-from .API import Get_WasteData_From_Config
+from .API import get_wastedata_from_config
 
 
-__version__ = "5.0.16"
+__version__ = "5.1.0"
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -73,7 +74,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
 
     for conf in config:
 
-        data = Get_WasteData_From_Config(hass, conf)
+        data = get_wastedata_from_config(hass, conf)
 
         hass.data.setdefault(DOMAIN, {})[conf[CONF_ID]] = data
 

@@ -7,7 +7,7 @@ from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import *
-from .API import Get_WasteData_From_Config
+from .API import get_wastedata_from_config
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -23,9 +23,9 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         data = hass.data[DOMAIN].get(config[CONF_ID], None)
     else:
         schedule_update = True
-        data = Get_WasteData_From_Config(hass, config)
+        data = get_wastedata_from_config(hass, config)
 
-    sensor_today = config.get(CONF_TODAY_TOMORROW)
+    sensor_upcoming = config.get(CONF_UPCOMING)
 
     entities = []
 
@@ -33,10 +33,11 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         waste_type = resource.lower()
         entities.append(WasteTypeSensor(data, waste_type, config))
 
-    if sensor_today:
+    if sensor_upcoming:
         entities.append(WasteDateSensor(data, config, timedelta()))
         entities.append(WasteDateSensor(data, config, timedelta(days=1)))
-
+        entities.append(WasteUpcomingSensor(data, config))
+    
     async_add_entities(entities)
 
     if schedule_update: 
@@ -64,7 +65,7 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
         self._tomorrow = "Morgen" if self.dutch_days else "Tomorrow"
         
         formatted_name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX),  self.waste_collector, self.waste_type)
-        self._name = formatted_name
+        self._name = formatted_name.capitalize()
         self._attr_unique_id = formatted_name
         self._days_until = None
         self._sort_date = 0
@@ -189,7 +190,7 @@ class WasteDateSensor(RestoreEntity, SensorEntity):
             day = ''
             
         formatted_name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX),  self.waste_collector, day)
-        self._name = formatted_name
+        self._name = formatted_name.capitalize()
         self._attr_unique_id = formatted_name
         self._hidden = False
         self._state = None
@@ -206,6 +207,7 @@ class WasteDateSensor(RestoreEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         self._attrs = {
+            ATTR_WASTE_COLLECTOR: self.waste_collector,
             ATTR_HIDDEN: self._hidden
         }
         return self._attrs
@@ -218,8 +220,9 @@ class WasteDateSensor(RestoreEntity, SensorEntity):
 
         self._state = state.state
 
-        if ATTR_HIDDEN in state.attributes:
+        if ATTR_WASTE_COLLECTOR in state.attributes:
             self._attrs = {
+                ATTR_WASTE_COLLECTOR: state.attributes[ATTR_WASTE_COLLECTOR],
                 ATTR_HIDDEN: state.attributes[ATTR_HIDDEN]
             }
 
@@ -237,6 +240,75 @@ class WasteDateSensor(RestoreEntity, SensorEntity):
 
     def __set_state(self, collections):
         self._state = ', '.join([x.waste_type for x in collections])
+
+
+class WasteUpcomingSensor(RestoreEntity, SensorEntity):
+
+    def __init__(self, data, config):
+        self.data = data
+        self.waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
+        self.dutch_days = config.get(CONF_TRANSLATE_DAYS)
+        self.date_format = config.get(CONF_DATE_FORMAT)
+         
+        self.first_upcoming = "eerst volgende" if self.dutch_days else "first upcoming"
+        formatted_name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX),  self.waste_collector, self.first_upcoming)
+        self._name = formatted_name.capitalize()
+        self._attr_unique_id = formatted_name
+        self.upcoming_day = None
+        self.upcoming_waste_types = None
+        self._hidden = False
+        self._state = None
+        self._attrs = {}
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def state(self):
+        return self._state
+
+    @property
+    def extra_state_attributes(self):
+        self._attrs = {
+            ATTR_WASTE_COLLECTOR: self.waste_collector,
+            ATTR_UPCOMING_DAY: self.upcoming_day,
+            ATTR_UPCOMING_WASTE_TYPES: self.upcoming_waste_types,
+            ATTR_HIDDEN: self._hidden
+        }
+        return self._attrs
+
+    async def async_added_to_hass(self):
+        """Call when entity is about to be added to Home Assistant."""
+        if (state := await self.async_get_last_state()) is None:
+            self._state = None
+            return
+
+        self._state = state.state
+
+        if ATTR_WASTE_COLLECTOR in state.attributes:
+            self._attrs = {
+                ATTR_WASTE_COLLECTOR: state.attributes[ATTR_WASTE_COLLECTOR],
+                ATTR_UPCOMING_DAY: state.attributes[ATTR_UPCOMING_DAY],
+                ATTR_UPCOMING_WASTE_TYPES: state.attributes[ATTR_UPCOMING_WASTE_TYPES],
+                ATTR_HIDDEN: state.attributes[ATTR_HIDDEN]
+            }
+
+    def update(self):
+        collections = self.data.collections.get_first_upcoming()
+
+        if not collections:
+            self._hidden = True
+            self._state = "Geen" if self.dutch_days else "None"
+            return
+
+        self._hidden = False
+        self.__set_state(collections)
+
+    def __set_state(self, collections):
+        self.upcoming_day = _translate_state(self.date_format, collections[0].date.strftime(self.date_format))
+        self.upcoming_waste_types = ', '.join([x.waste_type for x in collections])
+        self._state = self.upcoming_day + ": " + self.upcoming_waste_types
 
 
 def _format_sensor(name, name_prefix, waste_collector, sensor_type):

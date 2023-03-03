@@ -17,7 +17,7 @@ CONF_STREET_NUMBER = 'streetnumber'
 CONF_SUFFIX = 'suffix'
 CONF_ADDRESS_ID = 'addressid'
 CONF_DATE_FORMAT = 'dateformat'
-CONF_TODAY_TOMORROW = 'upcomingsensor'
+CONF_UPCOMING = 'upcomingsensor'
 CONF_DATE_ONLY = 'dateonly'
 CONF_DATE_OBJECT = 'dateobject'
 CONF_NAME = 'name'
@@ -44,7 +44,7 @@ PLATFORM_SCHEMA = vol.Schema(
         vol.Optional(CONF_ADDRESS_ID, default=""): cv.string,
         vol.Optional(CONF_WASTE_COLLECTOR, default="Cure"): cv.string,
         vol.Optional(CONF_DATE_FORMAT, default="%d-%m-%Y"): cv.string,
-        vol.Optional(CONF_TODAY_TOMORROW, default=False): cv.boolean,
+        vol.Optional(CONF_UPCOMING, default=False): cv.boolean,
         vol.Optional(CONF_DATE_ONLY, default=False): cv.boolean,
         vol.Optional(CONF_DATE_OBJECT, default=False): cv.boolean,
         vol.Optional(CONF_NAME, default=""): cv.string,
@@ -63,6 +63,8 @@ PLATFORM_SCHEMA = vol.Schema(
 )
 
 ATTR_WASTE_COLLECTOR = 'Wastecollector'
+ATTR_UPCOMING_DAY = 'Upcoming_day'
+ATTR_UPCOMING_WASTE_TYPES = 'Upcoming_waste_types'
 ATTR_HIDDEN = 'Hidden'
 ATTR_SORT_DATE = 'Sort_date'
 ATTR_DAYS_UNTIL = 'Days_until'
