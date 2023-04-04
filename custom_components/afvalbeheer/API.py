@@ -392,7 +392,7 @@ class CirculusCollector(WasteCollector):
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
 
-            if not 'customData' in response or not response['customData']['response']['garbage']:
+            if not response or 'customData' not in response or not response['customData']['response']['garbage']:
                 _LOGGER.error('No Waste data found!')
                 return
 
@@ -610,6 +610,11 @@ class OmrinCollector(WasteCollector):
 
             response = await self.hass.async_add_executor_job(self.__get_data)
             self.collections.remove_all()
+            
+            if not response:
+                _LOGGER.error('No Waste data found!')
+                return
+            
             for item in response:
                 if not item['Datum']:
                     continue
@@ -1012,7 +1017,7 @@ class XimmioCollector(WasteCollector):
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
 
-            if not response['dataList']:
+            if not response or not response['dataList']:
                 _LOGGER.error('No Waste data found!')
                 return
 
