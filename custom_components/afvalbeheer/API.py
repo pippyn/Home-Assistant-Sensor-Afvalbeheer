@@ -317,8 +317,7 @@ class BurgerportaalCollector(WasteCollector):
         'gft': WASTE_TYPE_GREEN,
         'opk': WASTE_TYPE_PAPER,
         'pmdrest': WASTE_TYPE_TREE,
-        # 'pd': WASTE_TYPE_PACKAGES,
-        # 'md': WASTE_TYPE_PACKAGES,
+        'rest': WASTE_TYPE_GREY,
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix):
@@ -382,8 +381,7 @@ class BurgerportaalCollector(WasteCollector):
         try:
             if not self.refresh_token:
                 await self.hass.async_add_executor_job(self.__fetch_refresh_token)
-            
-            if not self.id_token:
+            else:
                 await self.hass.async_add_executor_job(self.__fetch_id_token)
                 
             if not self.address_id:
