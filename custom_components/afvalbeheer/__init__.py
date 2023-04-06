@@ -21,7 +21,7 @@ Current Version: 5.2.0 20230406
 20230228 - Code refactor
 20230303 - New next upcoming sensor
 20230406 - Fix for calendar
-20230406 - Switched to new API for RMN and BAR
+20230406 - New API for RMN and BAR
 
 Example config:
 Configuration.yaml:

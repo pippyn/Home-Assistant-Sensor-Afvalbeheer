@@ -87,7 +87,6 @@ OPZET_COLLECTOR_URLS = {
     'peelenmaas':               'https://afvalkalender.peelenmaas.nl',
     'prezero':                  'https://inzamelwijzer.prezero.nl',
     'purmerend':                'https://afvalkalender.purmerend.nl',
-    'rmn':                      'https://inzamelschema.rmn.nl',
     'schouwen-duiveland':       'https://afvalkalender.schouwen-duiveland.nl',
     'spaarnelanden':            'https://afvalwijzer.spaarnelanden.nl',
     'sudwestfryslan':           'https://afvalkalender.sudwestfryslan.nl',
@@ -104,7 +103,6 @@ XIMMIO_COLLECTOR_IDS = {
     'areareiniging':    'adc418da-d19b-11e5-ab30-625662870761',
     'avalex':           'f7a74ad1-fdbf-4a43-9f91-44644f4d4222',
     'avri':             '78cd4156-394b-413d-8936-d407e334559a',
-    'bar':              'bb58e633-de14-4b2a-9941-5bc419f1c4b0',
     'hellendoorn':      '24434f5b-7244-412b-9306-3a2bd1e22bc1',
     'meerlanden':       '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
     'ximmio':           '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
@@ -114,6 +112,11 @@ XIMMIO_COLLECTOR_IDS = {
     'waardlanden':      '942abcf6-3775-400d-ae5d-7380d728b23c',
     'westland':         '6fc75608-126a-4a50-9241-a002ce8c8a6c',
     'reinis':           '9dc25c8a-175a-4a41-b7a1-83f237a80b77',
+}
+
+BURGERPORTAAL_COLLECTOR_IDS = {
+    'rmn':              '138204213564933597',
+    'bar':              '138204213564933497',
 }
 
 DEPRECATED_AND_NEW_WASTECOLLECTORS = {
@@ -136,6 +139,7 @@ WASTE_TYPE_KCA = 'chemisch'
 WASTE_TYPE_KCA_LOCATION = 'chemisch-brengen'
 WASTE_TYPE_MILIEUB = 'milieuboer'
 WASTE_TYPE_PAPER_PMD = 'papier-pmd'
+WASTE_TYPE_PMD_GREY = 'pmd-restafval'
 WASTE_TYPE_PACKAGES = 'pmd'
 WASTE_TYPE_PAPER = 'papier'
 WASTE_TYPE_PLASTIC = 'plastic'
