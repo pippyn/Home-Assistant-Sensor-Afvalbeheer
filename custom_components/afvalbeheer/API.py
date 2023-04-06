@@ -317,8 +317,8 @@ class BurgerportaalCollector(WasteCollector):
         'gft': WASTE_TYPE_GREEN,
         'opk': WASTE_TYPE_PAPER,
         'pmdrest': WASTE_TYPE_TREE,
-        'pd': WASTE_TYPE_PACKAGES,
-        'md': WASTE_TYPE_PACKAGES,
+        # 'pd': WASTE_TYPE_PACKAGES,
+        # 'md': WASTE_TYPE_PACKAGES,
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix):
