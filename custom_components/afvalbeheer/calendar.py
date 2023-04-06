@@ -71,7 +71,7 @@ class AfvalbeheerCalendar(CalendarEntity):
                         CalendarEvent(
                             summary=waste_items.waste_type,
                             start=waste_items.date.date(),
-                            end=waste_items.date.date(),
+                            end=waste_items.date.date() + timedelta(days=1),
                         )
                     )
 
