@@ -316,7 +316,7 @@ class BurgerportaalCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
         'gft': WASTE_TYPE_GREEN,
         'opk': WASTE_TYPE_PAPER,
-        'pmdrest': WASTE_TYPE_TREE,
+        'pmdrest': WASTE_TYPE_PMD_GREY,
         'rest': WASTE_TYPE_GREY,
     }
 
