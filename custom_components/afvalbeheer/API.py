@@ -365,7 +365,7 @@ class BurgerportaalCollector(WasteCollector):
         
         if self.suffix:
             for address in response:
-                if 'addition' in address and address['addition'] == self.suffix:
+                if 'addition' in address and address['addition'] == self.suffix.upper():
                     self.address_id = address['addressId']
         
         if not self.address_id:

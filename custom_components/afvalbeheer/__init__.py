@@ -24,7 +24,7 @@ Current Version: 5.2.3 20230418
 20230406 - New API for RMN and BAR
 20230407 - Fix mapping for BAR
 20230418 - Added support for suffix in address for RMN and BAR
-20230418 - Changed Dutch month names to lower case
+20230418 - Changed Dutch month names to lowercase
 
 Example config:
 Configuration.yaml:
