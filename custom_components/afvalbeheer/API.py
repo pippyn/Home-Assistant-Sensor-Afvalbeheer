@@ -992,8 +992,7 @@ class RecycleApp(WasteCollector):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         try:
-            if (not self.accessToken):
-                await self.hass.async_add_executor_job(self.__get_access_token)
+            await self.hass.async_add_executor_job(self.__get_access_token)
 
             if (not self.postcode_id or not self.street_id) and self.accessToken:
                 await self.hass.async_add_executor_job(self.__get_location_ids)
