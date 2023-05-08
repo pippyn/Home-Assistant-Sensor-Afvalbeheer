@@ -92,6 +92,7 @@ Choose your collector from this list:
   - Meppel
   - Middelburg-Vlissingen
   - MijnAfvalwijzer
+  - Mijnafvalzaken
   - Montfoort
   - Omrin
   - PeelEnMaas

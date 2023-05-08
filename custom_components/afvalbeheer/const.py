@@ -83,6 +83,7 @@ OPZET_COLLECTOR_URLS = {
     'hvc':                      'https://inzamelkalender.hvcgroep.nl',
     'lingewaard':               'https://afvalwijzer.lingewaard.nl',
     'middelburg-vlissingen':    'https://afvalwijzer.middelburgvlissingen.nl',
+    'mijnafvalzaken':           'https://mijnafvalzaken.nl',
     'montfoort':                'https://afvalkalender.cyclusnv.nl',
     'peelenmaas':               'https://afvalkalender.peelenmaas.nl',
     'prezero':                  'https://inzamelwijzer.prezero.nl',
