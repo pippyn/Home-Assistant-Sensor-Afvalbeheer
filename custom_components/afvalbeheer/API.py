@@ -580,6 +580,7 @@ class LimburgNetCollector(WasteCollector):
         'Grofvuil': WASTE_TYPE_BULKLITTER,
         'Groenafval': WASTE_TYPE_BULKYGARDENWASTE,
         'Tuin- En Snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
+        'keukenafval': WASTE_TYPE_BULKYGARDENWASTE,
         # 'grof huisvuil afroep': WASTE_TYPE_BULKLITTER,
         # 'tak-snoeiafval': WASTE_TYPE_BULKYGARDENWASTE,
         'Glas': WASTE_TYPE_GLASS,
