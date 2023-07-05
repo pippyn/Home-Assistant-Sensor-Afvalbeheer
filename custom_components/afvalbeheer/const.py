@@ -73,6 +73,7 @@ NOTIFICATION_ID = "Afvalbeheer"
 
 OPZET_COLLECTOR_URLS = {
     'alphenaandenrijn':         'https://afvalkalender.alphenaandenrijn.nl',
+    'afval3xbeter':             'https://afval3xbeter.nl',
     'berkelland':               'https://afvalkalender.gemeenteberkelland.nl',
     'blink':                    'https://mijnblink.nl',
     'cranendonck':              'https://afvalkalender.cranendonck.nl',

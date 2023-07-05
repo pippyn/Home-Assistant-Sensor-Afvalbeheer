@@ -5,6 +5,7 @@
 Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API. 
 This sensor works with the following waste collectors:
   - ACV
+  - Afval3xBeter
   - Afvalstoffendienstkalender
   - AfvalAlert
   - Alkmaar
