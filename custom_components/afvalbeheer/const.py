@@ -96,7 +96,7 @@ OPZET_COLLECTOR_URLS = {
     'venray':                   'https://afvalkalender.venray.nl',
     'voorschoten':              'https://afvalkalender.voorschoten.nl',
     'waalre':                   'https://afvalkalender.waalre.nl',
-    'zrd':                      'https://afvalkalender.zrd.nl',
+    'zrd':                      'https://www.zrd.nl',
 }
 
 XIMMIO_COLLECTOR_IDS = {
