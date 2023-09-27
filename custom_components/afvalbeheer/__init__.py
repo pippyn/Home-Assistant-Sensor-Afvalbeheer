@@ -2,32 +2,6 @@
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
 Current Version: 5.2.8 20230927
-20220829 - Major change: Added Calendar support (credits @WouterTuinstra)
-20220829 - Give persistant notifications unique id's
-20220901 - Code cleanup
-20220913 - Fix: translate today and tomorrow sensor
-20221010 - Restoring an entity and attributes on Home Assistant Restart
-20221015 - Fix Meerlanden
-20221018 - Restore entity picture
-20221019 - Add new icons
-20221021 - Fix for Mijn AfvalWijzer
-20221025 - Update RecycleApp token
-20221107 - Remove Unit of measurement for better history
-20221108 - Fix RecycleApp mapping
-20230104 - Remove deprecated DEVICE_CLASS_*
-20230123 - Change mapping for Afvalwijzer
-20230125 - Only add requested fractions to calendar
-20230208 - Add Dutch day abbreviations
-20230228 - Code refactor
-20230303 - New next upcoming sensor
-20230406 - Fix for calendar
-20230406 - New API for RMN and BAR
-20230407 - Fix mapping for BAR
-20230418 - Added support for suffix in address for RMN and BAR
-20230418 - Changed Dutch month names to lowercase
-20230424 - Fix RecycleApp authentication
-20230508 - Added support for Mijnafvalzaken
-20230523 - Limburg.NET adjustments
 20230705 - Added support for Afval3xBeter
 20230822 - Fix icon for papier-pmd
 20230927 - Fix ZRD API
