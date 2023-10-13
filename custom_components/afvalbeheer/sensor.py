@@ -16,27 +16,16 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     _LOGGER.debug("Setup of sensor platform Afvalbeheer")
 
-    schedule_update = False
+    schedule_update = not (discovery_info and "config" in discovery_info)
 
-    if discovery_info and "config" in discovery_info:
-        config = discovery_info["config"]
-        data = hass.data[DOMAIN].get(config[CONF_ID], None)
-    else:
-        schedule_update = True
-        data = get_wastedata_from_config(hass, config)
+    config_data = discovery_info["config"] if discovery_info and "config" in discovery_info else config
+    data = hass.data[DOMAIN].get(config_data[CONF_ID], None) if not schedule_update else get_wastedata_from_config(hass, config)
 
-    sensor_upcoming = config.get(CONF_UPCOMING)
-
-    entities = []
-
-    for resource in config[CONF_RESOURCES]:
-        waste_type = resource.lower()
-        entities.append(WasteTypeSensor(data, waste_type, config))
-
-    if sensor_upcoming:
-        entities.append(WasteDateSensor(data, config, timedelta()))
-        entities.append(WasteDateSensor(data, config, timedelta(days=1)))
-        entities.append(WasteUpcomingSensor(data, config))
+    entities = [WasteTypeSensor(data, resource.lower(), config_data) for resource in config_data[CONF_RESOURCES]]
+    
+    if config_data.get(CONF_UPCOMING):
+        entities.extend([WasteDateSensor(data, config_data, timedelta(days=delta)) for delta in (0, 1)])
+        entities.append(WasteUpcomingSensor(data, config_data))
     
     async_add_entities(entities)
 
@@ -181,14 +170,8 @@ class WasteDateSensor(RestoreEntity, SensorEntity):
         self.waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
         self.dutch_days = config.get(CONF_TRANSLATE_DAYS)
         self.date_delta = date_delta
-        
-        if self.date_delta.days == 0:
-            day = "vandaag" if self.dutch_days else "today"
-        elif self.date_delta.days == 1:
-            day = "morgen" if self.dutch_days else "tomorrow"
-        else:
-            day = ''
-            
+        self.day_translation = {0: "vandaag", 1: "morgen"}
+        day = self.day_translation.get(self.date_delta.days, '')
         formatted_name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX),  self.waste_collector, day)
         self._name = formatted_name.capitalize()
         self._attr_unique_id = formatted_name
@@ -249,7 +232,6 @@ class WasteUpcomingSensor(RestoreEntity, SensorEntity):
         self.waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
         self.dutch_days = config.get(CONF_TRANSLATE_DAYS)
         self.date_format = config.get(CONF_DATE_FORMAT)
-         
         self.first_upcoming = "eerst volgende" if self.dutch_days else "first upcoming"
         formatted_name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX),  self.waste_collector, self.first_upcoming)
         self._name = formatted_name.capitalize()
@@ -320,16 +302,14 @@ def _format_sensor(name, name_prefix, waste_collector, sensor_type):
 
 
 def _translate_state(date_format, state):
-    if "%B" in date_format:
-        for EN_day, NL_day in DUTCH_TRANSLATION_MONTHS.items():
-            state = state.replace(EN_day, NL_day)
-    if "%b" in date_format:
-        for EN_day, NL_day in DUTCH_TRANSLATION_MONTHS_SHORT.items():
-            state = state.replace(EN_day, NL_day)
-    if "%A" in date_format:
-        for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
-            state = state.replace(EN_day, NL_day)
-    if "%a" in date_format:
-        for EN_day, NL_day in DUTCH_TRANSLATION_DAYS_SHORT.items():
-            state = state.replace(EN_day, NL_day)
+    translations = {
+        "%B": DUTCH_TRANSLATION_MONTHS,
+        "%b": DUTCH_TRANSLATION_MONTHS_SHORT,
+        "%A": DUTCH_TRANSLATION_DAYS,
+        "%a": DUTCH_TRANSLATION_DAYS_SHORT
+    }
+    for fmt, trans_dict in translations.items():
+        if fmt in date_format:
+            for EN_day, NL_day in trans_dict.items():
+                state = state.replace(EN_day, NL_day)
     return state
