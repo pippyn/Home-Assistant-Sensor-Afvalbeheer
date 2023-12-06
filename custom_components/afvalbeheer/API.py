@@ -463,13 +463,19 @@ class CirculusCollector(WasteCollector):
             )
 
             json_response_data = r.json()
-            if self.suffix != "" and json_response_data["flashMessage"] != "":
+            if json_response_data["flashMessage"]:
+                addresses = json_response_data["customData"]["addresses"]
                 authenticationUrl = ""
-                for address in json_response_data["customData"]["addresses"]:
-                    if re.search(' '+self.street_number+' '+self.suffix.lower(), address["address"]) != None:
-                        authenticationUrl = address["authenticationUrl"]
-                        break
-                r = requests.get(self.main_url+authenticationUrl, cookies=cookies)
+                if self.suffix:
+                    search_pattern = f' {self.street_number} {self.suffix.lower()}'
+                    for address in addresses:
+                        if re.search(search_pattern, address["address"]):
+                            authenticationUrl = address["authenticationUrl"]
+                            break
+                else:
+                    authenticationUrl = addresses[0]["authenticationUrl"]
+                if authenticationUrl:
+                    r = requests.get(self.main_url + authenticationUrl, cookies=cookies)
 
             logged_in_cookies = r.cookies
         else:
