@@ -5,8 +5,9 @@ Current Version: 5.2.10 20231208
 20230705 - Added support for Afval3xBeter
 20230822 - Fix icon for papier-pmd
 20230927 - Fix ZRD API
-20231206 - Fix suffix handeling for Circulus
+20231206 - Fix suffix handling for Circulus
 20231208 - Fix naming of today and tomorrow sensors
+
 
 Example config:
 Configuration.yaml:
