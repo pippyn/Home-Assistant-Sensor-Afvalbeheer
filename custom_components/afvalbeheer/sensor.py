@@ -170,7 +170,7 @@ class WasteDateSensor(RestoreEntity, SensorEntity):
         self.waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
         self.dutch_days = config.get(CONF_TRANSLATE_DAYS)
         self.date_delta = date_delta
-        if self.date_delta == 0:
+        if self.date_delta.days == 0:
             day = "vandaag" if self.dutch_days else "today"
         else:
             day = "morgen" if self.dutch_days else "tomorrow"
