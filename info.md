@@ -12,6 +12,7 @@ This sensor works with the following waste collectors:
   - Almere
   - AlphenAanDenRijn
   - AreaReiniging
+  - Assen
   - Avalex
   - Avri
   - BAR
