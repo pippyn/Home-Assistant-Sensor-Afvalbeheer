@@ -1,13 +1,13 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 5.2.11 20231208
+Current Version: 5.2.12 20231219
 20230705 - Added support for Afval3xBeter
 20230822 - Fix icon for papier-pmd
 20230927 - Fix ZRD API
 20231206 - Fix suffix handling for Circulus
 20231208 - Fix naming of today and tomorrow sensors
-
+20231219 - Support for new API Assen
 
 Example config:
 Configuration.yaml:
@@ -43,7 +43,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
 from .API import get_wastedata_from_config
 
 
-__version__ = "5.2.11"
+__version__ = "5.2.12"
 
 
 _LOGGER = logging.getLogger(__name__)
