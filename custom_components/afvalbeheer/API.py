@@ -986,8 +986,7 @@ class RWMCollector(WasteCollector):
                             date=datet,
                             waste_type=waste_type
                         )
-                        break
-                self.collections.add(collection)
+                        self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
