@@ -43,6 +43,7 @@ This sensor works with the following waste collectors:
   - RAD
   - RecycleApp (don't forget the streetname option)
   - RD4
+  - RWM
   - Reinis
   - ROVA
   - RMN
