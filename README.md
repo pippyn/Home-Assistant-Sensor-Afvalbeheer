@@ -115,6 +115,7 @@ Choose your collector from this list:
   - Waalre
   - Waardlanden
   - Westland
+  - Woerden
   - ZRD
 
 ### Resources

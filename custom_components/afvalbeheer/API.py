@@ -1066,6 +1066,7 @@ class XimmioCollector(WasteCollector):
         'meerlanden': "https://wasteprod2api.ximmio.com",
         'rad': "https://wasteprod2api.ximmio.com",
         'westland': "https://wasteprod2api.ximmio.com",
+        'woerden': "https://wasteprod2api.ximmio.com",        
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, address_id, customer_id):
