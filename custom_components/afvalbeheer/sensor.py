@@ -130,7 +130,7 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
         self._days_until = date_diff
         date_format = self.date_format
         if self.date_object:
-            self._state = collection.date.date
+            self._state = collection.date.date()
         elif self.date_only or (date_diff >= 8 and not self.always_show_day):
             self._state = collection.date.strftime(date_format)
         elif date_diff > 1:
