@@ -35,6 +35,7 @@ This sensor works with the following waste collectors:
   - Middelburg-Vlissingen
   - MijnAfvalwijzer
   - Mijnafvalzaken
+  - Montferland
   - Montfoort
   - Omrin
   - PeelEnMaas
