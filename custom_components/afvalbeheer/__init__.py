@@ -13,7 +13,7 @@ Current Version: 5.2.17 20240124
 20240109 - Change dateobject to date
 20240122 - Add support for Montferland API
 20240124 - Update RecycleApp X-Secret
-20240124 - Add support for Offalkalinder
+20240124 - Add support for Ôffalkalinder
 
 Example config:
 Configuration.yaml:

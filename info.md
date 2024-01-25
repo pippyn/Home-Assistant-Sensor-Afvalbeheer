@@ -37,6 +37,7 @@ This sensor works with the following waste collectors:
   - Mijnafvalzaken
   - Montferland
   - Montfoort
+  - Ôffalkalinder
   - Omrin
   - PeelEnMaas
   - PreZero
