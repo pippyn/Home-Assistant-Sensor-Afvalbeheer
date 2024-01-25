@@ -130,6 +130,7 @@ DEPRECATED_AND_NEW_WASTECOLLECTORS = {
     'ophaalkalender':   'recycleapp',
     'circulus-berkel':  'circulus',
     'alkmaar':          'hvc',
+    'ôffalkalinder':    'offalkalinder',
 }
 
 WASTE_TYPE_BRANCHES = 'takken'
