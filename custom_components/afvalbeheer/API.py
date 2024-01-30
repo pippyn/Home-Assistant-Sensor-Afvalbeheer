@@ -87,6 +87,11 @@ class WasteCollection(object):
         collection.icon_data = icon_data
         return collection
 
+    def __eq__(self, other):
+        """Overrides the default implementation"""
+        if isinstance(other, WasteCollection):
+            return (self.date == other.date and self.waste_type == other.waste_type and self.icon_data == other.icon_data)
+        return NotImplemented
 
 class WasteData(object):
 
@@ -1201,7 +1206,8 @@ class RecycleApp(WasteCollector):
                     date=datetime.strptime(item['timestamp'], '%Y-%m-%dT%H:%M:%S.000Z'),
                     waste_type=waste_type
                 )
-                self.collections.add(collection)
+                if collection not in self.collections:
+                    self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
