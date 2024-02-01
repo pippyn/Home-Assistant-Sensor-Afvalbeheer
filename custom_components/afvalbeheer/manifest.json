@@ -8,5 +8,5 @@
     "rsa",
     "pycryptodome"
   ],
-  "version": "5.2.17"
+  "version": "5.2.18"
 }

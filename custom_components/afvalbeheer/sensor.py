@@ -93,7 +93,7 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
     @property
     def device_class(self):
         if self.date_object:
-            return SensorDeviceClass.DATE
+            return SensorDeviceClass.TIMESTAMP
 
     async def async_added_to_hass(self):
         """Call when entity is about to be added to Home Assistant."""
@@ -130,7 +130,7 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
         self._days_until = date_diff
         date_format = self.date_format
         if self.date_object:
-            self._state = collection.date.date()
+            self._state = collection.date
         elif self.date_only or (date_diff >= 8 and not self.always_show_day):
             self._state = collection.date.strftime(date_format)
         elif date_diff > 1:
@@ -224,7 +224,7 @@ class WasteDateSensor(RestoreEntity, SensorEntity):
         self.__set_state(collections)
 
     def __set_state(self, collections):
-        self._state = ', '.join([x.waste_type for x in collections])
+        self._state = ', '.join(set([x.waste_type for x in collections]))
 
 
 class WasteUpcomingSensor(RestoreEntity, SensorEntity):
