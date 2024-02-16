@@ -45,14 +45,14 @@ class WasteCollectionRepository(object):
         today = datetime.now()
         return list(filter(lambda x: x.date.date() >= today.date(), self.get_sorted()))
     
-    def get_first_upcoming(self):
+    def get_first_upcoming(self, waste_types=None):
         upcoming = self.get_upcoming()
         first_item = upcoming[0] if upcoming else None
-        return list(filter(lambda x: x.date.date() == first_item.date.date(), upcoming))
+        return list(filter(lambda x: x.date.date() == first_item.date.date() and x.waste_type.lower() in (waste_type.lower() for waste_type in waste_types), upcoming))
     
     def get_upcoming_by_type(self, waste_type):
         today = datetime.now()
-        return list(filter(lambda x: x.date.date() >= today.date() and x.waste_type == waste_type, self.get_sorted()))
+        return list(filter(lambda x: x.date.date() >= today.date() and x.waste_type.lower() == waste_type.lower(), self.get_sorted()))
 
     def get_first_upcoming_by_type(self, waste_type):
         upcoming = self.get_upcoming_by_type(waste_type)
@@ -60,7 +60,7 @@ class WasteCollectionRepository(object):
 
     def get_by_date(self, date, waste_types=None):
         if waste_types:
-            return list(filter(lambda x: x.date.date() == date.date() and x.waste_type in waste_types, self.get_sorted()))
+            return list(filter(lambda x: x.date.date() == date.date() and x.waste_type.lower() in (waste_type.lower() for waste_type in waste_types), self.get_sorted()))
         else:
             return list(filter(lambda x: x.date.date() == date.date(), self.get_sorted()))
     
@@ -186,7 +186,7 @@ class WasteCollector(ABC):
         for from_type, to_type in self.WASTE_TYPE_MAPPING.items():
             if from_type.lower() in name.lower():
                 return to_type
-        return name.lower()
+        return name
 
 
 class AfvalAlertCollector(WasteCollector):

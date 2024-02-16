@@ -21,7 +21,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     config_data = discovery_info["config"] if discovery_info and "config" in discovery_info else config
     data = hass.data[DOMAIN].get(config_data[CONF_ID], None) if not schedule_update else get_wastedata_from_config(hass, config)
 
-    entities = [WasteTypeSensor(data, resource.lower(), config_data) for resource in config_data[CONF_RESOURCES]]
+    entities = [WasteTypeSensor(data, resource, config_data) for resource in config_data[CONF_RESOURCES]]
     
     if config_data.get(CONF_UPCOMING):
         entities.extend([WasteDateSensor(data, config_data, timedelta(days=delta)) for delta in (0, 1)])
@@ -54,8 +54,8 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
         self._tomorrow = "Morgen" if self.dutch_days else "Tomorrow"
         
         formatted_name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX),  self.waste_collector, self.waste_type)
-        self._name = formatted_name.capitalize()
-        self._attr_unique_id = formatted_name
+        self._name = formatted_name
+        self._attr_unique_id = formatted_name.lower()
         self._days_until = None
         self._sort_date = 0
         self._hidden = False
@@ -175,8 +175,8 @@ class WasteDateSensor(RestoreEntity, SensorEntity):
         else:
             day = "morgen" if self.dutch_days else "tomorrow"
         formatted_name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX),  self.waste_collector, day)
-        self._name = formatted_name.capitalize()
-        self._attr_unique_id = formatted_name
+        self._name = formatted_name
+        self._attr_unique_id = formatted_name.lower()
         self._hidden = False
         self._state = None
         self._attrs = {}
@@ -231,13 +231,14 @@ class WasteUpcomingSensor(RestoreEntity, SensorEntity):
 
     def __init__(self, data, config):
         self.data = data
+        self.waste_types = config[CONF_RESOURCES]
         self.waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
         self.dutch_days = config.get(CONF_TRANSLATE_DAYS)
         self.date_format = config.get(CONF_DATE_FORMAT)
         self.first_upcoming = "eerst volgende" if self.dutch_days else "first upcoming"
         formatted_name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX),  self.waste_collector, self.first_upcoming)
-        self._name = formatted_name.capitalize()
-        self._attr_unique_id = formatted_name
+        self._name = formatted_name
+        self._attr_unique_id = formatted_name.lower()
         self.upcoming_day = None
         self.upcoming_waste_types = None
         self._hidden = False
@@ -279,7 +280,7 @@ class WasteUpcomingSensor(RestoreEntity, SensorEntity):
             }
 
     def update(self):
-        collections = self.data.collections.get_first_upcoming()
+        collections = self.data.collections.get_first_upcoming(self.waste_types)
 
         if not collections:
             self._hidden = True
@@ -297,7 +298,7 @@ class WasteUpcomingSensor(RestoreEntity, SensorEntity):
 
 def _format_sensor(name, name_prefix, waste_collector, sensor_type):
     return (
-        (waste_collector + ' ' if name_prefix else "") +
+        (waste_collector.capitalize() + ' ' if name_prefix else "") +
         (name + ' ' if name else "") +
         sensor_type
     )

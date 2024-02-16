@@ -66,7 +66,7 @@ class AfvalbeheerCalendar(CalendarEntity):
         for waste_items in self.WasteData.collections:
             if start_date.date() <= waste_items.date.date() <= end_date.date():
                 # Summary below will define the name of event in calendar
-                if waste_items.waste_type in self.config[CONF_RESOURCES]:
+                if waste_items.waste_type.lower() in self.config[CONF_RESOURCES]:
                     events.append(
                         CalendarEvent(
                             summary=waste_items.waste_type,
