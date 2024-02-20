@@ -18,7 +18,7 @@ This sensor works with the following waste collectors:
   - BAR
   - Berkelland
   - Blink
-  - Circulus-Berkel
+  - Circulus
   - Cranendonck
   - Cure (use MijnAfvalwijzer)
   - Cyclus
@@ -58,6 +58,7 @@ This sensor works with the following waste collectors:
   - Waalre
   - Waardlanden
   - Westland
+  - Woerden
   - ZRD
 
 ![alt text](https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/example.png)
