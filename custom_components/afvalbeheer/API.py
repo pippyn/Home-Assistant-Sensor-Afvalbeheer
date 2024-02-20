@@ -1261,10 +1261,7 @@ class XimmioCollector(WasteCollector):
         self.company_code = XIMMIO_COLLECTOR_IDS[self.waste_collector]
         self.community = ""
         self.customer_id = customer_id
-        if address_id:
-            self.address_id = address_id
-        else:
-            self.address_id = None
+        self.address_id = address_id if address_id else None
 
     def __fetch_address(self):
         data = {
