@@ -79,6 +79,7 @@ OPZET_COLLECTOR_URLS = {
     'cranendonck':              'https://afvalkalender.cranendonck.nl',
     'cyclus':                   'https://afvalkalender.cyclusnv.nl',
     'dar':                      'https://afvalkalender.dar.nl',
+    'defryskemarren':           'https://afvalkalender.defryskemarren.nl',
     'denhaag':                  'https://huisvuilkalender.denhaag.nl',
     'gad':                      'https://inzamelkalender.gad.nl',
     'hvc':                      'https://inzamelkalender.hvcgroep.nl',
