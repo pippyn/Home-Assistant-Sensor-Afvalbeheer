@@ -235,7 +235,7 @@ class WasteUpcomingSensor(RestoreEntity, SensorEntity):
         self.waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
         self.dutch_days = config.get(CONF_TRANSLATE_DAYS)
         self.date_format = config.get(CONF_DATE_FORMAT)
-        self.first_upcoming = "eerst volgende" if self.dutch_days else "first upcoming"
+        self.first_upcoming = "eerstvolgende" if self.dutch_days else "first upcoming"
         formatted_name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX),  self.waste_collector, self.first_upcoming)
         self._name = formatted_name
         self._attr_unique_id = formatted_name.lower()
