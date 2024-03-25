@@ -23,6 +23,7 @@ This sensor works with the following waste collectors:
   - Cure (use MijnAfvalwijzer)
   - Cyclus
   - DAR
+  - DeFryskeMarren
   - DeAfvalApp
   - DenHaag
   - GAD
