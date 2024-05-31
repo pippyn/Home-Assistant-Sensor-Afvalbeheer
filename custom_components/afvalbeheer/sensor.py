@@ -224,7 +224,7 @@ class WasteDateSensor(RestoreEntity, SensorEntity):
         self.__set_state(collections)
 
     def __set_state(self, collections):
-        self._state = ', '.join(set([x.waste_type for x in collections]))
+        self._state = ', '.join(sorted({x.waste_type for x in collections}))
 
 
 class WasteUpcomingSensor(RestoreEntity, SensorEntity):
@@ -292,7 +292,7 @@ class WasteUpcomingSensor(RestoreEntity, SensorEntity):
 
     def __set_state(self, collections):
         self.upcoming_day = _translate_state(self.date_format, collections[0].date.strftime(self.date_format))
-        self.upcoming_waste_types = ', '.join([x.waste_type for x in collections])
+        self.upcoming_waste_types = ', '.join(sorted([x.waste_type for x in collections]))
         self._state = self.upcoming_day + ": " + self.upcoming_waste_types
 
 
