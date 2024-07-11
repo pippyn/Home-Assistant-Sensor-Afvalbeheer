@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 5.3.5 20240605
+Current Version: 5.3.6 20240711
 20230705 - Added support for Afval3xBeter
 20230822 - Fix icon for papier-pmd
 20230927 - Fix ZRD API
@@ -24,6 +24,7 @@ Current Version: 5.3.5 20240605
 20240414 - Fix deprecation warning for discovery
 20240531 - Sort output of upcomming sensors
 20240605 - Fix for RWM API
+20240711 - Add mapping for PMD-Rest in Ximmio
 
 Example config:
 Configuration.yaml:
@@ -60,7 +61,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
 from .API import get_wastedata_from_config
 
 
-__version__ = "5.3.5"
+__version__ = "5.3.6"
 
 
 _LOGGER = logging.getLogger(__name__)
