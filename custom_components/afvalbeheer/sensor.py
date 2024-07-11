@@ -70,10 +70,10 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
     @property
     def entity_picture(self):
         if self.built_in_icons and not self.disable_icons:
-            if self.built_in_icons_new and self.waste_type in FRACTION_ICONS_NEW:
-                self._entity_picture = FRACTION_ICONS_NEW[self.waste_type]
-            elif self.waste_type in FRACTION_ICONS:
-                self._entity_picture = FRACTION_ICONS[self.waste_type]
+            if self.built_in_icons_new and self.waste_type.lower() in FRACTION_ICONS_NEW:
+                self._entity_picture = FRACTION_ICONS_NEW[self.waste_type.lower()]
+            elif self.waste_type.lower() in FRACTION_ICONS:
+                self._entity_picture = FRACTION_ICONS[self.waste_type.lower()]
         return self._entity_picture
 
     @property
