@@ -787,8 +787,6 @@ class OmrinCollector(WasteCollector):
         'Chemisch afval': WASTE_TYPE_KCA,
         'Sortibak': WASTE_TYPE_SORTI,
         'Papier': WASTE_TYPE_PAPER,
-        'Groene container': WASTE_TYPE_GREEN,
-        'Grijze container': WASTE_TYPE_GREY,
         # 'REMAINDER': WASTE_TYPE_REMAINDER,
         # 'TEXTILE': WASTE_TYPE_TEXTILE,
         # 'TREE': WASTE_TYPE_TREE,
