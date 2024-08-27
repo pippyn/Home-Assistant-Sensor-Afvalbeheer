@@ -149,7 +149,7 @@ class WasteData(object):
 
     async def async_update(self, *_):
         await self.collector.update()
-        if self.update_interval != 0:
+        if self.update_interval is not None and self.update_interval != 0:
             await self.schedule_update(timedelta(hours=self.update_interval))
         else:
             await self.schedule_update(SCHEDULE_UPDATE_INTERVAL)
@@ -534,6 +534,54 @@ class CirculusCollector(WasteCollector):
                         )
                     if collection not in self.collections:
                         self.collections.add(collection)
+
+        except requests.exceptions.RequestException as exc:
+            _LOGGER.error('Error occurred while fetching data: %r', exc)
+            return False
+
+
+class CleanprofsCollector(WasteCollector):
+    WASTE_TYPE_MAPPING = {
+        'GFT': WASTE_TYPE_GREEN,
+        'RST': WASTE_TYPE_GREY,
+    }
+
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+        self.main_url = "https://cleanprofs.jmsdev.nl/"
+
+    def __get_data(self):
+        get_url = '{}api/get-plannings-address?zipcode={}&house_number={}'.format(
+                self.main_url, self.postcode, self.street_number)
+        return requests.get(get_url)
+
+    async def update(self):
+        _LOGGER.debug('Updating Waste collection dates using Rest API')
+
+        self.collections.remove_all()
+
+        try:
+            r = await self.hass.async_add_executor_job(self.__get_data)
+            response = r.json()
+
+            if not response:
+                _LOGGER.error('No Waste data found!')
+                return
+
+            for item in response:
+                if not item['full_date']:
+                    continue
+
+                waste_type = self.map_waste_type(item['product_name'])
+                if not waste_type:
+                    continue
+
+                collection = WasteCollection.create(
+                    date=datetime.strptime(item['full_date'], '%Y-%m-%d').replace(tzinfo=None),
+                    waste_type=waste_type
+                )
+                if collection not in self.collections:
+                    self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

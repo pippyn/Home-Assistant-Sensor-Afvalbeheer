@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 5.3.7 20240711
+Current Version: 5.3.8 20240827
 20230705 - Added support for Afval3xBeter
 20230822 - Fix icon for papier-pmd
 20230927 - Fix ZRD API
@@ -26,6 +26,8 @@ Current Version: 5.3.7 20240711
 20240605 - Fix for RWM API
 20240711 - Add mapping for PMD-Rest in Ximmio
 20240711 - Fix sensor icons
+20240827 - Add support for Cleanprofs
+20240827 - Small bug fixes
 
 Example config:
 Configuration.yaml:
@@ -58,11 +60,11 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.discovery import async_load_platform, load_platform
 
-from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
+from .const import DOMAIN, CONF_ID
 from .API import get_wastedata_from_config
 
 
-__version__ = "5.3.7"
+__version__ = "5.3.8"
 
 
 _LOGGER = logging.getLogger(__name__)
