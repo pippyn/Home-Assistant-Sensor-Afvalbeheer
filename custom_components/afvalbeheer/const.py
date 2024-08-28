@@ -77,7 +77,7 @@ OPZET_COLLECTOR_URLS = {
     'berkelland':               'https://afvalkalender.gemeenteberkelland.nl',
     'blink':                    'https://mijnblink.nl',
     'cranendonck':              'https://afvalkalender.cranendonck.nl',
-    'cyclus':                   'https://afvalkalender.cyclusnv.nl',
+    'cyclus':                   'https://cyclusnv.nl',
     'dar':                      'https://afvalkalender.dar.nl',
     'defryskemarren':           'https://afvalkalender.defryskemarren.nl',
     'denhaag':                  'https://huisvuilkalender.denhaag.nl',
