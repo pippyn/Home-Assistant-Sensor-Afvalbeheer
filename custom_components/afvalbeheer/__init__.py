@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 5.3.9 20240827
+Current Version: 5.3.10 20240829
 20230705 - Added support for Afval3xBeter
 20230822 - Fix icon for papier-pmd
 20230927 - Fix ZRD API
@@ -28,6 +28,7 @@ Current Version: 5.3.9 20240827
 20240711 - Fix sensor icons
 20240827 - Add support for Cleanprofs
 20240827 - Small bug fix with configs
+20240829 - Support for new ROVA API
 
 Example config:
 Configuration.yaml:
@@ -64,7 +65,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
 from .API import get_wastedata_from_config
 
 
-__version__ = "5.3.9"
+__version__ = "5.3.10"
 
 
 _LOGGER = logging.getLogger(__name__)
