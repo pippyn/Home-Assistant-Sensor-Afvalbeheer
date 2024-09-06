@@ -302,6 +302,14 @@ updateinterval: 12
 ```
 If you want to adjust the update interval, you can set this option to the desired hours. Default is 12.
 
+### Custom mapping of waste fractions
+```yaml
+custommapping:
+  keukenafval: VET-goed
+  fraction2: New name for fraction2
+```
+Some wastecollectors use the wrong fraction name and with this option you can override the default mapping. E.g. Meppel uses keukenafval for the fraction VET-goed, which by default gets mapped to GFT. Default is empty.
+
 ### Customer ID for Ximmio commercial address
 ```yaml
 customerid: 123456

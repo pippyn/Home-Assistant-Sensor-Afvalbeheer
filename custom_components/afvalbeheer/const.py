@@ -32,6 +32,7 @@ CONF_ALWAYS_SHOW_DAY = 'alwaysshowday'
 CONF_PRINT_AVAILABLE_WASTE_TYPES = 'printwastetypes'
 CONF_UPDATE_INTERVAL = 'updateinterval'
 CONF_CUSTOMER_ID = 'customerid'
+CONF_CUSTOM_MAPPING = 'custommapping'
 
 PLATFORM_SCHEMA = vol.Schema(
     {
@@ -59,6 +60,7 @@ PLATFORM_SCHEMA = vol.Schema(
         vol.Optional(CONF_PRINT_AVAILABLE_WASTE_TYPES, default=False): cv.boolean,
         vol.Optional(CONF_UPDATE_INTERVAL, default=0): cv.positive_int,
         vol.Optional(CONF_CUSTOMER_ID, default=""): cv.string,
+        vol.Optional(CONF_CUSTOM_MAPPING, default={}): dict,
     }, extra=vol.ALLOW_EXTRA  # Allow extra required due when validating config as sensor (platform key is added to config)
 )
 

@@ -96,7 +96,7 @@ class WasteCollection(object):
 
 class WasteData(object):
 
-    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, address_id, print_waste_type, update_interval, customer_id):
+    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, custom_mapping, address_id, print_waste_type, update_interval, customer_id):
         self.hass = hass
         self.waste_collector = waste_collector
         self.city_name = city_name
@@ -109,37 +109,38 @@ class WasteData(object):
         self.collector = None
         self.update_interval = update_interval
         self.customer_id = customer_id
+        self.custom_mapping = custom_mapping
         self.__select_collector()
 
     def __select_collector(self):
         if self.waste_collector in XIMMIO_COLLECTOR_IDS.keys():
-            self.collector = XimmioCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.address_id, self.customer_id)
+            self.collector = XimmioCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping, self.address_id, self.customer_id)
         elif self.waste_collector in ["mijnafvalwijzer", "afvalstoffendienstkalender"]:
-            self.collector = AfvalwijzerCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = AfvalwijzerCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping)
         elif self.waste_collector == "afvalalert":
-            self.collector = AfvalAlertCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = AfvalAlertCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping)
         elif self.waste_collector == "deafvalapp":
-            self.collector = DeAfvalAppCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = DeAfvalAppCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping)
         elif self.waste_collector == "circulus":
-            self.collector = CirculusCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = CirculusCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping,)
         elif self.waste_collector == "limburg.net":
-            self.collector = LimburgNetCollector(self.hass, self.waste_collector, self.city_name, self.postcode, self.street_name, self.street_number, self.suffix)
+            self.collector = LimburgNetCollector(self.hass, self.waste_collector, self.city_name, self.postcode, self.street_name, self.street_number, self.suffix, self.custom_mapping)
         elif self.waste_collector == "montferland":
-            self.collector = MontferlandNetCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = MontferlandNetCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping)
         elif self.waste_collector == "omrin":
-            self.collector = OmrinCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = OmrinCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping)
         elif self.waste_collector == "recycleapp":
-            self.collector = RecycleApp(self.hass, self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix)
+            self.collector = RecycleApp(self.hass, self.waste_collector, self.postcode, self.street_name, self.street_number, self.suffix, self.custom_mapping)
         elif self.waste_collector == "rd4":
-            self.collector = RD4Collector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = RD4Collector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping)
         elif self.waste_collector == "cleanprofs":
-            self.collector = CleanprofsCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = CleanprofsCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping)
         elif self.waste_collector == "rova":
-            self.collector = ROVACollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = ROVACollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping)
         elif self.waste_collector in BURGERPORTAAL_COLLECTOR_IDS.keys():
-            self.collector = BurgerportaalCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = BurgerportaalCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping)
         elif self.waste_collector in OPZET_COLLECTOR_URLS.keys():
-            self.collector = OpzetCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix)
+            self.collector = OpzetCollector(self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping)
         else:
             persistent_notification.create(
                 self.hass,
@@ -172,12 +173,13 @@ class WasteData(object):
 
 class WasteCollector(ABC):
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
         self.hass = hass
         self.waste_collector = waste_collector
         self.postcode = postcode
         self.street_number = street_number
         self.suffix = suffix
+        self.custom_mapping = custom_mapping
         self.collections = WasteCollectionRepository()
 
     @abstractmethod
@@ -185,6 +187,10 @@ class WasteCollector(ABC):
         pass
 
     def map_waste_type(self, name):
+        if self.custom_mapping:
+            for from_type, to_type in self.custom_mapping.items():
+                if from_type.lower() in name.lower():
+                    return to_type
         for from_type, to_type in self.WASTE_TYPE_MAPPING.items():
             if from_type.lower() in name.lower():
                 return to_type
@@ -208,8 +214,8 @@ class AfvalAlertCollector(WasteCollector):
         'kerst': WASTE_TYPE_TREE,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.main_url = "https://www.afvalalert.nl/kalender"
 
     def __get_data(self):
@@ -272,8 +278,8 @@ class AfvalwijzerCollector(WasteCollector):
         'md': WASTE_TYPE_PACKAGES,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.apikey = '5ef443e778f41c4f75c69459eea6e6ae0c2d92de729aa0fc61653815fbd6a8ca'
         self.waste_collector_url = self.waste_collector
 
@@ -331,8 +337,8 @@ class BurgerportaalCollector(WasteCollector):
         'rest': WASTE_TYPE_GREY,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.company_code = BURGERPORTAAL_COLLECTOR_IDS[self.waste_collector]
         self.apikey = 'AIzaSyA6NkRqJypTfP-cjWzrZNFJzPUbBaGjOdk'
         self.refresh_token = ''
@@ -448,8 +454,8 @@ class CirculusCollector(WasteCollector):
         # 'TREE': WASTE_TYPE_TREE,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.main_url = "https://mijn.circulus.nl"
 
     def __get_data(self):
@@ -547,8 +553,8 @@ class CleanprofsCollector(WasteCollector):
         'RST': WASTE_TYPE_GREY,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.main_url = "https://cleanprofs.jmsdev.nl/"
 
     def __get_data(self):
@@ -598,8 +604,8 @@ class DeAfvalAppCollector(WasteCollector):
         'kerstboom': WASTE_TYPE_TREE
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.main_url = "http://dataservice.deafvalapp.nl"
 
     def __get_data(self):
@@ -662,8 +668,8 @@ class LimburgNetCollector(WasteCollector):
         # 'kerstboom': WASTE_TYPE_TREE,
     }
 
-    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.city_name = city_name
         self.street_name = street_name.replace(" ", "+")
         self.main_url = "https://limburg.net/api-proxy/public"
@@ -752,8 +758,8 @@ class MontferlandNetCollector(WasteCollector):
         # 'kerstboom': WASTE_TYPE_TREE,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.main_url = "http://afvalwijzer.afvaloverzicht.nl/"
         self.query_start = "?Username=GSD&Password=gsd$2014"
         self.administratie_id = None
@@ -841,8 +847,8 @@ class OmrinCollector(WasteCollector):
         # 'TREE': WASTE_TYPE_TREE,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.main_url = "https://api-omrin.freed.nl/Account"
         self.appId = uuid.uuid1().__str__()
         self.publicKey = None
@@ -922,8 +928,8 @@ class OpzetCollector(WasteCollector):
         'pbd': WASTE_TYPE_PACKAGES,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.main_url = OPZET_COLLECTOR_URLS[self.waste_collector]
         self.bag_id = None
         if waste_collector == "suez":
@@ -1008,8 +1014,8 @@ class RD4Collector(WasteCollector):
         'pmd': WASTE_TYPE_PACKAGES,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.main_url = 'https://data.rd4.nl/api/v1/waste-calendar'
         self.postcode_split = re.search(r"(\d\d\d\d) ?([A-z][A-z])", self.postcode)
         self.postcode = self.postcode_split.group(1) + '+' + self.postcode_split.group(2).upper()
@@ -1066,8 +1072,8 @@ class ROVACollector(WasteCollector):
         'pmd': WASTE_TYPE_PACKAGES,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.main_url = 'https://www.rova.nl'
 
     def __get_data(self):
@@ -1137,8 +1143,8 @@ class RecycleApp(WasteCollector):
         'omb': WASTE_TYPE_GREY,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_name, street_number, suffix):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_name, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.street_name = street_name
         self.main_url = 'https://api.recycleapp.be/api/app/v1/'
         self.xsecret = 'Op2tDi2pBmh1wzeC5TaN2U3knZan7ATcfOQgxh4vqC0mDKmnPP2qzoQusmInpglfIkxx8SZrasBqi5zgMSvyHggK9j6xCQNQ8xwPFY2o03GCcQfcXVOyKsvGWLze7iwcfcgk2Ujpl0dmrt3hSJMCDqzAlvTrsvAEiaSzC9hKRwhijQAFHuFIhJssnHtDSB76vnFQeTCCvwVB27DjSVpDmq8fWQKEmjEncdLqIsRnfxLcOjGIVwX5V0LBntVbeiBvcjyKF2nQ08rIxqHHGXNJ6SbnAmTgsPTg7k6Ejqa7dVfTmGtEPdftezDbuEc8DdK66KDecqnxwOOPSJIN0zaJ6k2Ye2tgMSxxf16gxAmaOUqHS0i7dtG5PgPSINti3qlDdw6DTKEPni7X0rxM'
@@ -1270,8 +1276,8 @@ class XimmioCollector(WasteCollector):
         'woerden': "https://wasteprod2api.ximmio.com",        
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix, address_id, customer_id):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix)
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping, address_id, customer_id):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         if self.waste_collector in self.XIMMIO_URLS.keys():
             self.main_url = self.XIMMIO_URLS[self.waste_collector]
         else:
@@ -1367,6 +1373,7 @@ def get_wastedata_from_config(hass, config):
     print_waste_type = config.get(CONF_PRINT_AVAILABLE_WASTE_TYPES)
     update_interval = config.get(CONF_UPDATE_INTERVAL)
     customer_id = config.get(CONF_CUSTOMER_ID)
+    custom_mapping = config.get(CONF_CUSTOM_MAPPING)
     config["id"] = _format_id(waste_collector, postcode, street_number)
 
     if waste_collector in DEPRECATED_AND_NEW_WASTECOLLECTORS:
@@ -1406,6 +1413,7 @@ def get_wastedata_from_config(hass, config):
         street_name,
         street_number,
         suffix,
+        custom_mapping,
         address_id,
         print_waste_type,
         update_interval,
