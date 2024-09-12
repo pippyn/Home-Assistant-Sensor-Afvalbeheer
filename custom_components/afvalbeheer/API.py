@@ -115,7 +115,6 @@ class WasteData(object):
     def __select_collector(self):
         common_args = [self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping]
 
-        # Collector mapping with specific arguments
         collector_mapping = {
             **{key: (XimmioCollector, common_args + [self.address_id, self.customer_id]) for key in XIMMIO_COLLECTOR_IDS.keys()},
             "mijnafvalwijzer": (AfvalwijzerCollector, common_args),
@@ -134,7 +133,6 @@ class WasteData(object):
             **{key: (OpzetCollector, common_args) for key in OPZET_COLLECTOR_URLS.keys()},
         }
 
-        # Fetch the correct collector class and arguments
         collector_class, args = collector_mapping.get(self.waste_collector, (None, None))
 
         if collector_class:
@@ -160,9 +158,9 @@ class WasteData(object):
         if self.print_waste_type:
             persistent_notification.create(
                 self.hass,
-                'Available waste types: ' + ', '.join(self.collector.collections.get_available_waste_types()),
-                'Afvalwijzer' + " " + self.waste_collector, 
-                NOTIFICATION_ID + "_availablewastetypes_" + self.waste_collector)
+                f'Available waste types: {", ".join(self.collector.collections.get_available_waste_types())}',
+                f'Afvalwijzer {self.waste_collector}', 
+                f'{NOTIFICATION_ID}_availablewastetypes_{self.waste_collector}')
             self.print_waste_type = False
 
     @property
@@ -1378,29 +1376,27 @@ def get_wastedata_from_config(hass, config):
     if waste_collector in DEPRECATED_AND_NEW_WASTECOLLECTORS:
         persistent_notification.create(
             hass,
-            "Update your config to use {}! You are still using {} as a waste collector, which is deprecated. Check your automations and lovelace config, as the sensor names may also be changed!".format(
-                DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector], waste_collector
-            ),
-            "Afvalbeheer" + " " + waste_collector,
-            NOTIFICATION_ID + "_update_config_" + waste_collector,
+            f"Update your config to use {DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector]}! You are still using {waste_collector} as a waste collector, which is deprecated. Check your automations and lovelace config, as the sensor names may also be changed!",
+            f"Afvalbeheer {waste_collector}",
+            f"{NOTIFICATION_ID}_update_config_{waste_collector}",
         )
         waste_collector = DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector]
 
     if waste_collector in ["limburg.net"] and not city_name:
         persistent_notification.create(
             hass,
-            "Config invalid! Cityname is required for {}".format(waste_collector),
-            "Afvalbeheer" + " " + waste_collector,
-            NOTIFICATION_ID + "_invalid_config_" + waste_collector,
+            f"Config invalid! Cityname is required for {waste_collector}",
+            f"Afvalbeheer {waste_collector}",
+            f"{NOTIFICATION_ID}_invalid_config_{waste_collector}",
         )
         return
 
     if waste_collector in ["limburg.net", "recycleapp"] and not street_name:
         persistent_notification.create(
             hass,
-            "Config invalid! Streetname is required for {}".format(waste_collector),
-            "Afvalbeheer" + " " + waste_collector,
-            NOTIFICATION_ID + "_invalid_config_" + waste_collector,
+            f"Config invalid! Streetname is required for {waste_collector}",
+            f"Afvalbeheer {waste_collector}",
+            f"{NOTIFICATION_ID}_invalid_config_{waste_collector}",
         )
         return
 
