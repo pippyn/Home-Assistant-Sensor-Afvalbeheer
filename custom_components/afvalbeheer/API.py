@@ -65,10 +65,7 @@ class WasteCollectionRepository(object):
             return list(filter(lambda x: x.date.date() == date.date(), self.get_sorted()))
     
     def get_available_waste_types(self):
-        possible_waste_types = []
-        for collection in self.collections:
-            if collection.waste_type not in possible_waste_types:
-                possible_waste_types.append(collection.waste_type)
+        possible_waste_types = {collection.waste_type for collection in self.collections}
         return sorted(possible_waste_types, key=str.lower)
 
 
