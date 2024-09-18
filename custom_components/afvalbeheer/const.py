@@ -95,7 +95,7 @@ OPZET_COLLECTOR_URLS = {
     'purmerend':                'https://afvalkalender.purmerend.nl',
     'rwm':             	        'https://rwm.nl',
     'schouwen-duiveland':       'https://afvalkalender.schouwen-duiveland.nl',
-    'sliedrecht':               'afvalkalender.sliedrecht.nl',
+    'sliedrecht':               'https://afvalkalender.sliedrecht.nl',
     'spaarnelanden':            'https://afvalwijzer.spaarnelanden.nl',
     'sudwestfryslan':           'https://afvalkalender.sudwestfryslan.nl',
     'suez':                     'https://inzamelwijzer.prezero.nl',
