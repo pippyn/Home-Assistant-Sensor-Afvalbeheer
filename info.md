@@ -52,6 +52,7 @@ This sensor works with the following waste collectors:
   - ROVA
   - RMN
   - Schouwen-Duiveland
+  - Sliedrecht
   - Spaarnelanden
   - SudwestFryslan
   - Twente Milieu
