@@ -115,7 +115,7 @@ Choose your collector from this list:
   - Sliedrecht
   - Spaarnelanden
   - SudwestFryslan
-  - Twente Milieu
+  - TwenteMilieu
   - Venray
   - Voorschoten
   - Waalre
