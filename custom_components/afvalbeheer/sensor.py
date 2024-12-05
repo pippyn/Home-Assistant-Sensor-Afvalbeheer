@@ -177,7 +177,10 @@ class WasteDateSensor(BaseSensor):
     def __init__(self, data, config, date_delta):
         super().__init__(data, config)
         self.date_delta = date_delta
-        day = "vandaag" if self.dutch_days else "today" if self.date_delta.days == 0 else "morgen" if self.dutch_days else "tomorrow"
+        if self.date_delta.days == 0:
+            day = "vandaag" if self.dutch_days else "today"
+        else:
+            day = "morgen" if self.dutch_days else "tomorrow"
         self._name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, day)
 
     @property
