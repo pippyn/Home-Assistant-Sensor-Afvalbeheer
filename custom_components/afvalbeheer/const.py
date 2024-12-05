@@ -94,6 +94,7 @@ OPZET_COLLECTOR_URLS = {
     'prezero':                  'https://inzamelwijzer.prezero.nl',
     'purmerend':                'https://afvalkalender.purmerend.nl',
     'rwm':             	        'https://rwm.nl',
+    'saver':             	    'https://saver.nl',
     'schouwen-duiveland':       'https://afvalkalender.schouwen-duiveland.nl',
     'sliedrecht':               'https://afvalkalender.sliedrecht.nl',
     'spaarnelanden':            'https://afvalwijzer.spaarnelanden.nl',
