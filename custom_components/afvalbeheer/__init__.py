@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 5.5.1 20241205
+Current Version: 5.5.2 20241206
 20230705 - Added support for Afval3xBeter
 20230822 - Fix icon for papier-pmd
 20230927 - Fix ZRD API
@@ -35,6 +35,7 @@ Current Version: 5.5.1 20241205
 20240918 - Add support for Sliedrecht
 20241205 - Add support for Saver
 20241205 - Refactor sensor.py
+20241206 - Fix days until
 
 Example config:
 Configuration.yaml:
@@ -71,7 +72,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
 from .API import get_wastedata_from_config
 
 
-__version__ = "5.5.1"
+__version__ = "5.5.2"
 
 
 _LOGGER = logging.getLogger(__name__)

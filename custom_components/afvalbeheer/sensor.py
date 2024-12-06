@@ -128,6 +128,7 @@ class WasteTypeSensor(BaseSensor):
         self._hidden = False
         self._set_state(collection)
         self._set_sort_date(collection)
+        self._set_days_until(collection)
         self._set_picture(collection)
 
     def _set_state(self, collection):
@@ -159,6 +160,9 @@ class WasteTypeSensor(BaseSensor):
 
     def _set_sort_date(self, collection):
         self._attrs[ATTR_SORT_DATE] = int(collection.date.strftime("%Y%m%d"))
+        
+    def _set_days_until(self, collection):
+        self._attrs[ATTR_DAYS_UNTIL] = self._days_until
 
     def _set_picture(self, collection):
         if self.built_in_icons and not self.disable_icons:
