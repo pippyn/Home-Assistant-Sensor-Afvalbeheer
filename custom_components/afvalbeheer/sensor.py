@@ -49,6 +49,7 @@ class BaseSensor(RestoreEntity, SensorEntity):
         self._state = None
         self._attrs = {}
         self._entity_picture = None
+        self._attr_unique_id = None
 
     @property
     def state(self):
@@ -111,6 +112,7 @@ class WasteTypeSensor(BaseSensor):
         self._name = _format_sensor(
             config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.waste_type
         )
+        self._attr_unique_id = self._name.lower()
         self._days_until = None
         self._sort_date = 0
 
@@ -186,6 +188,7 @@ class WasteDateSensor(BaseSensor):
         else:
             day = "morgen" if self.dutch_days else "tomorrow"
         self._name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, day)
+        self._attr_unique_id = self._name.lower()
 
     @property
     def name(self):
@@ -208,6 +211,7 @@ class WasteUpcomingSensor(BaseSensor):
         super().__init__(data, config)
         self.first_upcoming = "eerstvolgende" if self.dutch_days else "first upcoming"
         self._name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.first_upcoming)
+        self._attr_unique_id = self._name.lower()
         self.upcoming_day = None
         self.upcoming_waste_types = None
 
