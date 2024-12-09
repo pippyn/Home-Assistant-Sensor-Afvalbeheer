@@ -63,11 +63,6 @@ class BaseSensor(RestoreEntity, SensorEntity):
     def entity_picture(self):
         return self._entity_picture
 
-    @property
-    def device_class(self):
-        if self.date_object:
-            return SensorDeviceClass.TIMESTAMP
-
     async def async_added_to_hass(self):
         """Restore the last known state."""
         state = await self.async_get_last_state()
@@ -78,10 +73,14 @@ class BaseSensor(RestoreEntity, SensorEntity):
 
     def _restore_attributes(self, state):
         self._attrs = {
-            ATTR_WASTE_COLLECTOR: state.attributes.get(ATTR_WASTE_COLLECTOR),
-            ATTR_HIDDEN: state.attributes.get(ATTR_HIDDEN),
-            ATTR_SORT_DATE: state.attributes.get(ATTR_SORT_DATE),
-            ATTR_DAYS_UNTIL: state.attributes.get(ATTR_DAYS_UNTIL),
+            key: value for key, value in {
+                ATTR_WASTE_COLLECTOR: state.attributes.get(ATTR_WASTE_COLLECTOR),
+                ATTR_HIDDEN: state.attributes.get(ATTR_HIDDEN),
+                ATTR_SORT_DATE: state.attributes.get(ATTR_SORT_DATE),
+                ATTR_DAYS_UNTIL: state.attributes.get(ATTR_DAYS_UNTIL),
+                ATTR_UPCOMING_DAY: state.attributes.get(ATTR_UPCOMING_DAY),
+                ATTR_UPCOMING_WASTE_TYPES: state.attributes.get(ATTR_UPCOMING_WASTE_TYPES),
+            }.items() if value is not None
         }
 
     def _restore_entity_picture(self, state):
@@ -120,18 +119,21 @@ class WasteTypeSensor(BaseSensor):
     def name(self):
         return self._name
 
+    @property
+    def device_class(self):
+        if self.date_object:
+            return SensorDeviceClass.TIMESTAMP
+
     def update(self):
         collection = self.data.collections.get_first_upcoming_by_type(self.waste_type)
         if not collection:
             self._state = None
             self._hidden = True
-            return
-
-        self._hidden = False
-        self._set_state(collection)
-        self._set_sort_date(collection)
-        self._set_days_until(collection)
-        self._set_picture(collection)
+        else:
+            self._hidden = False
+            self._set_state(collection)
+            self._set_picture(collection)
+        self._set_attr(collection)
 
     def _set_state(self, collection):
         date_diff = (collection.date - datetime.now()).days + 1
@@ -160,11 +162,12 @@ class WasteTypeSensor(BaseSensor):
         if self.dutch_days and not self.date_object:
             self._state = self._translate_state(self._state)
 
-    def _set_sort_date(self, collection):
-        self._attrs[ATTR_SORT_DATE] = int(collection.date.strftime("%Y%m%d"))
-        
-    def _set_days_until(self, collection):
-        self._attrs[ATTR_DAYS_UNTIL] = self._days_until
+    def _set_attr(self, collection):
+        self._attrs[ATTR_WASTE_COLLECTOR] = self.waste_collector
+        self._attrs[ATTR_HIDDEN] = self._hidden
+        if collection:
+            self._attrs[ATTR_SORT_DATE] = int(collection.date.strftime("%Y%m%d"))
+            self._attrs[ATTR_DAYS_UNTIL] = self._days_until
 
     def _set_picture(self, collection):
         if self.built_in_icons and not self.disable_icons:
@@ -200,10 +203,14 @@ class WasteDateSensor(BaseSensor):
         if not collections:
             self._hidden = True
             self._state = "Geen" if self.dutch_days else "None"
-            return
+        else:
+            self._hidden = False
+            self._state = ", ".join(sorted({x.waste_type for x in collections}))
+        self._set_attr()
 
-        self._hidden = False
-        self._state = ", ".join(sorted({x.waste_type for x in collections}))
+    def _set_attr(self):
+        self._attrs[ATTR_WASTE_COLLECTOR] = self.waste_collector
+        self._attrs[ATTR_HIDDEN] = self._hidden
 
 
 class WasteUpcomingSensor(BaseSensor):
@@ -225,11 +232,18 @@ class WasteUpcomingSensor(BaseSensor):
             self._hidden = True
             self._state = "Geen" if self.dutch_days else "None"
             return
-
-        self._hidden = False
-        self.upcoming_day = self._translate_state(collections[0].date.strftime(self.date_format))
-        self.upcoming_waste_types = ", ".join(sorted([x.waste_type for x in collections]))
-        self._state = f"{self.upcoming_day}: {self.upcoming_waste_types}"
+        else:
+            self._hidden = False
+            self.upcoming_day = self._translate_state(collections[0].date.strftime(self.date_format))
+            self.upcoming_waste_types = ", ".join(sorted([x.waste_type for x in collections]))
+            self._state = f"{self.upcoming_day}: {self.upcoming_waste_types}"
+        self._set_attr()
+    
+    def _set_attr(self):
+        self._attrs[ATTR_WASTE_COLLECTOR] = self.waste_collector
+        self._attrs[ATTR_HIDDEN] = self._hidden
+        self._attrs[ATTR_UPCOMING_DAY] = self.upcoming_day
+        self._attrs[ATTR_UPCOMING_WASTE_TYPES] = self.upcoming_waste_types
 
 
 def _format_sensor(name, name_prefix, waste_collector, sensor_type):
