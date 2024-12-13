@@ -51,6 +51,7 @@ This sensor works with the following waste collectors:
   - Reinis
   - ROVA
   - RMN
+  - Saver
   - Schouwen-Duiveland
   - Sliedrecht
   - Spaarnelanden
