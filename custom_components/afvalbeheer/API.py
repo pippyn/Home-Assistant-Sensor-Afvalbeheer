@@ -1140,44 +1140,48 @@ class RecycleApp(WasteCollector):
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping, street_name):
         super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.street_name = street_name
+        self.main_url = 'https://api.fostplus.be/recyclecms/public/v1/'
         self.main_url = 'https://www.recycleapp.be/api/app/v1/'
         self.xsecret = 'Op2tDi2pBmh1wzeC5TaN2U3knZan7ATcfOQgxh4vqC0mDKmnPP2qzoQusmInpglfIkxx8SZrasBqi5zgMSvyHggK9j6xCQNQ8xwPFY2o03GCcQfcXVOyKsvGWLze7iwcfcgk2Ujpl0dmrt3hSJMCDqzAlvTrsvAEiaSzC9hKRwhijQAFHuFIhJssnHtDSB76vnFQeTCCvwVB27DjSVpDmq8fWQKEmjEncdLqIsRnfxLcOjGIVwX5V0LBntVbeiBvcjyKF2nQ08rIxqHHGXNJ6SbnAmTgsPTg7k6Ejqa7dVfTmGtEPdftezDbuEc8DdK66KDecqnxwOOPSJIN0zaJ6k2Ye2tgMSxxf16gxAmaOUqHS0i7dtG5PgPSINti3qlDdw6DTKEPni7X0rxM'
         self.xconsumer = 'recycleapp.be'
         self.accessToken = ''
         self.postcode_id = ''
         self.street_id = ''
+        self.verify = False
 
     def __get_headers(self):
         headers = { 
-            'x-secret': self.xsecret,
             'x-consumer': self.xconsumer,
-            'User-Agent': '',
-            'Authorization': self.accessToken,
+            'User-Agent': 'Mozilla/5.0'
         }
         return headers
 
-    def __get_access_token(self):
-        response = requests.get("{}access-token".format(self.main_url), headers=self.__get_headers())
-        if response.status_code != 200:
-            _LOGGER.error('Invalid response from server for accessToken')
-            return
-        self.accessToken = response.json()['accessToken']
-    
     def __get_location_ids(self):
-        response = requests.get("{}zipcodes?q={}".format(self.main_url, self.postcode), headers=self.__get_headers())
+        response = requests.get("{}zipcodes?q={}".format(self.main_url, self.postcode), headers=self.__get_headers(), verify=self.verify)
         if response.status_code == 401:
-            self.__get_access_token()
-            response = requests.get("{}zipcodes?q={}".format(self.main_url, self.postcode), headers=self.__get_headers())
+            response = requests.get("{}zipcodes?q={}".format(self.main_url, self.postcode), headers=self.__get_headers(), verify=self.verify)
         if response.status_code != 200:
             _LOGGER.error('Invalid response from server for postcode_id')
             return
-        self.postcode_id = response.json()['items'][0]['id']
-        response = requests.get("{}streets?q={}&zipcodes={}".format(self.main_url, self.street_name, self.postcode_id), headers=self.__get_headers())
+        postcode_json = response.json()
+        _postcode_id = ""
+        for item in postcode_json["items"]:
+            if item["code"] == self.postcode:
+                _LOGGER.debug('Found postcode: ' + str(item["id"]))
+                _postcode_id = item["id"]
+                break
+        if _postcode_id == "":
+            _LOGGER.error('Could not find the right zip code.')
+            return
+        self.postcode_id = _postcode_id
+
+        response = requests.get("{}streets?q={}&zipcodes={}".format(self.main_url, self.street_name, self.postcode_id), headers=self.__get_headers(), verify=self.verify)
         if response.status_code != 200:
             _LOGGER.error('Invalid response from server for street_id')
             return
         for item in response.json()['items']:
-            if item['name'] == self.street_name:
+            if self.street_name in item['names'].values() :
+                _LOGGER.debug('Found street: ' + str(item["id"]))
                 self.street_id = item['id']
         if not self.street_id:
             self.street_id = response.json()['items'][0]['id']
@@ -1192,19 +1196,20 @@ class RecycleApp(WasteCollector):
             self.street_number,
             startdate,
             enddate), 
-            headers=self.__get_headers())
+            headers=self.__get_headers(), verify=self.verify)
         return response
 
     async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         try:
-            await self.hass.async_add_executor_job(self.__get_access_token)
-
-            if (not self.postcode_id or not self.street_id) and self.accessToken:
+            if (not self.postcode_id or not self.street_id):
                 await self.hass.async_add_executor_job(self.__get_location_ids)
 
-            if not self.postcode_id or not self.street_id or not self.accessToken:
+
+            _LOGGER.debug('update - postcode: ' + str(self.postcode_id))
+            _LOGGER.debug('update - straat: ' + str(self.street_id))
+            if not self.postcode_id or not self.street_id:
                 return
 
             r = await self.hass.async_add_executor_job(self.__get_data)
