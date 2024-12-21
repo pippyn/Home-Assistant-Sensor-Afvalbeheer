@@ -1141,7 +1141,6 @@ class RecycleApp(WasteCollector):
         super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.street_name = street_name
         self.main_url = 'https://api.fostplus.be/recyclecms/public/v1/'
-        self.main_url = 'https://www.recycleapp.be/api/app/v1/'
         self.xsecret = 'Op2tDi2pBmh1wzeC5TaN2U3knZan7ATcfOQgxh4vqC0mDKmnPP2qzoQusmInpglfIkxx8SZrasBqi5zgMSvyHggK9j6xCQNQ8xwPFY2o03GCcQfcXVOyKsvGWLze7iwcfcgk2Ujpl0dmrt3hSJMCDqzAlvTrsvAEiaSzC9hKRwhijQAFHuFIhJssnHtDSB76vnFQeTCCvwVB27DjSVpDmq8fWQKEmjEncdLqIsRnfxLcOjGIVwX5V0LBntVbeiBvcjyKF2nQ08rIxqHHGXNJ6SbnAmTgsPTg7k6Ejqa7dVfTmGtEPdftezDbuEc8DdK66KDecqnxwOOPSJIN0zaJ6k2Ye2tgMSxxf16gxAmaOUqHS0i7dtG5PgPSINti3qlDdw6DTKEPni7X0rxM'
         self.xconsumer = 'recycleapp.be'
         self.accessToken = ''
