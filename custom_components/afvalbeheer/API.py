@@ -297,7 +297,7 @@ class AfvalwijzerCollector(WasteCollector):
                 data = data + response['ophaaldagen']['data']
             
             if 'ophaaldagenNext' in response:
-                data = data + response['ophaaldagenNext']['data']
+                data = data + response['ophaaldagenNext']['data'][:25]
             
             if not data:
                 _LOGGER.error('No Waste data found!')
