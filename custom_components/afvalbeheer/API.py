@@ -21,6 +21,9 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class WasteCollectionRepository(object):
+    """
+    Repository for managing waste collections.
+    """
 
     def __init__(self):
         self.collections = []
@@ -33,43 +36,55 @@ class WasteCollectionRepository(object):
         return len(self.collections)
 
     def add(self, collection):
+        _LOGGER.debug(f"Adding collection: {collection}")
         self.collections.append(collection)
 
     def remove_all(self):
+        _LOGGER.debug("Removing all collections")
         self.collections = []
 
     def get_sorted(self):
+        _LOGGER.debug("Getting sorted collections")
         return sorted(self.collections, key=lambda x: x.date)
 
     def get_upcoming(self):
+        _LOGGER.debug("Getting upcoming collections")
         today = datetime.now()
         return list(filter(lambda x: x.date.date() >= today.date(), self.get_sorted()))
     
     def get_first_upcoming(self, waste_types=None):
+        _LOGGER.debug(f"Getting first upcoming collection for waste types: {waste_types}")
         upcoming = self.get_upcoming()
         first_item = upcoming[0] if upcoming else None
         return list(filter(lambda x: x.date.date() == first_item.date.date() and x.waste_type.lower() in (waste_type.lower() for waste_type in waste_types), upcoming))
     
     def get_upcoming_by_type(self, waste_type):
+        _LOGGER.debug(f"Getting upcoming collections for waste type: {waste_type}")
         today = datetime.now()
         return list(filter(lambda x: x.date.date() >= today.date() and x.waste_type.lower() == waste_type.lower(), self.get_sorted()))
 
     def get_first_upcoming_by_type(self, waste_type):
+        _LOGGER.debug(f"Getting first upcoming collection for waste type: {waste_type}")
         upcoming = self.get_upcoming_by_type(waste_type)
         return upcoming[0] if upcoming else None
 
     def get_by_date(self, date, waste_types=None):
+        _LOGGER.debug(f"Getting collections by date: {date} and waste types: {waste_types}")
         if waste_types:
             return list(filter(lambda x: x.date.date() == date.date() and x.waste_type.lower() in (waste_type.lower() for waste_type in waste_types), self.get_sorted()))
         else:
             return list(filter(lambda x: x.date.date() == date.date(), self.get_sorted()))
     
     def get_available_waste_types(self):
+        _LOGGER.debug("Getting available waste types")
         possible_waste_types = {collection.waste_type for collection in self.collections}
         return sorted(possible_waste_types, key=str.lower)
 
 
 class WasteCollection(object):
+    """
+    Represents a waste collection event.
+    """
 
     def __init__(self):
         self.date = None
@@ -92,6 +107,9 @@ class WasteCollection(object):
 
 
 class WasteData(object):
+    """
+    Manages waste data and schedules updates.
+    """
 
     def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, custom_mapping, address_id, print_waste_type, update_interval, customer_id):
         self.hass = hass
@@ -110,6 +128,7 @@ class WasteData(object):
         self.__select_collector()
 
     def __select_collector(self):
+        _LOGGER.debug(f"Selecting collector for waste_collector: {self.waste_collector}")
         common_args = [self.hass, self.waste_collector, self.postcode, self.street_number, self.suffix, self.custom_mapping]
 
         collector_mapping = {
@@ -143,10 +162,12 @@ class WasteData(object):
             )
 
     async def schedule_update(self, interval):
+        _LOGGER.debug(f"Scheduling update with interval: {interval}")
         nxt = dt_util.utcnow() + interval
         async_track_point_in_utc_time(self.hass, self.async_update, nxt)
 
     async def async_update(self, *_):
+        _LOGGER.debug("Performing async update")
         await self.collector.update()
         if self.update_interval is not None and self.update_interval != 0:
             await self.schedule_update(timedelta(hours=self.update_interval))
@@ -166,6 +187,9 @@ class WasteData(object):
 
 
 class WasteCollector(ABC):
+    """
+    Abstract base class for waste collectors.
+    """
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
         self.hass = hass
@@ -181,6 +205,7 @@ class WasteCollector(ABC):
         pass
 
     def map_waste_type(self, name):
+        _LOGGER.debug(f"Mapping waste type for name: {name}")
         if self.custom_mapping:
             for from_type, to_type in self.custom_mapping.items():
                 if from_type.lower() in name.lower():
@@ -192,6 +217,9 @@ class WasteCollector(ABC):
 
 
 class AfvalAlertCollector(WasteCollector):
+    """
+    Collector for AfvalAlert waste data.
+    """
     WASTE_TYPE_MAPPING = {
         # 'tak-snoeiafval': WASTE_TYPE_BRANCHES,
         # 'gemengde plastics': WASTE_TYPE_PLASTIC,
@@ -213,11 +241,13 @@ class AfvalAlertCollector(WasteCollector):
         self.main_url = "https://www.afvalalert.nl/kalender"
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from AfvalAlert")
         get_url = '{}/{}/{}{}'.format(
                 self.main_url, self.postcode, self.street_number, self.suffix)
         return requests.get(get_url)
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using AfvalAlert API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -251,6 +281,9 @@ class AfvalAlertCollector(WasteCollector):
 
 
 class AfvalwijzerCollector(WasteCollector):
+    """
+    Collector for Afvalwijzer waste data.
+    """
     WASTE_TYPE_MAPPING = {
         'dhm': WASTE_TYPE_PAPER_PMD,
         'restgft': WASTE_TYPE_GREENGREY,
@@ -278,11 +311,13 @@ class AfvalwijzerCollector(WasteCollector):
         self.waste_collector_url = self.waste_collector
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from Afvalwijzer")
         get_url = 'https://api.{}.nl/webservices/appsinput/?apikey={}&method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&app_name=afvalwijzer&platform=web&afvaldata={}&langs=nl'.format(
                 self.waste_collector_url, self.apikey, self.postcode, self.street_number, self.suffix, datetime.today().strftime('%Y-%m-%d'))
         return requests.get(get_url)
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using Afvalwijzer API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -324,6 +359,9 @@ class AfvalwijzerCollector(WasteCollector):
 
 
 class BurgerportaalCollector(WasteCollector):
+    """
+    Collector for Burgerportaal waste data.
+    """
     WASTE_TYPE_MAPPING = {
         'gft': WASTE_TYPE_GREEN,
         'opk': WASTE_TYPE_PAPER,
@@ -340,6 +378,7 @@ class BurgerportaalCollector(WasteCollector):
         self.address_id = ''
 
     def __fetch_refresh_token(self):
+        _LOGGER.debug("Fetching refresh token from Burgerportaal")
         response = requests.post("https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={}".format(self.apikey)).json()
         if not response:
             _LOGGER.error('Unable to fetch refresh token!')
@@ -348,6 +387,7 @@ class BurgerportaalCollector(WasteCollector):
         self.id_token = response['idToken']
         
     def __fetch_id_token(self):
+        _LOGGER.debug("Fetching ID token from Burgerportaal")
         headers = { 
             'Content-Type': 'application/x-www-form-urlencoded'
         }
@@ -364,6 +404,7 @@ class BurgerportaalCollector(WasteCollector):
         self.id_token = response['id_token']
         
     def __fetch_address_id(self):
+        _LOGGER.debug("Fetching address ID from Burgerportaal")
         headers = { 
             'authorization': self.id_token
         }
@@ -383,6 +424,7 @@ class BurgerportaalCollector(WasteCollector):
             self.address_id = response[0]['addressId']
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from Burgerportaal")
         headers = { 
             'authorization': self.id_token
         }
@@ -392,6 +434,7 @@ class BurgerportaalCollector(WasteCollector):
         return response
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using Burgerportaal API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -432,6 +475,9 @@ class BurgerportaalCollector(WasteCollector):
 
 
 class CirculusCollector(WasteCollector):
+    """
+    Collector for Circulus waste data.
+    """
     WASTE_TYPE_MAPPING = {
         # 'BRANCHES': WASTE_TYPE_BRANCHES,
         # 'BULKLITTER': WASTE_TYPE_BULKLITTER,
@@ -453,6 +499,7 @@ class CirculusCollector(WasteCollector):
         self.main_url = "https://mijn.circulus.nl"
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from Circulus")
         r = requests.get(self.main_url)
         cookies = r.cookies
         session_cookie = ""
@@ -511,6 +558,7 @@ class CirculusCollector(WasteCollector):
             _LOGGER.error("Unable to get Logged-in Cookie")
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using Circulus API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -542,6 +590,9 @@ class CirculusCollector(WasteCollector):
 
 
 class CleanprofsCollector(WasteCollector):
+    """
+    Collector for Cleanprofs waste data.
+    """
     WASTE_TYPE_MAPPING = {
         'GFT': WASTE_TYPE_GREEN,
         'RST': WASTE_TYPE_GREY,
@@ -552,11 +603,13 @@ class CleanprofsCollector(WasteCollector):
         self.main_url = "https://cleanprofs.jmsdev.nl/"
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from Cleanprofs")
         get_url = '{}api/get-plannings-address?zipcode={}&house_number={}'.format(
                 self.main_url, self.postcode, self.street_number)
         return requests.get(get_url)
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using Cleanprofs API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -590,6 +643,9 @@ class CleanprofsCollector(WasteCollector):
 
 
 class DeAfvalAppCollector(WasteCollector):
+    """
+    Collector for DeAfvalApp waste data.
+    """
     WASTE_TYPE_MAPPING = {
         'gemengde plastics': WASTE_TYPE_PLASTIC,
         'zak_blauw': WASTE_TYPE_GREY,
@@ -603,11 +659,13 @@ class DeAfvalAppCollector(WasteCollector):
         self.main_url = "http://dataservice.deafvalapp.nl"
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from DeAfvalApp")
         get_url = '{}/dataservice/DataServiceServlet?service=OPHAALSCHEMA&land=NL&postcode={}&straatId=0&huisnr={}&huisnrtoev={}'.format(
                 self.main_url, self.postcode, self.street_number, self.suffix)
         return requests.get(get_url)
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using DeAfvalApp API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -642,6 +700,9 @@ class DeAfvalAppCollector(WasteCollector):
 
 
 class LimburgNetCollector(WasteCollector):
+    """
+    Collector for Limburg.net waste data.
+    """
     WASTE_TYPE_MAPPING = {
         # 'tak-snoeiafval': WASTE_TYPE_BRANCHES,
         # 'gemengde plastics': WASTE_TYPE_PLASTIC,
@@ -671,6 +732,7 @@ class LimburgNetCollector(WasteCollector):
         self.street_id = None
 
     def __fetch_address(self):
+        _LOGGER.debug("Fetching address from Limburg.net")
         response = requests.get('{}/afval-kalender/gemeenten/search?query={}'.format(
             self.main_url, self.city_name)).json()
 
@@ -690,6 +752,7 @@ class LimburgNetCollector(WasteCollector):
         self.street_id = response[0]['nummer']
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from Limburg.net")
         data = []
         
         for x in range(0, 3):
@@ -707,6 +770,7 @@ class LimburgNetCollector(WasteCollector):
         return data
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using Limburg.net API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -742,6 +806,9 @@ class LimburgNetCollector(WasteCollector):
 
 
 class MontferlandNetCollector(WasteCollector):
+    """
+    Collector for Montferland waste data.
+    """
     WASTE_TYPE_MAPPING = {
         'Glas': WASTE_TYPE_GLASS,
         'GFT': WASTE_TYPE_GREEN,
@@ -760,6 +827,7 @@ class MontferlandNetCollector(WasteCollector):
         self.adres_id = None
 
     def __fetch_address(self):
+        _LOGGER.debug("Fetching address from Montferland")
         response = requests.get('{}Login.ashx{}&Postcode={}&Huisnummer={}&Toevoeging='.format(
             self.main_url, self.query_start, self.postcode, self.street_number, self.suffix)).json()
 
@@ -775,6 +843,7 @@ class MontferlandNetCollector(WasteCollector):
         self.administratie_id = response[0]["AdministratieID"]
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from Montferland")
         data = []
         
         today = datetime.today()
@@ -787,6 +856,7 @@ class MontferlandNetCollector(WasteCollector):
         return data
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using Montferland API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -822,6 +892,9 @@ class MontferlandNetCollector(WasteCollector):
 
 
 class OmrinCollector(WasteCollector):
+    """
+    Collector for Omrin waste data.
+    """
     WASTE_TYPE_MAPPING = {
         # 'BRANCHES': WASTE_TYPE_BRANCHES,
         'Grofvuil': WASTE_TYPE_BULKLITTER,
@@ -848,10 +921,12 @@ class OmrinCollector(WasteCollector):
         self.publicKey = None
 
     def __fetch_publickey(self):
+        _LOGGER.debug("Fetching public key from Omrin")
         response = requests.post("{}/GetToken/".format(self.main_url), json={'AppId': self.appId, 'AppVersion': '', 'OsVersion': '', 'Platform': 'HomeAssistant'}).json()
         self.publicKey = b64decode(response['PublicKey'])
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from Omrin")
         rsaPublicKey = RSA.importKey(self.publicKey)
         requestBody = {'a': False, 'Email': None, 'Password': None, 'PostalCode': self.postcode, 'HouseNumber': self.street_number}
 
@@ -862,6 +937,7 @@ class OmrinCollector(WasteCollector):
         return response['CalendarV2']
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using Omrin API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         try:
@@ -899,6 +975,9 @@ class OmrinCollector(WasteCollector):
 
 
 class OpzetCollector(WasteCollector):
+    """
+    Collector for Opzet waste data.
+    """
     WASTE_TYPE_MAPPING = {
         'pbd/papier': WASTE_TYPE_PAPER_PMD,
         'snoeiafval': WASTE_TYPE_BRANCHES,
@@ -932,6 +1011,7 @@ class OpzetCollector(WasteCollector):
             self._verify = True
 
     def __fetch_address(self):
+        _LOGGER.debug("Fetching address from Opzet")
         response = requests.get(
             "{}/rest/adressen/{}-{}".format(self.main_url, self.postcode, self.street_number), verify=self._verify).json()
 
@@ -948,12 +1028,14 @@ class OpzetCollector(WasteCollector):
             self.bag_id = response[0]['bagId']
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from Opzet")
         get_url = "{}/rest/adressen/{}/afvalstromen".format(
                 self.main_url,
                 self.bag_id)
         return requests.get(get_url, verify=self._verify)
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using Opzet API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -991,6 +1073,9 @@ class OpzetCollector(WasteCollector):
 
 
 class RD4Collector(WasteCollector):
+    """
+    Collector for RD4 waste data.
+    """
     WASTE_TYPE_MAPPING = {
         'pruning': WASTE_TYPE_BRANCHES,
         # 'sloop': WASTE_TYPE_BULKLITTER,
@@ -1015,6 +1100,7 @@ class RD4Collector(WasteCollector):
         self.postcode = self.postcode_split.group(1) + '+' + self.postcode_split.group(2).upper()
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from RD4")
         self.today = datetime.today()
         self.year = self.today.year
         response = requests.get(
@@ -1023,6 +1109,7 @@ class RD4Collector(WasteCollector):
         return response
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using RD4 API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -1060,6 +1147,9 @@ class RD4Collector(WasteCollector):
 
 
 class ROVACollector(WasteCollector):
+    """
+    Collector for ROVA waste data.
+    """
     WASTE_TYPE_MAPPING = {
         'gft': WASTE_TYPE_GREEN,
         'papier': WASTE_TYPE_PAPER,
@@ -1071,6 +1161,7 @@ class ROVACollector(WasteCollector):
         self.main_url = 'https://www.rova.nl'
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from ROVA")
         self.today = datetime.today()
         self.year = self.today.year
         response = requests.get(
@@ -1079,6 +1170,7 @@ class ROVACollector(WasteCollector):
         return response
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using ROVA API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -1111,6 +1203,9 @@ class ROVACollector(WasteCollector):
 
 
 class RecycleApp(WasteCollector):
+    """
+    Collector for RecycleApp waste data.
+    """
     WASTE_TYPE_MAPPING = {
         'grof': WASTE_TYPE_BULKLITTER,
         # 'glas': WASTE_TYPE_GLASS,
@@ -1148,6 +1243,7 @@ class RecycleApp(WasteCollector):
         self.street_id = ''
 
     def __get_headers(self):
+        _LOGGER.debug("Getting headers for RecycleApp")
         headers = { 
             'x-secret': self.xsecret,
             'x-consumer': self.xconsumer,
@@ -1157,6 +1253,7 @@ class RecycleApp(WasteCollector):
         return headers
 
     def __get_access_token(self):
+        _LOGGER.debug("Fetching access token from RecycleApp")
         response = requests.get("{}access-token".format(self.main_url), headers=self.__get_headers())
         if response.status_code != 200:
             _LOGGER.error('Invalid response from server for accessToken')
@@ -1164,6 +1261,7 @@ class RecycleApp(WasteCollector):
         self.accessToken = response.json()['accessToken']
     
     def __get_location_ids(self):
+        _LOGGER.debug("Fetching location IDs from RecycleApp")
         response = requests.get("{}zipcodes?q={}".format(self.main_url, self.postcode), headers=self.__get_headers())
         if response.status_code == 401:
             self.__get_access_token()
@@ -1183,6 +1281,7 @@ class RecycleApp(WasteCollector):
             self.street_id = response.json()['items'][0]['id']
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from RecycleApp")
         startdate = datetime.now().strftime("%Y-%m-%d")
         enddate = (datetime.now() + timedelta(days=+60)).strftime("%Y-%m-%d")
         response = requests.get("{}collections?zipcodeId={}&streetId={}&houseNumber={}&fromDate={}&untilDate={}&size=100".format(
@@ -1196,6 +1295,7 @@ class RecycleApp(WasteCollector):
         return response
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using RecycleApp API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         try:
@@ -1244,6 +1344,9 @@ class RecycleApp(WasteCollector):
 
 
 class XimmioCollector(WasteCollector):
+    """
+    Collector for Ximmio waste data.
+    """
     WASTE_TYPE_MAPPING = {
         'BRANCHES': WASTE_TYPE_BRANCHES,
         'BULKLITTER': WASTE_TYPE_BULKLITTER,
@@ -1282,6 +1385,7 @@ class XimmioCollector(WasteCollector):
         self.address_id = address_id if address_id else None
 
     def __fetch_address(self):
+        _LOGGER.debug("Fetching address from Ximmio")
         data = {
             "postCode": self.postcode,
             "houseNumber": self.street_number,
@@ -1305,6 +1409,7 @@ class XimmioCollector(WasteCollector):
         self.address_id = response['dataList'][0]['UniqueId']
 
     def __get_data(self):
+        _LOGGER.debug("Fetching data from Ximmio")
         data = {
             "uniqueAddressID": self.address_id,
             "startDate": datetime.now().strftime('%Y-%m-%d'),
@@ -1322,6 +1427,7 @@ class XimmioCollector(WasteCollector):
         return response
 
     async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using Ximmio API")
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
@@ -1356,6 +1462,7 @@ class XimmioCollector(WasteCollector):
 
 
 def get_wastedata_from_config(hass, config):
+    _LOGGER.debug("Getting WasteData from config")
     _LOGGER.debug("Get Rest API retriever")
     city_name = config.get(CONF_CITY_NAME)
     postcode = config.get(CONF_POSTCODE)
@@ -1414,4 +1521,5 @@ def get_wastedata_from_config(hass, config):
 
 
 def _format_id(waste_collector, postcode, house_number):
+    _LOGGER.debug(f"Formatting ID for waste_collector: {waste_collector}, postcode: {postcode}, house_number: {house_number}")
     return waste_collector + "-" + postcode + "-" + str(house_number)
