@@ -27,6 +27,7 @@ This sensor works with the following waste collectors:
   - DeFryskeMarren
   - DeAfvalApp
   - DenHaag
+  - Drimmelen
   - GAD
   - Hellendoorn
   - HVC
