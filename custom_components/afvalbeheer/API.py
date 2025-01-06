@@ -79,6 +79,11 @@ class WasteCollectionRepository(object):
         _LOGGER.debug("Getting available waste types")
         possible_waste_types = {collection.waste_type for collection in self.collections}
         return sorted(possible_waste_types, key=str.lower)
+    
+    def get_available_waste_type_slugs(self):
+        _LOGGER.debug("Getting available waste type slugs")
+        possible_waste_type_slugs = {collection.waste_type_slug for collection in self.collections}
+        return sorted(possible_waste_type_slugs, key=str.lower)
 
 
 class WasteCollection(object):
@@ -89,13 +94,15 @@ class WasteCollection(object):
     def __init__(self):
         self.date = None
         self.waste_type = None
+        self.waste_type_slug = None
         self.icon_data = None
 
     @classmethod
-    def create(cls, date, waste_type, icon_data=None):
+    def create(cls, date, waste_type, waste_type_slug, icon_data=None):
         collection = cls()
         collection.date = date
         collection.waste_type = waste_type
+        collection.waste_type_slug = waste_type_slug
         collection.icon_data = icon_data
         return collection
 
@@ -111,7 +118,7 @@ class WasteData(object):
     Manages waste data and schedules updates.
     """
 
-    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, custom_mapping, address_id, print_waste_type, update_interval, customer_id):
+    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, custom_mapping, address_id, print_waste_type, print_waste_type_slugs, update_interval, customer_id):
         self.hass = hass
         self.waste_collector = waste_collector
         self.city_name = city_name
@@ -121,6 +128,7 @@ class WasteData(object):
         self.suffix = suffix
         self.address_id = address_id
         self.print_waste_type = print_waste_type
+        self.print_waste_type_slugs = print_waste_type_slugs
         self.collector = None
         self.update_interval = update_interval
         self.customer_id = customer_id
@@ -180,6 +188,13 @@ class WasteData(object):
                 f'Available waste types: {", ".join(self.collector.collections.get_available_waste_types())}',
                 f'Afvalwijzer {self.waste_collector}',
                 f'{NOTIFICATION_ID}_availablewastetypes_{self.waste_collector}')
+            self.print_waste_type = False
+        if self.print_waste_type_slugs:
+            persistent_notification.create(
+                self.hass,
+                f'Waste type slugs used by API: {", ".join(self.collector.collections.get_available_waste_type_slugs())}',
+                f'Afvalwijzer {self.waste_collector}',
+                f'{NOTIFICATION_ID}_availablewastetypeslugs_{self.waste_collector}')
             self.print_waste_type = False
 
     @property
@@ -249,7 +264,6 @@ class AfvalAlertCollector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using AfvalAlert API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
@@ -271,7 +285,8 @@ class AfvalAlertCollector(WasteCollector):
 
                 collection = WasteCollection.create(
                     date=datetime.strptime(item['date'], '%Y-%m-%d'),
-                    waste_type=waste_type
+                    waste_type=waste_type,
+                    waste_type_slug=item['type']
                 )
                 if collection not in self.collections:
                     self.collections.add(collection)
@@ -319,7 +334,6 @@ class AfvalwijzerCollector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Afvalwijzer API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
@@ -349,7 +363,8 @@ class AfvalwijzerCollector(WasteCollector):
 
                 collection = WasteCollection.create(
                     date=datetime.strptime(item['date'], '%Y-%m-%d'),
-                    waste_type=waste_type
+                    waste_type=waste_type,
+                    waste_type_slug=item['type']
                 )
                 if collection not in self.collections:
                     self.collections.add(collection)
@@ -436,7 +451,6 @@ class BurgerportaalCollector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Burgerportaal API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
@@ -465,7 +479,8 @@ class BurgerportaalCollector(WasteCollector):
 
                 collection = WasteCollection.create(
                     date=datetime.strptime(item['collectionDate'].split("T")[0], '%Y-%m-%d'),
-                    waste_type=waste_type
+                    waste_type=waste_type,
+                    waste_type_slug=item['fraction'].lower()
                 )
                 if collection not in self.collections:
                     self.collections.add(collection)
@@ -560,7 +575,6 @@ class CirculusCollector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Circulus API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
@@ -579,9 +593,10 @@ class CirculusCollector(WasteCollector):
                         continue
 
                     collection = WasteCollection.create(
-                            date=datetime.strptime(date, '%Y-%m-%d'),
-                            waste_type=waste_type
-                        )
+                        date=datetime.strptime(date, '%Y-%m-%d'),
+                        waste_type=waste_type,
+                        waste_type_slug=item['code']
+                    )
                     if collection not in self.collections:
                         self.collections.add(collection)
 
@@ -611,7 +626,6 @@ class CleanprofsCollector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Cleanprofs API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
@@ -633,7 +647,8 @@ class CleanprofsCollector(WasteCollector):
 
                 collection = WasteCollection.create(
                     date=datetime.strptime(item['full_date'], '%Y-%m-%d').replace(tzinfo=None),
-                    waste_type=waste_type
+                    waste_type=waste_type,
+                    waste_type_slug=item['product_name']
                 )
                 if collection not in self.collections:
                     self.collections.add(collection)
@@ -667,7 +682,6 @@ class DeAfvalAppCollector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using DeAfvalApp API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
@@ -690,7 +704,8 @@ class DeAfvalAppCollector(WasteCollector):
 
                     collection = WasteCollection.create(
                         date=datetime.strptime(ophaaldatum, '%d-%m-%Y'),
-                        waste_type=waste_type
+                        waste_type=waste_type,
+                        waste_type_slug=rows.split(';')[0]
                     )
                     if collection not in self.collections:
                         self.collections.add(collection)
@@ -772,7 +787,6 @@ class LimburgNetCollector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Limburg.net API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
@@ -796,7 +810,8 @@ class LimburgNetCollector(WasteCollector):
 
                 collection = WasteCollection.create(
                     date=datetime.strptime(item['date'], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None),
-                    waste_type=waste_type
+                    waste_type=waste_type,
+                    waste_type_slug=item['title']
                 )
                 if collection not in self.collections:
                     self.collections.add(collection)
@@ -858,7 +873,6 @@ class MontferlandNetCollector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Montferland API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
@@ -882,7 +896,8 @@ class MontferlandNetCollector(WasteCollector):
 
                 collection = WasteCollection.create(
                     date=datetime.strptime(item['Datum'], '%Y-%m-%dT%H:%M:%S'),
-                    waste_type=waste_type
+                    waste_type=waste_type,
+                    waste_type_slug=item['Soort']
                 )
                 if collection not in self.collections:
                     self.collections.add(collection)
@@ -939,7 +954,6 @@ class OmrinCollector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Omrin API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         try:
             if not self.publicKey:
@@ -965,7 +979,8 @@ class OmrinCollector(WasteCollector):
 
                 collection = WasteCollection.create(
                     date=datetime.strptime(item['Datum'], '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None),
-                    waste_type=waste_type
+                    waste_type=waste_type,
+                    waste_type_slug=item['Omschrijving']
                 )
                 if collection not in self.collections:
                     self.collections.add(collection)
@@ -1037,7 +1052,6 @@ class OpzetCollector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Opzet API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
@@ -1063,6 +1077,7 @@ class OpzetCollector(WasteCollector):
                 collection = WasteCollection.create(
                     date=datetime.strptime(item['ophaaldatum'], '%Y-%m-%d'),
                     waste_type=waste_type,
+                    waste_type_slug=item['menu_title'],
                     icon_data=item['icon_data']
                 )
                 if collection not in self.collections:
@@ -1111,7 +1126,6 @@ class RD4Collector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using RD4 API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
@@ -1137,7 +1151,8 @@ class RD4Collector(WasteCollector):
 
                 collection = WasteCollection.create(
                     date=datetime.strptime(date, "%Y-%m-%d"),
-                    waste_type=waste_type
+                    waste_type=waste_type,
+                    waste_type_slug=item['type']
                 )
                 if collection not in self.collections:
                     self.collections.add(collection)
@@ -1172,7 +1187,6 @@ class ROVACollector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using ROVA API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
@@ -1193,7 +1207,8 @@ class ROVACollector(WasteCollector):
 
                 collection = WasteCollection.create(
                     date=datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z').replace(tzinfo=None),
-                    waste_type=waste_type
+                    waste_type=waste_type,
+                    waste_type_slug=item["wasteType"]["title"]
                 )
                 if collection not in self.collections:
                     self.collections.add(collection)
@@ -1297,7 +1312,6 @@ class RecycleApp(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using RecycleApp API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         try:
             await self.hass.async_add_executor_job(self.__get_access_token)
@@ -1334,7 +1348,8 @@ class RecycleApp(WasteCollector):
 
                 collection = WasteCollection.create(
                     date=datetime.strptime(item['timestamp'], '%Y-%m-%dT%H:%M:%S.000Z'),
-                    waste_type=waste_type
+                    waste_type=waste_type,
+                    waste_type_slug=item['fraction']['name']['nl']
                 )
                 if collection not in self.collections:
                     self.collections.add(collection)
@@ -1343,6 +1358,74 @@ class RecycleApp(WasteCollector):
             _LOGGER.error('Error occurred while fetching data: %r', exc)
             return False
 
+
+class StraatbeeldCollector(WasteCollector):
+    """
+    Collector for Straatbeeld waste data.
+    """
+    WASTE_TYPE_MAPPING = {
+        'gft': WASTE_TYPE_GREEN,
+        'rest': WASTE_TYPE_GREY,
+        'pmd': WASTE_TYPE_PACKAGES,
+        'papier': WASTE_TYPE_PAPER,
+        'kerstboom': WASTE_TYPE_TREE,
+    }
+
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
+        self.main_url = "https://drimmelen-afvalkalender-api.straatbeeld.online"
+
+    def __get_data(self):
+        _LOGGER.debug("Fetching data from Straatbeeld")
+        data = {
+            "postal_code": self.postcode,
+            "house_number": self.street_number,
+            "house_letter": self.suffix,
+        }
+
+        return requests.post(f"{self.main_url}/find-address", data=data)
+
+    async def update(self):
+        _LOGGER.debug("Updating Waste collection dates using Straatbeeld API")
+
+        self.collections.remove_all()
+
+        try:
+            r = await self.hass.async_add_executor_job(self.__get_data)
+            if r.status_code != 200:
+                _LOGGER.error('Invalid response from server for collection data')
+                return
+            response = r.json()
+
+            if not response:
+                _LOGGER.error('No Waste data found!')
+                return
+
+            self.collections.remove_all()
+
+            for _, months in response['collections'].items():
+                for _, days in months.items():
+                    for day in days:
+
+                        date = datetime.strptime(day['date']['formatted'], '%Y-%m-%d')
+
+                        for item in day['data']:
+
+                            waste_type = self.map_waste_type(item['id'])
+                            if not waste_type:
+                                continue
+
+                            collection = WasteCollection.create(
+                                date=date,
+                                waste_type=waste_type,
+                                waste_type_slug=item['id']
+                            )
+                            if collection not in self.collections:
+                                self.collections.add(collection)
+
+        except requests.exceptions.RequestException as exc:
+            _LOGGER.error('Error occurred while fetching data: %r', exc)
+            return False
 
 class XimmioCollector(WasteCollector):
     """
@@ -1429,7 +1512,6 @@ class XimmioCollector(WasteCollector):
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Ximmio API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
 
         self.collections.remove_all()
 
@@ -1452,79 +1534,11 @@ class XimmioCollector(WasteCollector):
 
                     collection = WasteCollection.create(
                         date=datetime.strptime(date, '%Y-%m-%dT%H:%M:%S'),
-                        waste_type=waste_type
+                        waste_type=waste_type,
+                        waste_type_slug=item['_pickupTypeText']
                     )
                     if collection not in self.collections:
                         self.collections.add(collection)
-
-        except requests.exceptions.RequestException as exc:
-            _LOGGER.error('Error occurred while fetching data: %r', exc)
-            return False
-
-
-class StraatbeeldCollector(WasteCollector):
-    """
-    Collector for Straatbeeld waste data.
-    """
-    WASTE_TYPE_MAPPING = {
-        'gft': WASTE_TYPE_GREEN,
-        'rest': WASTE_TYPE_GREY,
-        'pmd': WASTE_TYPE_PACKAGES,
-        'papier': WASTE_TYPE_PAPER,
-        'kerstboom': WASTE_TYPE_TREE,
-    }
-
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
-        self.main_url = "https://drimmelen-afvalkalender-api.straatbeeld.online"
-
-    def __get_data(self):
-        _LOGGER.debug("Fetching data from Straatbeeld")
-        data = {
-            "postal_code": self.postcode,
-            "house_number": self.street_number,
-            "house_letter": self.suffix,
-        }
-
-        return requests.post(f"{self.main_url}/find-address", data=data)
-
-    async def update(self):
-        _LOGGER.debug("Updating Waste collection dates using Straatbeeld API")
-        _LOGGER.debug('Updating Waste collection dates using Rest API')
-
-        self.collections.remove_all()
-
-        try:
-            r = await self.hass.async_add_executor_job(self.__get_data)
-            if r.status_code != 200:
-                _LOGGER.error('Invalid response from server for collection data')
-                return
-            response = r.json()
-
-            if not response:
-                _LOGGER.error('No Waste data found!')
-                return
-
-            self.collections.remove_all()
-
-            for _, months in response['collections'].items():
-                for _, days in months.items():
-                    for day in days:
-
-                        date = datetime.strptime(day['date']['formatted'], '%Y-%m-%d')
-
-                        for item in day['data']:
-
-                            waste_type = self.map_waste_type(item['id'])
-                            if not waste_type:
-                                continue
-
-                            collection = WasteCollection.create(
-                                date=date,
-                                waste_type=waste_type
-                            )
-                            if collection not in self.collections:
-                                self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
@@ -1542,6 +1556,7 @@ def get_wastedata_from_config(hass, config):
     address_id = config.get(CONF_ADDRESS_ID)
     waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
     print_waste_type = config.get(CONF_PRINT_AVAILABLE_WASTE_TYPES)
+    print_waste_type_slugs = config.get(CONF_PRINT_AVAILABLE_WASTE_TYPE_SLUGS)
     update_interval = config.get(CONF_UPDATE_INTERVAL)
     customer_id = config.get(CONF_CUSTOMER_ID)
     custom_mapping = config.get(CONF_CUSTOM_MAPPING)
@@ -1585,6 +1600,7 @@ def get_wastedata_from_config(hass, config):
         custom_mapping,
         address_id,
         print_waste_type,
+        print_waste_type_slugs,
         update_interval,
         customer_id,
     )
