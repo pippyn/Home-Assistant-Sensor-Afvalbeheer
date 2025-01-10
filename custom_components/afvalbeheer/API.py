@@ -732,12 +732,13 @@ class GemeenteAmsterdamCollector(WasteCollector):
         self.waste_collector_url = "https://api.data.amsterdam.nl/v1/afvalwijzer/afvalwijzer"
 
     def __get_data(self):
-        if not self.suffix:
-            get_url = '{}/?huisnummer={}&postcode={}'.format(
-                self.waste_collector_url, self.street_number, self.postcode)
-        else:
-            get_url = '{}/?huisnummer={}&huisletter={}&postcode={}'.format(
-                self.waste_collector_url, self.street_number, self.suffix, self.postcode)
+        params = {
+            'postcode': self.postcode,
+            'huisnummer': self.street_number,
+            'huisletter': self.suffix
+        }
+        filtered_params = {k: v for k, v in params.items() if v}
+        get_url = '{}/?{}'.format(self.waste_collector_url, '&'.join('{}={}'.format(k, v) for k, v in filtered_params.items()))
         return requests.get(get_url)
     
     def date_in_future(self, dates_list, current_date):
