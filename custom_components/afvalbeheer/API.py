@@ -154,6 +154,7 @@ class WasteData(object):
             "cleanprofs": (CleanprofsCollector, common_args),
             "rova": (ROVACollector, common_args),
             "drimmelen": (StraatbeeldCollector, common_args),
+            "gemeenteamsterdam": (GemeenteAmsterdamCollector, common_args),
             **{key: (BurgerportaalCollector, common_args) for key in BURGERPORTAAL_COLLECTOR_IDS.keys()},
             **{key: (OpzetCollector, common_args) for key in OPZET_COLLECTOR_URLS.keys()},
         }
@@ -709,6 +710,138 @@ class DeAfvalAppCollector(WasteCollector):
                     )
                     if collection not in self.collections:
                         self.collections.add(collection)
+
+        except requests.exceptions.RequestException as exc:
+            _LOGGER.error('Error occurred while fetching data: %r', exc)
+            return False
+
+
+class GemeenteAmsterdamCollector(WasteCollector):
+    WASTE_TYPE_MAPPING = {
+        'ga': WASTE_TYPE_BULKLITTER,
+        'glas': WASTE_TYPE_GLASS,
+        'gft': WASTE_TYPE_GREEN,
+        'rest': WASTE_TYPE_GREY,
+        'papier': WASTE_TYPE_PAPER,
+        'textiel': WASTE_TYPE_TEXTILE,
+        'plastic': WASTE_TYPE_PMD_GREY,
+    }
+
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
+        self.waste_collector_url = "https://api.data.amsterdam.nl/v1/afvalwijzer/afvalwijzer"
+
+    def __get_data(self):
+        if not self.suffix:
+            get_url = '{}/?huisnummer={}&postcode={}'.format(
+                self.waste_collector_url, self.street_number, self.postcode)
+        else:
+            get_url = '{}/?huisnummer={}&huisletter={}&postcode={}'.format(
+                self.waste_collector_url, self.street_number, self.suffix, self.postcode)
+        return requests.get(get_url)
+    
+    def date_in_future(self, dates_list, current_date):
+        dates = []
+        for instance in range(len(dates_list)):
+            if dates_list[instance] > current_date:
+                dates.append(dates_list[instance])
+        return dates
+
+    def generate_dates_for_year(self, day_delta, week_interval, even_weeks, current_date):
+        dates = []
+        week_offset = 0
+        while week_offset <= 52:
+            date = (current_date + timedelta(days=day_delta, weeks=week_offset))
+            # IF statement to account for 52week years vs 53week years
+            if ((date.isocalendar()[1]%2 == 0) and not even_weeks) or ((date.isocalendar()[1]%2 > 0) and even_weeks):
+                date = date - timedelta(weeks=1)
+                if dates[(len(dates)-1)] == date:
+                    date = (date + timedelta(weeks=2))
+                    week_offset = week_offset + 1
+                elif ((date.isocalendar()[1]%2 > 0) and even_weeks):
+                    date = (date + timedelta(weeks=2))
+                    week_offset = week_offset + 2
+                else:
+                    week_offset = week_offset - 1
+            dates.append(date)
+            week_offset = week_offset + week_interval
+        return dates
+
+    async def update(self):
+        _LOGGER.debug('Updating Waste collection dates using Rest API')
+
+        self.collections.remove_all()
+
+        try:
+            r = await self.hass.async_add_executor_job(self.__get_data)
+            response = r.json()
+
+            if (len(response['_embedded']['afvalwijzer']) < 1):
+                _LOGGER.error('No Waste data found!')
+                return
+
+            for item in response['_embedded']['afvalwijzer']:
+                if not item['afvalwijzerAfvalkalenderFrequentie']:
+                    continue
+
+                if not item['afvalwijzerFractieCode']:
+                    continue
+
+                if not item['afvalwijzerOphaaldagen']:
+                    continue
+
+                waste_type = self.map_waste_type(item['afvalwijzerFractieCode'].lower())
+                if not waste_type:
+                    continue
+                
+                today = datetime.now()
+                collection_days = item['afvalwijzerOphaaldagen'].replace(' ', '').split(',')
+                for day in collection_days:
+                    match day:
+                        case 'maandag':
+                            week_day = 1
+                        case 'dinsdag':
+                            week_day = 2
+                        case 'woensdag':
+                            week_day = 3
+                        case 'donderdag':
+                            week_day = 4
+                        case 'vrijdag':
+                            week_day = 5
+                        case 'zaterdag':
+                            week_day = 6
+                        case 'zondag':
+                            week_day = 7
+                    if 'weken' in item['afvalwijzerAfvalkalenderFrequentie']:
+                        match item['afvalwijzerAfvalkalenderFrequentie']:
+                            case 'oneven weken':
+                                if today.isocalendar()[1]%2 == 0:
+                                    day_delta = (week_day - today.isocalendar()[2]) + 7
+                                elif today.isocalendar()[2] > week_day:
+                                    day_delta = (week_day - today.isocalendar()[2]) + 14
+                                else:
+                                    day_delta = week_day - today.isocalendar()[2]
+                                future_dates = self.generate_dates_for_year(day_delta, 2, False, today)
+                            case "even weken":
+                                if today.isocalendar()[1]%2 > 0:
+                                    day_delta = (week_day - today.isocalendar()[2]) + 7
+                                elif today.isocalendar()[2] > week_day:
+                                    day_delta = (week_day - today.isocalendar()[2]) + 14
+                                else:
+                                    day_delta = week_day - today.isocalendar()[2]
+                                future_dates = self.generate_dates_for_year(day_delta, 2, True, today)
+                    else:
+                        item["afvalwijzerAfvalkalenderFrequentie"] = item["afvalwijzerAfvalkalenderFrequentie"].replace(" ", ".").replace("./", "").replace(".", ",").split(",")
+                        dates = [datetime.strptime(date, "%d-%m-%y") for date in item["afvalwijzerAfvalkalenderFrequentie"]]
+                        future_dates = self.date_in_future(dates, today)
+                    
+                    for date in future_dates:  
+                        collection = WasteCollection.create(
+                            date=datetime.strptime(date.strftime('%Y-%m-%d'), '%Y-%m-%d'),
+                            waste_type=waste_type
+                        )
+                        if collection not in self.collections:
+                            self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
