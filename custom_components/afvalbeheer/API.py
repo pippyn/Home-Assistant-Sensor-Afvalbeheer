@@ -748,22 +748,23 @@ class GemeenteAmsterdamCollector(WasteCollector):
                 dates.append(dates_list[instance])
         return dates
 
-    def generate_dates_for_year(self, day_delta, week_interval, even_weeks, current_date):
+    def generate_dates_for_year(self, day_delta, week_interval, current_date, even_weeks = False):
         dates = []
         week_offset = 0
         while week_offset <= 52:
             date = (current_date + timedelta(days=day_delta, weeks=week_offset))
-            # IF statement to account for 52week years vs 53week years
-            if ((date.isocalendar()[1]%2 == 0) and not even_weeks) or ((date.isocalendar()[1]%2 > 0) and even_weeks):
-                date = date - timedelta(weeks=1)
-                if dates[(len(dates)-1)] == date:
-                    date = (date + timedelta(weeks=2))
-                    week_offset = week_offset + 1
-                elif ((date.isocalendar()[1]%2 > 0) and even_weeks):
-                    date = (date + timedelta(weeks=2))
-                    week_offset = week_offset + 2
-                else:
-                    week_offset = week_offset - 1
+            if week_interval > 1:
+                # IF statement to account for 52week years vs 53week years
+                if ((date.isocalendar()[1]%2 == 0) and not even_weeks) or ((date.isocalendar()[1]%2 > 0) and even_weeks):
+                    date = date - timedelta(weeks=1)
+                    if dates[(len(dates)-1)] == date:
+                        date = (date + timedelta(weeks=2))
+                        week_offset = week_offset + 1
+                    elif ((date.isocalendar()[1]%2 > 0) and even_weeks):
+                        date = (date + timedelta(weeks=2))
+                        week_offset = week_offset + 2
+                    else:
+                        week_offset = week_offset - 1
             dates.append(date)
             week_offset = week_offset + week_interval
         return dates
@@ -782,7 +783,10 @@ class GemeenteAmsterdamCollector(WasteCollector):
                 return
 
             for item in response['_embedded']['afvalwijzer']:
-                if not item['afvalwijzerAfvalkalenderFrequentie']:
+                if not item['afvalwijzerAfvalkalenderFrequentie'] and not item['afvalwijzerWaar']:
+                    continue
+
+                if not item['afvalwijzerAfvalkalenderFrequentie'] and (not 'stoep' in item['afvalwijzerWaar']):
                     continue
 
                 if not item['afvalwijzerFractieCode']:
@@ -813,9 +817,15 @@ class GemeenteAmsterdamCollector(WasteCollector):
                             week_day = 6
                         case 'zondag':
                             week_day = 7
-                    if 'weken' in item['afvalwijzerAfvalkalenderFrequentie']:
-                        match item['afvalwijzerAfvalkalenderFrequentie']:
-                            case 'oneven weken':
+                    if not item['afvalwijzerAfvalkalenderFrequentie']:
+                        if today.isocalendar()[2] > week_day:
+                            day_delta = (week_day - today.isocalendar()[2]) + 7
+                        else:
+                            day_delta = (week_day - today.isocalendar()[2])
+                        future_dates = self.generate_dates_for_year(day_delta, 1, today)
+                    elif ('weken' in item['afvalwijzerAfvalkalenderFrequentie']) or ('week' in item['afvalwijzerAfvalkalenderFrequentie']):
+                        match item['afvalwijzerAfvalkalenderFrequentie'].replace(' weken', '').replace(' week', ''):
+                            case 'oneven':
                                 if today.isocalendar()[1]%2 == 0:
                                     day_delta = (week_day - today.isocalendar()[2]) + 7
                                 elif today.isocalendar()[2] > week_day:
@@ -823,7 +833,7 @@ class GemeenteAmsterdamCollector(WasteCollector):
                                 else:
                                     day_delta = week_day - today.isocalendar()[2]
                                 future_dates = self.generate_dates_for_year(day_delta, 2, False, today)
-                            case "even weken":
+                            case 'even':
                                 if today.isocalendar()[1]%2 > 0:
                                     day_delta = (week_day - today.isocalendar()[2]) + 7
                                 elif today.isocalendar()[2] > week_day:
@@ -832,8 +842,17 @@ class GemeenteAmsterdamCollector(WasteCollector):
                                     day_delta = week_day - today.isocalendar()[2]
                                 future_dates = self.generate_dates_for_year(day_delta, 2, True, today)
                     else:
-                        item["afvalwijzerAfvalkalenderFrequentie"] = item["afvalwijzerAfvalkalenderFrequentie"].replace(" ", ".").replace("./", "").replace(".", ",").split(",")
-                        dates = [datetime.strptime(date, "%d-%m-%y") for date in item["afvalwijzerAfvalkalenderFrequentie"]]
+                        item['afvalwijzerAfvalkalenderFrequentie'] = item['afvalwijzerAfvalkalenderFrequentie'].replace(' ', '.').replace('./', '').replace('.', ',').split(',')
+                        dates = []
+                        for date in item['afvalwijzerAfvalkalenderFrequentie']:
+                            try:
+                                dates.append(datetime.strptime(date, '%d-%m-%y'))
+                            except ValueError as ve1:
+                                _LOGGER.warning('Date provided in different formate resulting in ValueError 1:', ve1)
+                                try:
+                                    dates.append(datetime.strptime(date, '%d-%m-%Y'))
+                                except ValueError as ve2:
+                                    _LOGGER.warning('Unexpected date format resulting in ValueError 2:', ve2)
                         future_dates = self.date_in_future(dates, today)
                     
                     for date in future_dates:  
