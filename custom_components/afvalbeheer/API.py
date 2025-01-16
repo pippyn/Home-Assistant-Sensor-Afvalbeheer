@@ -437,7 +437,7 @@ class BurgerportaalCollector(WasteCollector):
                     self.address_id = address['addressId']
 
         if not self.address_id:
-            self.address_id = response[0]['addressId']
+            self.address_id = response[-1]['addressId']
 
     def __get_data(self):
         _LOGGER.debug("Fetching data from Burgerportaal")
