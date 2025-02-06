@@ -265,8 +265,6 @@ class AfvalAlertCollector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using AfvalAlert API")
 
-        self.collections.remove_all()
-
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
@@ -274,6 +272,8 @@ class AfvalAlertCollector(WasteCollector):
             if not response:
                 _LOGGER.error('No Waste data found!')
                 return
+            
+            self.collections.remove_all()
 
             for item in response['items']:
                 if not item['date']:
@@ -335,8 +335,6 @@ class AfvalwijzerCollector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Afvalwijzer API")
 
-        self.collections.remove_all()
-
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
@@ -352,6 +350,8 @@ class AfvalwijzerCollector(WasteCollector):
             if not data:
                 _LOGGER.error('No Waste data found!')
                 return
+            
+            self.collections.remove_all()
 
             for item in data:
                 if not item['date']:
@@ -452,8 +452,6 @@ class BurgerportaalCollector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Burgerportaal API")
 
-        self.collections.remove_all()
-
         try:
             if not self.refresh_token:
                 await self.hass.async_add_executor_job(self.__fetch_refresh_token)
@@ -469,6 +467,8 @@ class BurgerportaalCollector(WasteCollector):
                 _LOGGER.error('No Waste data found!')
                 return
 
+            self.collections.remove_all()
+            
             for item in response:
                 if not item['collectionDate']:
                     continue
@@ -576,8 +576,6 @@ class CirculusCollector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Circulus API")
 
-        self.collections.remove_all()
-
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
@@ -585,6 +583,8 @@ class CirculusCollector(WasteCollector):
             if not response or 'customData' not in response or not response['customData']['response']['garbage']:
                 _LOGGER.error('No Waste data found!')
                 return
+            
+            self.collections.remove_all()
 
             for item in response['customData']['response']['garbage']:
                 for date in item['dates']:
@@ -627,8 +627,6 @@ class CleanprofsCollector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Cleanprofs API")
 
-        self.collections.remove_all()
-
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
@@ -636,6 +634,8 @@ class CleanprofsCollector(WasteCollector):
             if not response:
                 _LOGGER.error('No Waste data found!')
                 return
+            
+            self.collections.remove_all()
 
             for item in response:
                 if not item['full_date']:
@@ -683,8 +683,6 @@ class DeAfvalAppCollector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using DeAfvalApp API")
 
-        self.collections.remove_all()
-
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.text
@@ -692,6 +690,8 @@ class DeAfvalAppCollector(WasteCollector):
             if not response:
                 _LOGGER.error('No Waste data found!')
                 return
+            
+            self.collections.remove_all()
 
             for rows in response.strip().split('\n'):
                 waste_type = self.map_waste_type(rows.split(';')[0])
@@ -788,8 +788,6 @@ class LimburgNetCollector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Limburg.net API")
 
-        self.collections.remove_all()
-
         try:
             if not self.city_id or not self.street_id:
                 await self.hass.async_add_executor_job(self.__fetch_address)
@@ -799,6 +797,8 @@ class LimburgNetCollector(WasteCollector):
             if not response:
                 _LOGGER.error('No Waste data found!')
                 return
+            
+            self.collections.remove_all()
 
             for item in response:
                 if not item['date']:
@@ -874,8 +874,6 @@ class MontferlandNetCollector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Montferland API")
 
-        self.collections.remove_all()
-
         try:
             if not self.administratie_id or not self.adres_id:
                 await self.hass.async_add_executor_job(self.__fetch_address)
@@ -885,6 +883,8 @@ class MontferlandNetCollector(WasteCollector):
             if not response:
                 _LOGGER.error('No Waste data found!')
                 return
+            
+            self.collections.remove_all()
 
             for item in response:
                 if not item['Datum']:
@@ -960,11 +960,12 @@ class OmrinCollector(WasteCollector):
                 await self.hass.async_add_executor_job(self.__fetch_publickey)
 
             response = await self.hass.async_add_executor_job(self.__get_data)
-            self.collections.remove_all()
 
             if not response:
                 _LOGGER.error('No Waste data found!')
                 return
+            
+            self.collections.remove_all()
 
             for item in response:
                 if not item['Datum']:
@@ -1053,8 +1054,6 @@ class OpzetCollector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Opzet API")
 
-        self.collections.remove_all()
-
         try:
             if not self.bag_id:
                 await self.hass.async_add_executor_job(self.__fetch_address)
@@ -1065,6 +1064,8 @@ class OpzetCollector(WasteCollector):
             if not response:
                 _LOGGER.error('No Waste data found!')
                 return
+            
+            self.collections.remove_all()
 
             for item in response:
                 if not item['ophaaldatum']:
@@ -1127,8 +1128,6 @@ class RD4Collector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using RD4 API")
 
-        self.collections.remove_all()
-
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
@@ -1140,6 +1139,8 @@ class RD4Collector(WasteCollector):
             if not response["success"]:
                 _LOGGER.error('Address not found!')
                 return
+            
+            self.collections.remove_all()
 
             for item in response["data"]["items"][0]:
 
@@ -1188,8 +1189,6 @@ class ROVACollector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using ROVA API")
 
-        self.collections.remove_all()
-
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
@@ -1197,6 +1196,8 @@ class ROVACollector(WasteCollector):
             if not response:
                 _LOGGER.error('No Waste data found!')
                 return
+            
+            self.collections.remove_all()
 
             for item in response:
                 waste_type = self.map_waste_type(item["wasteType"]["title"])
@@ -1388,8 +1389,6 @@ class StraatbeeldCollector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Straatbeeld API")
 
-        self.collections.remove_all()
-
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
             if r.status_code != 200:
@@ -1513,8 +1512,6 @@ class XimmioCollector(WasteCollector):
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Ximmio API")
 
-        self.collections.remove_all()
-
         try:
             if not self.address_id:
                 await self.hass.async_add_executor_job(self.__fetch_address)
@@ -1525,6 +1522,8 @@ class XimmioCollector(WasteCollector):
             if not response or not response['dataList']:
                 _LOGGER.error('No Waste data found!')
                 return
+            
+            self.collections.remove_all()
 
             for item in response['dataList']:
                 for date in item['pickupDates']:
