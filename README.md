@@ -4,7 +4,7 @@
 ## Home Assisant sensor component for Afvalbeheer
 
 Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API.
-This sensor works with the following waste collectors: Blink, Cure, Suez, ACV, Twente Milieu, Hellendoorn, Cyclus, DAR, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Schouwen-Duiveland, Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, SudwestFryslan, Montfoort, GAD, Cranendonck, ROVA, RD4, Limburg.NET, Afval Alert, RecycleApp, DeAfvalApp, Alkmaar, AreaReiniging, Almere, Waardlanden, Reinis, Avri, Omrin, BAR, RAD, Meppel, PreZero, Lingewaard Voorschoten, Westland and Middelburg-Vlissingen.
+This sensor works with the following waste collectors: Blink, Cure, Suez, ACV, TwenteMilieu, Hellendoorn, Cyclus, DAR, De Fryske Marren, HVC Groep, Meerlanden, RMN (Reinigingsbedrijf Midden Nederland), Schouwen-Duiveland, Peel en Maas, Purmerend, Circulus-Berkel (Afvalvrij), Avalex, Venray, Den Haag, Berkelland, Alphen aan den Rijn, Waalre, ZRD, Spaarnelanden, SudwestFryslan, Montfoort, GAD, Cranendonck, ROVA, RD4, RWM, Limburg.NET, Afval Alert, RecycleApp, DeAfvalApp, Alkmaar, AreaReiniging, Almere, Waardlanden, Reinis, Avri, Omrin, BAR, Assen, RAD, Meppel, Montferland, PreZero, Sliedrecht, Lingewaard Voorschoten, Westland, Ôffalkalinder, Afval3xBeter, Middelburg-Vlissingen, Saver, Drimmelen and Cleanprofs.
 
 Cure users should switch to the waste collector MijnAfvalwijzer
 
@@ -65,24 +65,29 @@ wastecollector:
 ```
 Choose your collector from this list:
   - ACV
+  - Afval3xBeter
   - Afvalstoffendienstkalender
   - AfvalAlert
   - Alkmaar
   - Almere
   - AlphenAanDenRijn
   - AreaReiniging
+  - Assen
   - Avalex
   - Avri
   - BAR
   - Berkelland
   - Blink
   - Circulus
+  - Cleanprofs
   - Cranendonck
   - Cure (use MijnAfvalwijzer)
   - Cyclus
   - DAR
   - DeAfvalApp
+  - DeFryskeMarren
   - DenHaag
+  - Drimmelen
   - GAD
   - Hellendoorn
   - HVC
@@ -93,7 +98,9 @@ Choose your collector from this list:
   - Middelburg-Vlissingen
   - MijnAfvalwijzer
   - Mijnafvalzaken
+  - Montferland
   - Montfoort
+  - Ôffalkalinder
   - Omrin
   - PeelEnMaas
   - PreZero
@@ -101,18 +108,22 @@ Choose your collector from this list:
   - RAD
   - RecycleApp (don't forget the streetname option)
   - RD4
+  - RWM
   - Reinis
   - ROVA
   - RMN
+  - Saver
   - Schouwen-Duiveland
+  - Sliedrecht
   - Spaarnelanden
   - SudwestFryslan
-  - Twente Milieu
+  - TwenteMilieu
   - Venray
   - Voorschoten
   - Waalre
   - Waardlanden
   - Westland
+  - Woerden
   - ZRD
 
 ### Resources
@@ -293,6 +304,14 @@ If you want to display the names of the days in dutch. Default is 0.
 updateinterval: 12
 ```
 If you want to adjust the update interval, you can set this option to the desired hours. Default is 12.
+
+### Custom mapping of waste fractions
+```yaml
+custommapping:
+  keukenafval: VET-goed
+  fraction2: New name for fraction2
+```
+Some wastecollectors use the wrong fraction name and with this option you can override the default mapping. E.g. Meppel uses keukenafval for the fraction VET-goed, which by default gets mapped to GFT. Default is empty.
 
 ### Customer ID for Ximmio commercial address
 ```yaml

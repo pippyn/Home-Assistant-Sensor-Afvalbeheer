@@ -5,24 +5,29 @@
 Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API. 
 This sensor works with the following waste collectors:
   - ACV
+  - Afval3xBeter
   - Afvalstoffendienstkalender
   - AfvalAlert
   - Alkmaar
   - Almere
   - AlphenAanDenRijn
   - AreaReiniging
+  - Assen
   - Avalex
   - Avri
   - BAR
   - Berkelland
   - Blink
-  - Circulus-Berkel
+  - Circulus
+  - Cleanprofs
   - Cranendonck
   - Cure (use MijnAfvalwijzer)
   - Cyclus
   - DAR
+  - DeFryskeMarren
   - DeAfvalApp
   - DenHaag
+  - Drimmelen
   - GAD
   - Hellendoorn
   - HVC
@@ -33,7 +38,9 @@ This sensor works with the following waste collectors:
   - Middelburg-Vlissingen
   - MijnAfvalwijzer
   - Mijnafvalzaken
+  - Montferland
   - Montfoort
+  - Ôffalkalinder
   - Omrin
   - PeelEnMaas
   - PreZero
@@ -41,18 +48,22 @@ This sensor works with the following waste collectors:
   - RAD
   - RecycleApp (don't forget the streetname option)
   - RD4
+  - RWM
   - Reinis
   - ROVA
   - RMN
+  - Saver
   - Schouwen-Duiveland
+  - Sliedrecht
   - Spaarnelanden
   - SudwestFryslan
-  - Twente Milieu
+  - TwenteMilieu
   - Venray
   - Voorschoten
   - Waalre
   - Waardlanden
   - Westland
+  - Woerden
   - ZRD
 
 ![alt text](https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/example.png)

@@ -1,32 +1,46 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 5.2.5 20230508
-20220829 - Major change: Added Calendar support (credits @WouterTuinstra)
-20220829 - Give persistant notifications unique id's
-20220901 - Code cleanup
-20220913 - Fix: translate today and tomorrow sensor
-20221010 - Restoring an entity and attributes on Home Assistant Restart
-20221015 - Fix Meerlanden
-20221018 - Restore entity picture
-20221019 - Add new icons
-20221021 - Fix for Mijn AfvalWijzer
-20221025 - Update RecycleApp token
-20221107 - Remove Unit of measurement for better history
-20221108 - Fix RecycleApp mapping
-20230104 - Remove deprecated DEVICE_CLASS_*
-20230123 - Change mapping for Afvalwijzer
-20230125 - Only add requested fractions to calendar
-20230208 - Add Dutch day abbreviations
-20230228 - Code refactor
-20230303 - New next upcoming sensor
-20230406 - Fix for calendar
-20230406 - New API for RMN and BAR
-20230407 - Fix mapping for BAR
-20230418 - Added support for suffix in address for RMN and BAR
-20230418 - Changed Dutch month names to lowercase
-20230424 - Fix RecycleApp authentication
-20230508 - Added support for Mijnafvalzaken
+Current Version: 5.6.3 20250206
+20230705 - Added support for Afval3xBeter
+20230822 - Fix icon for papier-pmd
+20230927 - Fix ZRD API
+20231206 - Fix suffix handling for Circulus
+20231208 - Fix naming of today and tomorrow sensors
+20231219 - Support for new API Assen
+20240109 - Add support for Woerden
+20240109 - Add support for RWM
+20240109 - Change dateobject to date
+20240122 - Add support for Montferland API
+20240124 - Update RecycleApp X-Secret
+20240124 - Add support for Ôffalkalinder
+20240201 - Revert change of dateobject
+20240201 - Fix for collection days duplicates
+20240215 - Better way to fix for collection days duplicates
+20240216 - Use correct case for fractions
+20240216 - Remove unwanted fractions from upcomming sensor
+20240325 - Added support for DeFryskeMarren
+20240325 - Fix spelling mistake in "Eerstvolgende"
+20240414 - Fix deprecation warning for discovery
+20240531 - Sort output of upcomming sensors
+20240605 - Fix for RWM API
+20240711 - Add mapping for PMD-Rest in Ximmio
+20240711 - Fix sensor icons
+20240827 - Add support for Cleanprofs
+20240827 - Small bug fix with configs
+20240829 - Support for new ROVA API
+20240906 - New option for custom mapping
+20240911 - Fix API url for Cyclus and Montfoort
+20240917 - Fix API url for RyclycleApp
+20240918 - Add support for Sliedrecht
+20241205 - Add support for Saver
+20241205 - Refactor sensor.py
+20241206 - Fix bugs
+20241209 - Fix attributes and date object
+20250106 - Added support for Straatbeeld
+20250116 - Fix for Burgerportaal
+20250206 - Keep current info if data retrieval has failed
+20250304 - Fix for RWM API
 
 Example config:
 Configuration.yaml:
@@ -57,12 +71,13 @@ from homeassistant.const import Platform
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.helpers.discovery import async_load_platform, load_platform
 
 from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID
 from .API import get_wastedata_from_config
 
 
-__version__ = "5.2.5"
+__version__ = "5.6.3"
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -85,12 +100,12 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
 
         hass.data.setdefault(DOMAIN, {})[conf[CONF_ID]] = data
 
-        await hass.helpers.discovery.async_load_platform(
-            Platform.SENSOR, DOMAIN, {"config": conf}, conf
+        await async_load_platform(
+            hass, Platform.SENSOR, DOMAIN, {"config": conf}, conf
         )
 
-        hass.helpers.discovery.load_platform(
-            Platform.CALENDAR, DOMAIN, {"config": conf}, conf
+        load_platform(
+            hass, Platform.CALENDAR, DOMAIN, {"config": conf}, conf
         )
 
         await data.schedule_update(timedelta())

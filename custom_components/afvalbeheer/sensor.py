@@ -1,6 +1,5 @@
 import logging
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from homeassistant.const import CONF_RESOURCES
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
@@ -9,47 +8,56 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from .const import *
 from .API import get_wastedata_from_config
 
-
 _LOGGER = logging.getLogger(__name__)
 
-
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+    """
+    Setup the waste management sensor platform.
+
+    Args:
+        hass: Home Assistant object.
+        config: Configuration dictionary.
+        async_add_entities: Callback to add entities to Home Assistant.
+        discovery_info: Discovery information passed by Home Assistant.
+    """
     _LOGGER.debug("Setup of sensor platform Afvalbeheer")
 
-    schedule_update = False
+    schedule_update = not (discovery_info and "config" in discovery_info)
+    _LOGGER.debug("Schedule update: %s", schedule_update)
 
-    if discovery_info and "config" in discovery_info:
-        config = discovery_info["config"]
-        data = hass.data[DOMAIN].get(config[CONF_ID], None)
-    else:
-        schedule_update = True
-        data = get_wastedata_from_config(hass, config)
+    config_data = discovery_info["config"] if discovery_info and "config" in discovery_info else config
+    _LOGGER.debug("Configuration data: %s", config_data)
 
-    sensor_upcoming = config.get(CONF_UPCOMING)
+    data = hass.data[DOMAIN].get(config_data[CONF_ID], None) if not schedule_update else get_wastedata_from_config(hass, config)
+    _LOGGER.debug("Data source: %s", data)
 
-    entities = []
+    entities = [WasteTypeSensor(data, resource, config_data) for resource in config_data[CONF_RESOURCES]]
+    _LOGGER.debug("Created WasteTypeSensor entities: %s", entities)
 
-    for resource in config[CONF_RESOURCES]:
-        waste_type = resource.lower()
-        entities.append(WasteTypeSensor(data, waste_type, config))
+    if config_data.get(CONF_UPCOMING):
+        entities.extend([WasteDateSensor(data, config_data, timedelta(days=delta)) for delta in (0, 1)])
+        entities.append(WasteUpcomingSensor(data, config_data))
+        _LOGGER.debug("Added upcoming waste sensors.")
 
-    if sensor_upcoming:
-        entities.append(WasteDateSensor(data, config, timedelta()))
-        entities.append(WasteDateSensor(data, config, timedelta(days=1)))
-        entities.append(WasteUpcomingSensor(data, config))
-    
     async_add_entities(entities)
+    _LOGGER.debug("Entities added to Home Assistant.")
 
-    if schedule_update: 
+    if schedule_update:
+        _LOGGER.debug("Scheduling data update.")
         await data.schedule_update(timedelta())
 
 
-class WasteTypeSensor(RestoreEntity, SensorEntity):
+class BaseSensor(RestoreEntity, SensorEntity):
+    """
+    Base class for waste management sensors.
 
-    def __init__(self, data, waste_type, config):
+    Attributes:
+        data: Data source for waste information.
+        config: Configuration dictionary for the sensor.
+    """
+    def __init__(self, data, config):
         self.data = data
-        self.waste_type = waste_type
-        self.waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
+        self.waste_collector = config.get(CONF_WASTE_COLLECTOR, "").lower()
         self.date_format = config.get(CONF_DATE_FORMAT)
         self.date_object = config.get(CONF_DATE_OBJECT)
         self.built_in_icons = config.get(CONF_BUILT_IN_ICONS)
@@ -59,277 +67,272 @@ class WasteTypeSensor(RestoreEntity, SensorEntity):
         self.day_of_week = config.get(CONF_DAY_OF_WEEK)
         self.day_of_week_only = config.get(CONF_DAY_OF_WEEK_ONLY)
         self.always_show_day = config.get(CONF_ALWAYS_SHOW_DAY)
+        self.waste_types = config[CONF_RESOURCES]
         self.date_only = 1 if self.date_object else config.get(CONF_DATE_ONLY)
-
-        self._today = "Vandaag" if self.dutch_days else "Today"
-        self._tomorrow = "Morgen" if self.dutch_days else "Tomorrow"
-        
-        formatted_name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX),  self.waste_collector, self.waste_type)
-        self._name = formatted_name.capitalize()
-        self._attr_unique_id = formatted_name
-        self._days_until = None
-        self._sort_date = 0
         self._hidden = False
-        self._entity_picture = None
         self._state = None
         self._attrs = {}
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def entity_picture(self):
-        if self.built_in_icons and not self.disable_icons:
-            if self.built_in_icons_new and self.waste_type in FRACTION_ICONS_NEW:
-                self._entity_picture = FRACTION_ICONS_NEW[self.waste_type]
-            elif self.waste_type in FRACTION_ICONS:
-                self._entity_picture = FRACTION_ICONS[self.waste_type]
-        return self._entity_picture
+        self._entity_picture = None
+        self._attr_unique_id = None
+        _LOGGER.debug("BaseSensor initialized with configuration: %s", config)
 
     @property
     def state(self):
+        """Return the state of the sensor."""
         return self._state
 
     @property
     def extra_state_attributes(self):
-        self._attrs = {
-            ATTR_WASTE_COLLECTOR: self.waste_collector,
-            ATTR_HIDDEN: self._hidden,
-            ATTR_SORT_DATE: self._sort_date,
-            ATTR_DAYS_UNTIL: self._days_until
-        }
+        """Return additional state attributes."""
         return self._attrs
 
     @property
-    def device_class(self):
-        if self.date_object == True:
-            return SensorDeviceClass.TIMESTAMP
+    def entity_picture(self):
+        """Return the entity picture for the sensor."""
+        return self._entity_picture
 
     async def async_added_to_hass(self):
-        """Call when entity is about to be added to Home Assistant."""
-        if (state := await self.async_get_last_state()) is None:
-            self._state = None
-            return
+        """Restore the last known state upon adding to Home Assistant."""
+        state = await self.async_get_last_state()
+        if state is not None:
+            _LOGGER.debug("Restoring last state for sensor: %s", state)
+            self._state = state.state
+            self._restore_attributes(state)
+            self._restore_entity_picture(state)
 
-        self._state = state.state
+    def _restore_attributes(self, state):
+        """Restore attributes from the previous state."""
+        self._attrs = {
+            key: value for key, value in {
+                ATTR_WASTE_COLLECTOR: state.attributes.get(ATTR_WASTE_COLLECTOR),
+                ATTR_HIDDEN: state.attributes.get(ATTR_HIDDEN),
+                ATTR_SORT_DATE: state.attributes.get(ATTR_SORT_DATE),
+                ATTR_DAYS_UNTIL: state.attributes.get(ATTR_DAYS_UNTIL),
+                ATTR_UPCOMING_DAY: state.attributes.get(ATTR_UPCOMING_DAY),
+                ATTR_UPCOMING_WASTE_TYPES: state.attributes.get(ATTR_UPCOMING_WASTE_TYPES),
+            }.items() if value is not None
+        }
+        _LOGGER.debug("Restored attributes: %s", self._attrs)
 
-        if ATTR_WASTE_COLLECTOR in state.attributes:
-            if not self.disable_icons and 'entity_picture' in state.attributes.keys():
-                self._entity_picture = state.attributes['entity_picture']
-            self._attrs = {
-                ATTR_WASTE_COLLECTOR: state.attributes[ATTR_WASTE_COLLECTOR],
-                ATTR_HIDDEN: state.attributes[ATTR_HIDDEN],
-                ATTR_SORT_DATE: state.attributes[ATTR_SORT_DATE],
-                ATTR_DAYS_UNTIL: state.attributes[ATTR_DAYS_UNTIL]
-            }
+    def _restore_entity_picture(self, state):
+        """Restore the entity picture from the previous state."""
+        if not self.disable_icons:
+            self._entity_picture = state.attributes.get("entity_picture")
+            _LOGGER.debug("Restored entity picture: %s", self._entity_picture)
+
+    def _translate_state(self, state):
+        """Translate state based on format and translation dictionary."""
+        translations = {
+            "%B": DUTCH_TRANSLATION_MONTHS,
+            "%b": DUTCH_TRANSLATION_MONTHS_SHORT,
+            "%A": DUTCH_TRANSLATION_DAYS,
+            "%a": DUTCH_TRANSLATION_DAYS_SHORT,
+        }
+        for fmt, trans_dict in translations.items():
+            if fmt in self.date_format:
+                for en_term, nl_term in trans_dict.items():
+                    state = state.replace(en_term, nl_term)
+        _LOGGER.debug("Translated state: %s", state)
+        return state
+
+
+class WasteTypeSensor(BaseSensor):
+    """
+    Sensor for specific waste types.
+
+    Attributes:
+        waste_type: The type of waste this sensor represents.
+    """
+    def __init__(self, data, waste_type, config):
+        super().__init__(data, config)
+        self.waste_type = waste_type
+        self._today = TODAY_STRING['nl'] if self.dutch_days else TODAY_STRING['en']
+        self._tomorrow = TOMORROW_STRING['nl'] if self.dutch_days else TOMORROW_STRING['en']
+        self._name = _format_sensor(
+            config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.waste_type
+        )
+        self._attr_unique_id = self._name.lower()
+        self._days_until = None
+        self._sort_date = 0
+        _LOGGER.debug("WasteTypeSensor initialized: %s", self._name)
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return self._name
+
+    @property
+    def device_class(self):
+        """Return the device class for timestamp sensors."""
+        if self.date_object:
+            return SensorDeviceClass.TIMESTAMP
 
     def update(self):
+        """Update the state and attributes of the sensor."""
+        _LOGGER.debug("Updating WasteTypeSensor: %s", self._name)
         collection = self.data.collections.get_first_upcoming_by_type(self.waste_type)
         if not collection:
             self._state = None
             self._hidden = True
-            return
+            _LOGGER.debug("No upcoming collection found for waste type: %s", self.waste_type)
+        else:
+            self._hidden = False
+            self._set_state(collection)
+            self._set_picture(collection)
+        self._set_attr(collection)
+        _LOGGER.debug("Updated state for %s: %s", self._name, self._state)
 
-        self._hidden = False
-        self.__set_state(collection)
-        self.__set_sort_date(collection)
-        self.__set_picture(collection)
-
-    def __set_state(self, collection):
+    def _set_state(self, collection):
+        """Set the state of the sensor based on collection data."""
         date_diff = (collection.date - datetime.now()).days + 1
         self._days_until = date_diff
-        date_format = self.date_format
         if self.date_object:
             self._state = collection.date
         elif self.date_only or (date_diff >= 8 and not self.always_show_day):
-            self._state = collection.date.strftime(date_format)
+            self._state = collection.date.strftime(self.date_format)
         elif date_diff > 1:
             if self.day_of_week:
                 if self.day_of_week_only:
-                    date_format = "%A"
-                    self._state = collection.date.strftime(date_format)
+                    self._state = collection.date.strftime("%A")
                 else:
-                    if "%A"  not in self.date_format:
-                        date_format = "%A, " + date_format
-                    self._state = collection.date.strftime(date_format)
+                    if "%A" not in self.date_format:
+                        self.date_format = "%A, " + self.date_format
+                    self._state = collection.date.strftime(self.date_format)
             else:
-                self._state = collection.date.strftime(date_format)
+                self._state = collection.date.strftime(self.date_format)
         elif date_diff == 1:
-            self._state = collection.date.strftime(self._tomorrow if self.day_of_week_only else self._tomorrow + ", " + date_format)
+            self._state = collection.date.strftime(self._tomorrow if self.day_of_week_only else self._tomorrow + ", " + self.date_format)
         elif date_diff == 0:
-            self._state = collection.date.strftime(self._today if self.day_of_week_only else self._today + ", " + date_format)
+            self._state = collection.date.strftime(self._today if self.day_of_week_only else self._today + ", " + self.date_format)
         else:
             self._state = None
 
         if self.dutch_days and not self.date_object:
-            self._state = _translate_state(date_format, self._state)
+            self._state = self._translate_state(self._state)
+        _LOGGER.debug("State set for %s: %s", self._name, self._state)
 
-    def __set_sort_date(self, collection):
-        self._sort_date = int(collection.date.strftime('%Y%m%d'))
+    def _set_attr(self, collection):
+        """Set the attributes of the sensor based on collection data."""
+        self._attrs[ATTR_WASTE_COLLECTOR] = self.waste_collector
+        self._attrs[ATTR_HIDDEN] = self._hidden
+        if collection:
+            self._attrs[ATTR_SORT_DATE] = int(collection.date.strftime("%Y%m%d"))
+            self._attrs[ATTR_DAYS_UNTIL] = self._days_until
+        _LOGGER.debug("Attributes set for %s: %s", self._name, self._attrs)
 
-    def __set_picture(self, collection):
-        if collection.icon_data and not self.disable_icons:
-            self._entity_picture = collection.icon_data
+    def _set_picture(self, collection):
+        """Set the entity picture based on collection data."""
+        if self.built_in_icons and not self.disable_icons:
+            self._entity_picture = self._get_entity_picture()
+            _LOGGER.debug("Entity picture set for %s: %s", self._name, self._entity_picture)
+
+    def _get_entity_picture(self):
+        """Get the appropriate entity picture for the waste type."""
+        waste_type_lower = self.waste_type.lower()
+        if self.built_in_icons_new and waste_type_lower in FRACTION_ICONS_NEW:
+            return FRACTION_ICONS_NEW[waste_type_lower]
+        elif waste_type_lower in FRACTION_ICONS:
+            return FRACTION_ICONS[waste_type_lower]
+        return None
 
 
-class WasteDateSensor(RestoreEntity, SensorEntity):
+class WasteDateSensor(BaseSensor):
+    """
+    Sensor for waste collections on specific dates.
 
+    Attributes:
+        date_delta: The number of days offset from today.
+    """
     def __init__(self, data, config, date_delta):
-        self.data = data
-        self.waste_types = config[CONF_RESOURCES]
-        self.waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
-        self.dutch_days = config.get(CONF_TRANSLATE_DAYS)
+        super().__init__(data, config)
         self.date_delta = date_delta
-        
         if self.date_delta.days == 0:
-            day = "vandaag" if self.dutch_days else "today"
-        elif self.date_delta.days == 1:
-            day = "morgen" if self.dutch_days else "tomorrow"
+            day = TODAY_STRING['nl'].lower() if self.dutch_days else TODAY_STRING['en'].lower()
         else:
-            day = ''
-            
-        formatted_name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX),  self.waste_collector, day)
-        self._name = formatted_name.capitalize()
-        self._attr_unique_id = formatted_name
-        self._hidden = False
-        self._state = None
-        self._attrs = {}
+            day = TOMORROW_STRING['nl'].lower() if self.dutch_days else TOMORROW_STRING['en'].lower()
+        self._name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, day)
+        self._attr_unique_id = self._name.lower()
 
     @property
     def name(self):
+        """Return the name of the sensor."""
         return self._name
 
-    @property
-    def state(self):
-        return self._state
-
-    @property
-    def extra_state_attributes(self):
-        self._attrs = {
-            ATTR_WASTE_COLLECTOR: self.waste_collector,
-            ATTR_HIDDEN: self._hidden
-        }
-        return self._attrs
-
-    async def async_added_to_hass(self):
-        """Call when entity is about to be added to Home Assistant."""
-        if (state := await self.async_get_last_state()) is None:
-            self._state = None
-            return
-
-        self._state = state.state
-
-        if ATTR_WASTE_COLLECTOR in state.attributes:
-            self._attrs = {
-                ATTR_WASTE_COLLECTOR: state.attributes[ATTR_WASTE_COLLECTOR],
-                ATTR_HIDDEN: state.attributes[ATTR_HIDDEN]
-            }
-
     def update(self):
+        """Update the state and attributes of the sensor."""
         date = datetime.now() + self.date_delta
         collections = self.data.collections.get_by_date(date, self.waste_types)
-
         if not collections:
             self._hidden = True
-            self._state = "Geen" if self.dutch_days else "None"
-            return
+            self._state = NO_DATE_STRING['nl'] if self.dutch_days else NO_DATE_STRING['en']
+        else:
+            self._hidden = False
+            self._state = ", ".join(sorted({x.waste_type for x in collections}))
+        self._set_attr()
 
-        self._hidden = False
-        self.__set_state(collections)
+    def _set_attr(self):
+        """Set the attributes of the sensor."""
+        self._attrs[ATTR_WASTE_COLLECTOR] = self.waste_collector
+        self._attrs[ATTR_HIDDEN] = self._hidden
 
-    def __set_state(self, collections):
-        self._state = ', '.join([x.waste_type for x in collections])
 
+class WasteUpcomingSensor(BaseSensor):
+    """
+    Sensor for the first upcoming waste collection.
 
-class WasteUpcomingSensor(RestoreEntity, SensorEntity):
-
+    Attributes:
+        first_upcoming: Label for the first upcoming waste collection.
+    """
     def __init__(self, data, config):
-        self.data = data
-        self.waste_collector = config.get(CONF_WASTE_COLLECTOR).lower()
-        self.dutch_days = config.get(CONF_TRANSLATE_DAYS)
-        self.date_format = config.get(CONF_DATE_FORMAT)
-         
-        self.first_upcoming = "eerst volgende" if self.dutch_days else "first upcoming"
-        formatted_name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX),  self.waste_collector, self.first_upcoming)
-        self._name = formatted_name.capitalize()
-        self._attr_unique_id = formatted_name
+        super().__init__(data, config)
+        self.first_upcoming = "eerstvolgende" if self.dutch_days else "first upcoming"
+        self._name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.first_upcoming)
+        self._attr_unique_id = self._name.lower()
         self.upcoming_day = None
         self.upcoming_waste_types = None
-        self._hidden = False
-        self._state = None
-        self._attrs = {}
 
     @property
     def name(self):
+        """Return the name of the sensor."""
         return self._name
 
-    @property
-    def state(self):
-        return self._state
-
-    @property
-    def extra_state_attributes(self):
-        self._attrs = {
-            ATTR_WASTE_COLLECTOR: self.waste_collector,
-            ATTR_UPCOMING_DAY: self.upcoming_day,
-            ATTR_UPCOMING_WASTE_TYPES: self.upcoming_waste_types,
-            ATTR_HIDDEN: self._hidden
-        }
-        return self._attrs
-
-    async def async_added_to_hass(self):
-        """Call when entity is about to be added to Home Assistant."""
-        if (state := await self.async_get_last_state()) is None:
-            self._state = None
-            return
-
-        self._state = state.state
-
-        if ATTR_WASTE_COLLECTOR in state.attributes:
-            self._attrs = {
-                ATTR_WASTE_COLLECTOR: state.attributes[ATTR_WASTE_COLLECTOR],
-                ATTR_UPCOMING_DAY: state.attributes[ATTR_UPCOMING_DAY],
-                ATTR_UPCOMING_WASTE_TYPES: state.attributes[ATTR_UPCOMING_WASTE_TYPES],
-                ATTR_HIDDEN: state.attributes[ATTR_HIDDEN]
-            }
-
     def update(self):
-        collections = self.data.collections.get_first_upcoming()
-
+        """Update the state and attributes of the sensor."""
+        collections = self.data.collections.get_first_upcoming(self.waste_types)
         if not collections:
             self._hidden = True
-            self._state = "Geen" if self.dutch_days else "None"
+            self._state = NO_DATE_STRING['nl'] if self.dutch_days else NO_DATE_STRING['en']
             return
-
-        self._hidden = False
-        self.__set_state(collections)
-
-    def __set_state(self, collections):
-        self.upcoming_day = _translate_state(self.date_format, collections[0].date.strftime(self.date_format))
-        self.upcoming_waste_types = ', '.join([x.waste_type for x in collections])
-        self._state = self.upcoming_day + ": " + self.upcoming_waste_types
+        else:
+            self._hidden = False
+            self.upcoming_day = self._translate_state(collections[0].date.strftime(self.date_format))
+            self.upcoming_waste_types = ", ".join(sorted([x.waste_type for x in collections]))
+            self._state = f"{self.upcoming_day}: {self.upcoming_waste_types}"
+        self._set_attr()
+    
+    def _set_attr(self):
+        """Set the attributes of the sensor."""
+        self._attrs[ATTR_WASTE_COLLECTOR] = self.waste_collector
+        self._attrs[ATTR_HIDDEN] = self._hidden
+        self._attrs[ATTR_UPCOMING_DAY] = self.upcoming_day
+        self._attrs[ATTR_UPCOMING_WASTE_TYPES] = self.upcoming_waste_types
 
 
 def _format_sensor(name, name_prefix, waste_collector, sensor_type):
+    """
+    Format the sensor name based on its configuration.
+
+    Args:
+        name: The base name of the sensor.
+        name_prefix: Whether to include the waste collector's name as a prefix.
+        waste_collector: Name of the waste collector.
+        sensor_type: Type of the sensor (e.g., waste type or date).
+
+    Returns:
+        Formatted sensor name as a string.
+    """
     return (
-        (waste_collector + ' ' if name_prefix else "") +
-        (name + ' ' if name else "") +
-        sensor_type
+        (waste_collector.capitalize() + " " if name_prefix else "")
+        + (name + " " if name else "")
+        + sensor_type
     )
-
-
-def _translate_state(date_format, state):
-    if "%B" in date_format:
-        for EN_day, NL_day in DUTCH_TRANSLATION_MONTHS.items():
-            state = state.replace(EN_day, NL_day)
-    if "%b" in date_format:
-        for EN_day, NL_day in DUTCH_TRANSLATION_MONTHS_SHORT.items():
-            state = state.replace(EN_day, NL_day)
-    if "%A" in date_format:
-        for EN_day, NL_day in DUTCH_TRANSLATION_DAYS.items():
-            state = state.replace(EN_day, NL_day)
-    if "%a" in date_format:
-        for EN_day, NL_day in DUTCH_TRANSLATION_DAYS_SHORT.items():
-            state = state.replace(EN_day, NL_day)
-    return state
