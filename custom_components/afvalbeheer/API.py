@@ -431,10 +431,9 @@ class BurgerportaalCollector(WasteCollector):
             _LOGGER.error('Unable to fetch refresh token!')
             return
 
-        if self.suffix:
-            for address in response:
-                if 'addition' in address and address['addition'] == self.suffix.upper():
-                    self.address_id = address['addressId']
+        for address in response:
+            if 'addition' in address and address['addition'] == self.suffix.upper():
+                self.address_id = address['addressId']
 
         if not self.address_id:
             self.address_id = response[-1]['addressId']
