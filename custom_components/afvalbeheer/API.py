@@ -1285,7 +1285,7 @@ class RecycleApp(WasteCollector):
         if response.status_code != 200:
             _LOGGER.error('Invalid response from server for postcode_id')
             return
-        self.postcode_id = response.json()['items'][0]['id']
+        self.postcode_id = response.json()['items'][-1]['id']
         response = requests.get("{}streets?q={}&zipcodes={}".format(self.main_url, self.street_name, self.postcode_id), headers=self.__get_headers())
         if response.status_code != 200:
             _LOGGER.error('Invalid response from server for street_id')
