@@ -754,7 +754,7 @@ class GemeenteAmsterdamCollector(WasteCollector):
             week_offset = week_offset + week_interval
         return dates
     
-    def check_response_for_suffix(params):
+    def check_response_for_suffix(self, params):
         filtered_params = {k: v for k, v in params.items() if v}
         get_url = '{}/?{}'.format(self.waste_collector_url, '&'.join('{}={}'.format(k, v) for k, v in filtered_params.items()))
         test_response = requests.get(get_url)
