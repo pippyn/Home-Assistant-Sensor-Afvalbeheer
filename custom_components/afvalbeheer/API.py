@@ -726,20 +726,6 @@ class GemeenteAmsterdamCollector(WasteCollector):
         'plastic': WASTE_TYPE_PMD_GREY,
     }
 
-    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
-        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
-        self.waste_collector_url = "https://api.data.amsterdam.nl/v1/afvalwijzer/afvalwijzer"
-
-    def __get_data(self):
-        params = {
-            'postcode': self.postcode,
-            'huisnummer': self.street_number,
-            'huisletter': self.suffix
-        }
-        filtered_params = {k: v for k, v in params.items() if v}
-        get_url = '{}/?{}'.format(self.waste_collector_url, '&'.join('{}={}'.format(k, v) for k, v in filtered_params.items()))
-        return requests.get(get_url)
-    
     def date_in_future(self, dates_list, current_date):
         dates = []
         for instance in range(len(dates_list)):
@@ -767,11 +753,68 @@ class GemeenteAmsterdamCollector(WasteCollector):
             dates.append(date)
             week_offset = week_offset + week_interval
         return dates
+    
+    def check_response_for_suffix(params):
+        filtered_params = {k: v for k, v in params.items() if v}
+        get_url = '{}/?{}'.format(self.waste_collector_url, '&'.join('{}={}'.format(k, v) for k, v in filtered_params.items()))
+        test_response = requests.get(get_url)
+        if len(test_response.text) > 220:
+            return True, get_url
+        else:
+            return False, get_url
+
+    def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
+        super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
+        self.waste_collector_url = "https://api.data.amsterdam.nl/v1/afvalwijzer/afvalwijzer"
+
+    def __get_data(self):
+        # Checking for suffix and trying different combinations for response
+        if self.suffix:
+            params = {
+                'postcode': self.postcode,
+                'huisnummer': self.street_number,
+                'huisletter': self.suffix.lower()
+            }
+            test_result, get_url = self.check_response_for_suffix(params)
+            if test_result:
+                return requests.get(get_url)
+            else:
+                params = {
+                    'postcode': self.postcode,
+                    'huisnummer': self.street_number,
+                    'huisnummertoevoeging': self.suffix.lower()
+                }
+                test_result, get_url = self.check_response_for_suffix(params)
+                if test_result:
+                    return requests.get(get_url)
+                else:
+                    params = {
+                    'postcode': self.postcode,
+                    'huisnummer': self.street_number,
+                    'huisletter': self.suffix.upper()
+                }
+                test_result, get_url = self.check_response_for_suffix(params)
+                if test_result:
+                    return requests.get(get_url)
+                else:
+                    params = {
+                        'postcode': self.postcode,
+                        'huisnummer': self.street_number,
+                        'huisnummertoevoeging': self.suffix.upper()
+                    }
+                    test_result, get_url = self.check_response_for_suffix(params)
+                    return requests.get(get_url)
+        else:
+            params = {
+                'postcode': self.postcode,
+                'huisnummer': self.street_number
+            }
+            filtered_params = {k: v for k, v in params.items() if v}
+            get_url = '{}/?{}'.format(self.waste_collector_url, '&'.join('{}={}'.format(k, v) for k, v in filtered_params.items()))
+            return requests.get(get_url)
 
     async def update(self):
         _LOGGER.debug('Updating Waste collection dates using Rest API')
-
-        self.collections.remove_all()
 
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
@@ -780,6 +823,8 @@ class GemeenteAmsterdamCollector(WasteCollector):
             if (len(response['_embedded']['afvalwijzer']) < 1):
                 _LOGGER.error('No Waste data found!')
                 return
+            
+            self.collections.remove_all()
 
             for item in response['_embedded']['afvalwijzer']:
                 if not item['afvalwijzerAfvalkalenderFrequentie'] and not item['afvalwijzerWaar']:
@@ -852,6 +897,13 @@ class GemeenteAmsterdamCollector(WasteCollector):
                                     dates.append(datetime.strptime(date, '%d-%m-%Y'))
                                 except ValueError as ve2:
                                     _LOGGER.warning('Unexpected date format resulting in ValueError 2:', ve2)
+                                    try:
+                                        day_month_date = datetime.strptime(date, '%d-%m')
+                                        gen_date = datetime(today.year, day_month_date.month, day_month_date.day)
+                                        process_date = datetime.strftime(gen_date, '%d-%m-%y')
+                                        dates.append(datetime.strptime(process_date, '%d-%m-%y'))
+                                    except ValueError as ve3:
+                                        _LOGGER.error('Unable to process date:', ve3)
                         future_dates = self.date_in_future(dates, today)
                     
                     for date in future_dates:  
