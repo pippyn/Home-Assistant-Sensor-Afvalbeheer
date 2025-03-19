@@ -866,7 +866,7 @@ class GemeenteAmsterdamCollector(WasteCollector):
                             day_delta = (week_day - today.isocalendar()[2]) + 7
                         else:
                             day_delta = (week_day - today.isocalendar()[2])
-                        future_dates = self.generate_dates_for_year(day_delta, 1, today)
+                        future_dates = self.generate_dates_for_year(day_delta, 1, today, False)
                     elif ('weken' in item['afvalwijzerAfvalkalenderFrequentie']) or ('week' in item['afvalwijzerAfvalkalenderFrequentie']):
                         match item['afvalwijzerAfvalkalenderFrequentie'].replace(' weken', '').replace(' week', ''):
                             case 'oneven':
@@ -876,7 +876,7 @@ class GemeenteAmsterdamCollector(WasteCollector):
                                     day_delta = (week_day - today.isocalendar()[2]) + 14
                                 else:
                                     day_delta = week_day - today.isocalendar()[2]
-                                future_dates = self.generate_dates_for_year(day_delta, 2, False, today)
+                                future_dates = self.generate_dates_for_year(day_delta, 2, today, False)
                             case 'even':
                                 if today.isocalendar()[1]%2 > 0:
                                     day_delta = (week_day - today.isocalendar()[2]) + 7
@@ -884,7 +884,7 @@ class GemeenteAmsterdamCollector(WasteCollector):
                                     day_delta = (week_day - today.isocalendar()[2]) + 14
                                 else:
                                     day_delta = week_day - today.isocalendar()[2]
-                                future_dates = self.generate_dates_for_year(day_delta, 2, True, today)
+                                future_dates = self.generate_dates_for_year(day_delta, 2, today, True)
                     else:
                         item['afvalwijzerAfvalkalenderFrequentie'] = item['afvalwijzerAfvalkalenderFrequentie'].replace(' ', '.').replace('./', '').replace('.', ',').split(',')
                         dates = []
@@ -909,7 +909,8 @@ class GemeenteAmsterdamCollector(WasteCollector):
                     for date in future_dates:  
                         collection = WasteCollection.create(
                             date=datetime.strptime(date.strftime('%Y-%m-%d'), '%Y-%m-%d'),
-                            waste_type=waste_type
+                            waste_type=waste_type,
+                            waste_type_slug=item['afvalwijzerFractieCode'].lower()
                         )
                         if collection not in self.collections:
                             self.collections.add(collection)
