@@ -415,7 +415,7 @@ class BurgerportaalCollector(WasteCollector):
 
         response = requests.post("https://securetoken.googleapis.com/v1/token?key={}".format(self.apikey), headers=headers, data=data).json()
         if not response:
-            _LOGGER.error('Unable to fetch refresh token!')
+            _LOGGER.error('Unable to fetch ID token!')
             return
         self.id_token = response['id_token']
 
@@ -428,7 +428,7 @@ class BurgerportaalCollector(WasteCollector):
         response = requests.get("https://europe-west3-burgerportaal-production.cloudfunctions.net/exposed/organisations/{}/address?zipcode={}&housenumber={}".format(
             self.company_code, self.postcode, self.street_number), headers=headers).json()
         if not response:
-            _LOGGER.error('Unable to fetch refresh token!')
+            _LOGGER.error('Unable to fetch address!')
             return
 
         for address in response:
