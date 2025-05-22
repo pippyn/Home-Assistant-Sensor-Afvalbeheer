@@ -47,6 +47,12 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         await data.schedule_update(timedelta())
 
 
+async def async_setup_entry(hass, entry, async_add_entities):
+    """Set up Afvalbeheer sensors from a config entry."""
+    config = dict(entry.data)  # Make a mutable copy
+    await async_setup_platform(hass, config, async_add_entities)
+
+
 class BaseSensor(RestoreEntity, SensorEntity):
     """
     Base class for waste management sensors.

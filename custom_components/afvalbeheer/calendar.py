@@ -3,7 +3,7 @@ from datetime import datetime
 from datetime import timedelta
 from typing import Optional, List
 
-from .API import WasteData
+from .API import WasteData, get_wastedata_from_config
 
 from homeassistant.const import CONF_RESOURCES
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
@@ -13,26 +13,36 @@ from .const import DOMAIN, CONF_ID
 
 _LOGGER = logging.getLogger(__name__)
 
-def setup_platform(hass, config, async_add_entities, discovery_info=None):
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """
     Set up the Afvalbeheer calendar platform.
-
-    Args:
-        hass: The Home Assistant instance.
-        config: The platform configuration.
-        async_add_entities: Function to add entities to Home Assistant.
-        discovery_info: Discovery info, if available.
     """
-    if discovery_info and "config" in discovery_info:
-        conf = discovery_info["config"]
-    else:
-        conf = config
+    schedule_update = not (discovery_info and "config" in discovery_info)
+    _LOGGER.debug("Schedule update: %s", schedule_update)
 
-    if not conf:
-        _LOGGER.warning("No configuration found. Platform setup aborted.")
-        return
+    config_data = discovery_info["config"] if discovery_info and "config" in discovery_info else config
 
-    async_add_entities([AfvalbeheerCalendar(hass.data[DOMAIN][conf[CONF_ID]], conf)])
+    waste_data = hass.data[DOMAIN].get(config_data[CONF_ID])
+    if waste_data is None:
+        waste_data = get_wastedata_from_config(hass, config_data)
+        hass.data[DOMAIN][config_data[CONF_ID]] = waste_data
+        
+    if hasattr(waste_data, "async_update"):
+        await waste_data.async_update()
+    elif hasattr(waste_data, "schedule_update"):
+        await waste_data.schedule_update(timedelta())
+
+    async_add_entities([AfvalbeheerCalendar(waste_data, config_data)])
+    
+
+async def async_setup_entry(hass, entry, async_add_entities):
+    """Set up Afvalbeheer sensors from a config entry."""
+    config = dict(entry.data)
+    if CONF_ID not in config or not config[CONF_ID]:
+        import uuid
+        config[CONF_ID] = str(uuid.uuid4())
+    await async_setup_platform(hass, config, async_add_entities)
+
 
 class AfvalbeheerCalendar(CalendarEntity):
     """Defines an Afvalbeheer calendar entity."""

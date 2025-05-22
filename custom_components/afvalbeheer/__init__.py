@@ -112,3 +112,10 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
         await data.schedule_update(timedelta())
 
     return True
+
+
+async def async_setup_entry(hass, entry):
+    """Set up Afvalbeheer from a config entry."""
+    # Forward the config entry setup to the sensor and calendar platforms
+    await hass.config_entries.async_forward_entry_setups(entry, ["sensor", "calendar"])
+    return True
