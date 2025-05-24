@@ -1,9 +1,12 @@
 import logging
 from datetime import datetime, timedelta
 
+from homeassistant.config_entries import ConfigEntry
+
 from homeassistant.const import CONF_RESOURCES
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.helpers.entity_registry import async_get as async_get_entity_registry
 
 from .const import *
 from .API import get_wastedata_from_config
@@ -47,10 +50,38 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         await data.schedule_update(timedelta())
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
+async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
     """Set up Afvalbeheer sensors from a config entry."""
-    config = dict(entry.data)  # Make a mutable copy
+    entry.async_on_unload(entry.add_update_listener(async_reload_entry))
+    config = dict({**entry.data, **entry.options})  # Make a mutable copy
+
+    # --- Begin: Remove orphaned entities ---
+    entity_registry = async_get_entity_registry(hass)
+    domain = "sensor"
+    entry_id = entry.entry_id
+    collector = config.get(CONF_WASTE_COLLECTOR, "").lower()
+    name = config.get(CONF_NAME)
+    name_prefix = config.get(CONF_NAME_PREFIX)
+    waste_types = config[CONF_RESOURCES]
+    # Build expected unique_ids
+    expected_unique_ids = set()
+    for resource in waste_types:
+        expected_unique_ids.add(_format_sensor(name, name_prefix, collector, resource).lower())
+    if config.get(CONF_UPCOMING):
+        expected_unique_ids.add(_format_sensor(name, name_prefix, collector, "eerstvolgende" if config.get(CONF_TRANSLATE_DAYS) else "first upcoming").lower())
+        expected_unique_ids.add(_format_sensor(name, name_prefix, collector, TODAY_STRING['nl'].lower() if config.get(CONF_TRANSLATE_DAYS) else TODAY_STRING['en'].lower()).lower())
+        expected_unique_ids.add(_format_sensor(name, name_prefix, collector, TOMORROW_STRING['nl'].lower() if config.get(CONF_TRANSLATE_DAYS) else TOMORROW_STRING['en'].lower()).lower())
+    # Remove orphaned entities
+    for entity in list(entity_registry.entities.values()):
+        if entity.domain == domain and entity.config_entry_id == entry_id:
+            if entity.unique_id not in expected_unique_ids:
+                entity_registry.async_remove(entity.entity_id)
+    # --- End: Remove orphaned entities ---
+
     await async_setup_platform(hass, config, async_add_entities)
+
+async def async_reload_entry(hass, entry):
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 class BaseSensor(RestoreEntity, SensorEntity):

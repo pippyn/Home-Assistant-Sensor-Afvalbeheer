@@ -115,7 +115,23 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
 
 
 async def async_setup_entry(hass, entry):
-    """Set up Afvalbeheer from a config entry."""
-    # Forward the config entry setup to the sensor and calendar platforms
+    config = {**entry.data, **entry.options}
+
+    if DOMAIN not in hass.data:
+        hass.data[DOMAIN] = {}
+    hass.data[DOMAIN][entry.entry_id] = {
+        "config": config,
+    }
+
     await hass.config_entries.async_forward_entry_setups(entry, ["sensor", "calendar"])
     return True
+
+
+async def async_unload_entry(hass, entry):
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, ["sensor", "calendar"])
+
+    # Clean up stored data
+    if unload_ok:
+        hass.data[DOMAIN].pop(entry.entry_id, None)
+
+    return unload_ok

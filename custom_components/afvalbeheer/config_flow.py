@@ -8,12 +8,10 @@ from .const import (
     CONF_RESOURCES, CONF_NAME_PREFIX, CONF_DATE_FORMAT, CONF_UPCOMING, CONF_DATE_ONLY,
     CONF_DATE_OBJECT, CONF_BUILT_IN_ICONS, CONF_BUILT_IN_ICONS_NEW, CONF_DISABLE_ICONS,
     CONF_TRANSLATE_DAYS, CONF_DAY_OF_WEEK, CONF_DAY_OF_WEEK_ONLY, CONF_ALWAYS_SHOW_DAY,
-    CONF_CUSTOM_MAPPING,
+    CONF_STREET_NAME, CONF_CITY_NAME
 )
-import uuid
 import homeassistant.helpers.config_validation as cv
 
-# Minimal waste collectors and resources for dropdowns
 WASTE_COLLECTORS = [
     "ACV", "Afval3xBeter", "Afvalstoffendienstkalender", "AfvalAlert", "Alkmaar",
     "Almere", "AlphenAanDenRijn", "AreaReiniging", "Assen", "Avalex", "Avri", "BAR",
@@ -28,23 +26,45 @@ WASTE_COLLECTORS = [
     "Woerden", "ZRD"
 ]
 
+
 class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    VERSION = 1
 
     async def async_step_user(self, user_input=None):
         errors = {}
         if user_input is not None:
-            # Save address info and go to resource selection
-            self._address_input = user_input
-            return await self.async_step_resources()
+            self._collector = user_input[CONF_WASTE_COLLECTOR]
+            return await self.async_step_address()
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
                 vol.Required(CONF_WASTE_COLLECTOR, default="Blink"): vol.In(WASTE_COLLECTORS),
-                vol.Required(CONF_POSTCODE): str,
-                vol.Required(CONF_STREET_NUMBER): str,
-                vol.Optional(CONF_SUFFIX, default=""): str,
             }),
+            errors=errors,
+        )
+
+    async def async_step_address(self, user_input=None):
+        errors = {}
+        collector = getattr(self, "_collector", "Blink")
+        collector_lower = collector.lower()
+        show_city = collector_lower == "limburg.net"
+        show_street = collector_lower in ["limburg.net", "recycleapp"]
+
+        schema_dict = {
+            vol.Required(CONF_POSTCODE): str,
+            vol.Required(CONF_STREET_NUMBER): str,
+            vol.Optional(CONF_SUFFIX, default=""): str,
+        }
+        if show_city:
+            schema_dict[vol.Required(CONF_CITY_NAME)] = str
+        if show_street:
+            schema_dict[vol.Required(CONF_STREET_NAME)] = str
+
+        if user_input is not None:
+            self._address_input = {CONF_WASTE_COLLECTOR: self._collector, **user_input}
+            return await self.async_step_resources()
+        return self.async_show_form(
+            step_id="address",
+            data_schema=vol.Schema(schema_dict),
             errors=errors,
         )
 
@@ -54,11 +74,8 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         available_resources = await self._async_get_available_resources(address)
         if not available_resources:
             errors["base"] = "no_resources"
-            available_resources = [
-                "restafval", "gft", "papier", "pmd"
-            ]
+            available_resources = []
         if user_input is not None:
-            # Save all config and finish
             data = {**self._address_input, **user_input}
             return self.async_create_entry(
                 title=data.get(CONF_NAME) or data[CONF_WASTE_COLLECTOR],
@@ -95,34 +112,112 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def _async_get_available_resources(self, address):
-        # Import here to avoid circular import at HA startup
         try:
             from .API import get_wastedata_from_config
         except ImportError:
             return []
-        # Prepare config dict for API
+
         config = {
             CONF_WASTE_COLLECTOR: address[CONF_WASTE_COLLECTOR],
             CONF_POSTCODE: address[CONF_POSTCODE],
             CONF_STREET_NUMBER: address[CONF_STREET_NUMBER],
             CONF_SUFFIX: address.get(CONF_SUFFIX, ""),
-            CONF_RESOURCES: ["restafval"],  # dummy, required by schema
+            CONF_RESOURCES: ["restafval"],
         }
-        # Try to get available waste types (fractions) for this address
+        collector_lower = address[CONF_WASTE_COLLECTOR].lower()
+        if collector_lower == "limburg.net":
+            config[CONF_CITY_NAME] = address.get(CONF_CITY_NAME, "")
+        if collector_lower in ["limburg.net", "recycleapp"]:
+            config[CONF_STREET_NAME] = address.get(CONF_STREET_NAME, "")
         try:
-            # get_wastedata_from_config is sync, but may call async API, so run in executor
             data = await self.hass.async_add_executor_job(get_wastedata_from_config, self.hass, config)
             if not data or not hasattr(data, "collections"):
                 return []
-            # Wait for data to update (API call)
             await data.async_update()
             resources = data.collections.get_available_waste_types()
             return resources
         except Exception:
             return []
 
-    # @staticmethod
-    # @callback
-    # def async_get_options_flow(config_entry):
-    #     # Prevent options flow from being available (disables "Reconfigure" in UI)
-    #     return None
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        return AfvalbeheerOptionsFlowHandler(config_entry)
+
+
+class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
+    def __init__(self, config_entry):
+        self.config_entry = config_entry
+        self._collector = None
+        self._address_input = {}
+
+    async def async_step_init(self, user_input=None):
+        if user_input is not None:
+            self._collector = user_input[CONF_WASTE_COLLECTOR]
+            return await self.async_step_address()
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema({
+                vol.Required(CONF_WASTE_COLLECTOR, default=self.config_entry.data.get(CONF_WASTE_COLLECTOR)): vol.In(WASTE_COLLECTORS),
+            }),
+        )
+
+    async def async_step_address(self, user_input=None):
+        collector = self._collector
+        collector_lower = collector.lower()
+        show_city = collector_lower == "limburg.net"
+        show_street = collector_lower in ["limburg.net", "recycleapp"]
+
+        schema_dict = {
+            vol.Required(CONF_POSTCODE, default=self.config_entry.data.get(CONF_POSTCODE)): str,
+            vol.Required(CONF_STREET_NUMBER, default=self.config_entry.data.get(CONF_STREET_NUMBER)): str,
+            vol.Optional(CONF_SUFFIX, default=self.config_entry.data.get(CONF_SUFFIX, "")): str,
+        }
+        if show_city:
+            schema_dict[vol.Required(CONF_CITY_NAME, default=self.config_entry.data.get(CONF_CITY_NAME, ""))] = str
+        if show_street:
+            schema_dict[vol.Required(CONF_STREET_NAME, default=self.config_entry.data.get(CONF_STREET_NAME, ""))] = str
+
+        if user_input is not None:
+            self._address_input = {CONF_WASTE_COLLECTOR: self._collector, **user_input}
+            return await self.async_step_resources()
+
+        return self.async_show_form(step_id="address", data_schema=vol.Schema(schema_dict))
+
+    async def async_step_resources(self, user_input=None):
+        available_resources = await AfvalbeheerConfigFlow._async_get_available_resources(self, self._address_input)
+        if not available_resources:
+            available_resources = []
+
+        current = {**self.config_entry.data, **self.config_entry.options}
+
+        if user_input is not None:
+            data = {**self._address_input, **user_input}
+            return self.async_create_entry(title="", data=data)
+
+        return self.async_show_form(
+            step_id="resources",
+            data_schema=vol.Schema({
+                vol.Required(CONF_RESOURCES, default=current.get(CONF_RESOURCES, available_resources)): selector.SelectSelector(
+                    selector.SelectSelectorConfig(
+                        options=available_resources,
+                        multiple=True,
+                        mode=selector.SelectSelectorMode.DROPDOWN,
+                    )
+                ),
+                vol.Optional(CONF_NAME, default=current.get(CONF_NAME, "")): str,
+                vol.Optional(CONF_NAME_PREFIX, default=current.get(CONF_NAME_PREFIX, True)): cv.boolean,
+                vol.Optional(CONF_DATE_FORMAT, default=current.get(CONF_DATE_FORMAT, "%d-%m-%Y")): str,
+                vol.Optional(CONF_UPCOMING, default=current.get(CONF_UPCOMING, False)): cv.boolean,
+                vol.Optional(CONF_DATE_ONLY, default=current.get(CONF_DATE_ONLY, False)): cv.boolean,
+                vol.Optional(CONF_DATE_OBJECT, default=current.get(CONF_DATE_OBJECT, False)): cv.boolean,
+                vol.Optional(CONF_BUILT_IN_ICONS, default=current.get(CONF_BUILT_IN_ICONS, False)): cv.boolean,
+                vol.Optional(CONF_BUILT_IN_ICONS_NEW, default=current.get(CONF_BUILT_IN_ICONS_NEW, False)): cv.boolean,
+                vol.Optional(CONF_DISABLE_ICONS, default=current.get(CONF_DISABLE_ICONS, False)): cv.boolean,
+                vol.Optional(CONF_TRANSLATE_DAYS, default=current.get(CONF_TRANSLATE_DAYS, False)): cv.boolean,
+                vol.Optional(CONF_DAY_OF_WEEK, default=current.get(CONF_DAY_OF_WEEK, True)): cv.boolean,
+                vol.Optional(CONF_DAY_OF_WEEK_ONLY, default=current.get(CONF_DAY_OF_WEEK_ONLY, False)): cv.boolean,
+                vol.Optional(CONF_ALWAYS_SHOW_DAY, default=current.get(CONF_ALWAYS_SHOW_DAY, False)): cv.boolean,
+            }),
+        )

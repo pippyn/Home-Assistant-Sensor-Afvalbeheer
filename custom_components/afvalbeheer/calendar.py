@@ -5,6 +5,8 @@ from typing import Optional, List
 
 from .API import WasteData, get_wastedata_from_config
 
+from homeassistant.config_entries import ConfigEntry
+
 from homeassistant.const import CONF_RESOURCES
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.core import HomeAssistant
@@ -22,26 +24,33 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     config_data = discovery_info["config"] if discovery_info and "config" in discovery_info else config
 
-    waste_data = hass.data[DOMAIN].get(config_data[CONF_ID])
-    if waste_data is None:
-        waste_data = get_wastedata_from_config(hass, config_data)
-        hass.data[DOMAIN][config_data[CONF_ID]] = waste_data
+    data = hass.data[DOMAIN].get(config_data[CONF_ID], None) if not schedule_update else get_wastedata_from_config(hass, config)
         
+    if hasattr(data, "async_update"):
+        await data.async_update()
+    elif hasattr(data, "schedule_update"):
+        await data.schedule_update(timedelta())
+
+    async_add_entities([AfvalbeheerCalendar(data, config_data)])
+    
+
+async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
+    """Set up Afvalbeheer calendar from a config entry."""
+    config = dict({**entry.data, **entry.options})
+
+    if CONF_ID not in config or not config[CONF_ID]:
+        import uuid
+        config[CONF_ID] = str(uuid.uuid4())
+
+    # Always create a new WasteData object with the latest config
+    waste_data = get_wastedata_from_config(hass, config)
+
     if hasattr(waste_data, "async_update"):
         await waste_data.async_update()
     elif hasattr(waste_data, "schedule_update"):
         await waste_data.schedule_update(timedelta())
 
-    async_add_entities([AfvalbeheerCalendar(waste_data, config_data)])
-    
-
-async def async_setup_entry(hass, entry, async_add_entities):
-    """Set up Afvalbeheer sensors from a config entry."""
-    config = dict(entry.data)
-    if CONF_ID not in config or not config[CONF_ID]:
-        import uuid
-        config[CONF_ID] = str(uuid.uuid4())
-    await async_setup_platform(hass, config, async_add_entities)
+    async_add_entities([AfvalbeheerCalendar(waste_data, config)])
 
 
 class AfvalbeheerCalendar(CalendarEntity):
