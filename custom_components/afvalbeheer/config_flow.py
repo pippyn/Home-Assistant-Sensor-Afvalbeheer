@@ -169,15 +169,18 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
         show_city = collector_lower == "limburg.net"
         show_street = collector_lower in ["limburg.net", "recycleapp"]
 
+        # Combine current data and options to get all current values
+        current = {**self.config_entry.data, **self.config_entry.options}
+
         schema_dict = {
-            vol.Required(CONF_POSTCODE, default=self.config_entry.data.get(CONF_POSTCODE)): str,
-            vol.Required(CONF_STREET_NUMBER, default=self.config_entry.data.get(CONF_STREET_NUMBER)): str,
-            vol.Optional(CONF_SUFFIX, default=self.config_entry.data.get(CONF_SUFFIX, "")): str,
+            vol.Required(CONF_POSTCODE, default=current.get(CONF_POSTCODE)): str,
+            vol.Required(CONF_STREET_NUMBER, default=current.get(CONF_STREET_NUMBER)): str,
+            vol.Optional(CONF_SUFFIX, default=current.get(CONF_SUFFIX, "")): str,
         }
         if show_city:
-            schema_dict[vol.Required(CONF_CITY_NAME, default=self.config_entry.data.get(CONF_CITY_NAME, ""))] = str
+            schema_dict[vol.Required(CONF_CITY_NAME, default=current.get(CONF_CITY_NAME, ""))] = str
         if show_street:
-            schema_dict[vol.Required(CONF_STREET_NAME, default=self.config_entry.data.get(CONF_STREET_NAME, ""))] = str
+            schema_dict[vol.Required(CONF_STREET_NAME, default=current.get(CONF_STREET_NAME, ""))] = str
 
         if user_input is not None:
             self._address_input = {CONF_WASTE_COLLECTOR: self._collector, **user_input}
