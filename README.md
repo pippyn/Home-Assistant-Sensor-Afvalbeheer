@@ -18,6 +18,48 @@ You can use HACS to install this sensor. It is included by default.
 ### Manual
 Copy the files in the /custom_components/afvalbeheer/ folder to: [homeassistant]/config/custom_components/afvalbeheer/
 
+## Configuration Options: Config Flow vs YAML
+
+Some options for Afvalbeheer can be set via the Home Assistant UI (Config Flow), while others are only available when configuring via YAML.
+
+### Options Available in Config Flow (UI)
+
+The following options can be set via the Home Assistant UI (Integrations > Add Integration):
+
+- `wastecollector`
+- `resources`
+- `postcode`
+- `streetnumber`
+- `suffix`
+- `cityname` (for Limburg.net)
+- `streetname` (for Limburg.net and RecycleApp)
+- `name`
+- `nameprefix`
+- `dateformat`
+- `upcomingsensor`
+- `dateonly`
+- `dateobject`
+- `builtinicons`
+- `builtiniconsnew`
+- `disableicons`
+- `dutch`
+- `dayofweek`
+- `dayofweekonly`
+- `alwaysshowday`
+
+### Options **Only** Available in YAML
+
+The following options **cannot** be set via the UI and must be configured in `configuration.yaml`:
+
+- `printwastetypes`
+- `printwastetypeslugs`
+- `updateinterval`
+- `customerid`
+- `custommapping`
+- `addressid`
+
+**Example:**
+
 ## Example configs:
 ### Single instance
 ```yaml
@@ -59,6 +101,13 @@ afvalbeheer:
     postcode: 1111AA
     streetnumber: 2
 ```
+
+> **Note:** If you need to use any of the YAML-only options, you must configure Afvalbeheer via YAML instead of the UI.
+
+---
+
+For a full list of options and their descriptions, see the [documentation](https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer).
+
 ### Wastecollector
 ```
 wastecollector:
