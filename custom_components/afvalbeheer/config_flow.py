@@ -37,14 +37,14 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
-                vol.Required(CONF_WASTE_COLLECTOR, default="Blink"): vol.In(WASTE_COLLECTORS),
+                vol.Required(CONF_WASTE_COLLECTOR, default="ACV"): vol.In(WASTE_COLLECTORS),
             }),
             errors=errors,
         )
 
     async def async_step_address(self, user_input=None):
         errors = {}
-        collector = getattr(self, "_collector", "Blink")
+        collector = getattr(self, "_collector", "ACV")
         collector_lower = collector.lower()
         show_city = collector_lower == "limburg.net"
         show_street = collector_lower in ["limburg.net", "recycleapp"]
