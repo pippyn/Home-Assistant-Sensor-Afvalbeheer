@@ -13,13 +13,13 @@ from .const import (
 import homeassistant.helpers.config_validation as cv
 
 WASTE_COLLECTORS = [
-    "ACV", "Afval3xBeter", "Afvalstoffendienstkalender", "AfvalAlert", "Alkmaar",
+    "ACV", "Afval3xBeter", "Afvalstoffendienstkalender", "AfvalAlert",
     "Almere", "AlphenAanDenRijn", "AreaReiniging", "Assen", "Avalex", "Avri", "BAR",
-    "Berkelland", "Blink", "Circulus", "Cleanprofs", "Cranendonck", "Cure",
+    "Berkelland", "Blink", "Circulus", "Cleanprofs", "Cranendonck",
     "Cyclus", "DAR", "DeAfvalApp", "DeFryskeMarren", "DenHaag", "Drimmelen", "GAD",
-    "Hellendoorn", "HVC", "Limburg.NET", "Lingewaard", "Meerlanden", "Meppel",
+    "Hellendoorn", "HVC", "Limburg.NET", "Lingewaard", "Meerlanden",
     "Middelburg-Vlissingen", "MijnAfvalwijzer", "Mijnafvalzaken", "Montferland",
-    "Montfoort", "Ôffalkalinder", "Omrin", "PeelEnMaas", "PreZero", "Purmerend",
+    "Montfoort", "Omrin", "PeelEnMaas", "PreZero", "Purmerend",
     "RAD", "RecycleApp", "RD4", "RWM", "Reinis", "ROVA", "RMN", "Saver",
     "Schouwen-Duiveland", "Sliedrecht", "Spaarnelanden", "SudwestFryslan",
     "TwenteMilieu", "Venray", "Voorschoten", "Waalre", "Waardlanden", "Westland",
