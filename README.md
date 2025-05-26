@@ -106,8 +106,6 @@ afvalbeheer:
 
 ---
 
-For a full list of options and their descriptions, see the [documentation](https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer).
-
 ### Wastecollector
 ```
 wastecollector:
