@@ -37,14 +37,14 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema({
-                vol.Required(CONF_WASTE_COLLECTOR, default="ACV"): vol.In(WASTE_COLLECTORS),
+                vol.Required(CONF_WASTE_COLLECTOR, default=""): vol.In(WASTE_COLLECTORS),
             }),
             errors=errors,
         )
 
     async def async_step_address(self, user_input=None):
         errors = {}
-        collector = getattr(self, "_collector", "ACV")
+        collector = getattr(self, "_collector", "")
         collector_lower = collector.lower()
         show_city = collector_lower == "limburg.net"
         show_street = collector_lower in ["limburg.net", "recycleapp"]
@@ -97,13 +97,13 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Optional(CONF_NAME, default=""): str,
                 vol.Optional(CONF_NAME_PREFIX, default=True): cv.boolean,
                 vol.Optional(CONF_DATE_FORMAT, default="%d-%m-%Y"): str,
-                vol.Optional(CONF_UPCOMING, default=False): cv.boolean,
+                vol.Optional(CONF_UPCOMING, default=True): cv.boolean,
                 vol.Optional(CONF_DATE_ONLY, default=False): cv.boolean,
                 vol.Optional(CONF_DATE_OBJECT, default=False): cv.boolean,
                 vol.Optional(CONF_BUILT_IN_ICONS, default=False): cv.boolean,
                 vol.Optional(CONF_BUILT_IN_ICONS_NEW, default=False): cv.boolean,
                 vol.Optional(CONF_DISABLE_ICONS, default=False): cv.boolean,
-                vol.Optional(CONF_TRANSLATE_DAYS, default=False): cv.boolean,
+                vol.Optional(CONF_TRANSLATE_DAYS, default=True): cv.boolean,
                 vol.Optional(CONF_DAY_OF_WEEK, default=True): cv.boolean,
                 vol.Optional(CONF_DAY_OF_WEEK_ONLY, default=False): cv.boolean,
                 vol.Optional(CONF_ALWAYS_SHOW_DAY, default=False): cv.boolean,
