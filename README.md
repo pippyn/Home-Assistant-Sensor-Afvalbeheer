@@ -1,15 +1,15 @@
-# Home Assistant Sensor Component for Afvalbeheer
+# Home Assistant Sensor & Calendar Component for Afvalbeheer
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/pippyn)
 
-Afvalbeheer provides Home Assistant sensors for multiple Dutch and Belgian waste collectors using REST APIs.
+Afvalbeheer provides Home Assistant sensors and a calendar entity for multiple Dutch and Belgian waste collectors using REST APIs.
 
 ---
 
 ## Supported Waste Collectors
 
-This sensor works with many waste collectors, including:
+This integration works with many waste collectors, including:
 
 ACV, Afval3xBeter, Afvalstoffendienstkalender, AfvalAlert, Alkmaar, Almere, AlphenAanDenRijn, AreaReiniging, Assen, Avalex, Avri, BAR, Berkelland, Blink, Circulus, Cleanprofs, Cranendonck, Cure (use MijnAfvalwijzer), Cyclus, DAR, DeAfvalApp, DeFryskeMarren, DenHaag, Drimmelen, GAD, Hellendoorn, HVC, Limburg.NET (requires `streetname` and `cityname`), Lingewaard, Meerlanden, Meppel, Middelburg-Vlissingen, MijnAfvalwijzer, Mijnafvalzaken, Montferland, Montfoort, Ôffalkalinder, Omrin, PeelEnMaas, PreZero, Purmerend, RAD, RecycleApp (requires `streetname`), RD4, RWM, Reinis, ROVA, RMN, Saver, Schouwen-Duiveland, Sliedrecht, Spaarnelanden, SudwestFryslan, TwenteMilieu, Venray, Voorschoten, Waalre, Waardlanden, Westland, Woerden, ZRD.
 
@@ -31,11 +31,26 @@ ACV, Afval3xBeter, Afvalstoffendienstkalender, AfvalAlert, Alkmaar, Almere, Alph
 
 ---
 
+## Features
+
+- **Sensor entities** for each waste type and for upcoming collections (today, tomorrow, next upcoming)
+- **Calendar entity** showing all upcoming waste collection events (see below)
+- Support for custom naming, icons, translations, and advanced mapping
+- Works with both YAML and UI (Config Flow) configuration
+
+---
+
+## Calendar Entity
+
+This integration automatically creates a calendar entity (`calendar.afvalbeheer_<name>`) that shows all upcoming waste collection events for your address and selected waste types. You can use this entity in Home Assistant dashboards, automations, or notifications just like any other calendar.
+
+---
+
 ## Configuration Options
 
 Some options can be set via the Home Assistant UI (Config Flow), others only via YAML.
 
-### UI (Config Flow) Options
+### UI (Config Flow) and YAML Options
 - `wastecollector`
 - `resources`
 - `postcode`
@@ -112,6 +127,17 @@ afvalbeheer:
     postcode: 1111AA
     streetnumber: 2
 ```
+
+---
+
+## Entity Naming
+
+Sensor and calendar entity names are built as follows:
+- If `nameprefix` is enabled (default): `<WasteCollector> <Custom Name> <WasteType>`
+- If `nameprefix` is disabled: `<Custom Name> <WasteType>`
+- If `name` is empty: `<WasteCollector> <WasteType>`
+
+For example, with `wastecollector: Blink`, `name: Buiten`, and `nameprefix: 1`, you get: `sensor.blink_buiten_restafval`.
 
 ---
 
@@ -242,6 +268,8 @@ Update interval in hours. Default: 12.
 custommapping:
   keukenafval: VET-goed
   fraction2: New name for fraction2
+  papier: Papier (blauw)
+  pmd: PMD-Rest
 ```
 Override default mapping for waste fractions. Default: empty.
 
@@ -250,6 +278,12 @@ Override default mapping for waste fractions. Default: empty.
 customerid: 123456
 ```
 For commercial addresses using Ximmio collectors. Default: empty.
+
+---
+
+## Error Handling
+
+If the integration cannot retrieve data from your waste collector (e.g., due to network issues or API changes), the previous valid data will be kept and a persistent notification may be shown in Home Assistant. Check the Home Assistant logs for more details if you encounter issues.
 
 ---
 
