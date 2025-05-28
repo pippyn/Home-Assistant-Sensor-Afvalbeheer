@@ -194,6 +194,7 @@ class WasteTypeSensor(BaseSensor):
             if self.day_of_week:
                 if self.day_of_week_only:
                     self._state = collection.date.strftime("%A")
+                    self.date_format = "%A"
                 else:
                     if "%A" not in self.date_format:
                         self.date_format = "%A, " + self.date_format
