@@ -126,9 +126,14 @@ XIMMIO_COLLECTOR_IDS = {
 }
 
 BURGERPORTAAL_COLLECTOR_IDS = {
+    # 'amsterdam':        '138204213565341829',
     'assen':            '138204213565303512',
     'bar':              '138204213564933497',
+    'groningen':        '452048812597326549',
+    # 'maassluis':        '138204213564933097',
     'rmn':              '138204213564933597',
+    # 'saver':            '138204213565265087',
+    # 'zaanstad':         '138204213564932198',
 }
 
 DEPRECATED_AND_NEW_WASTECOLLECTORS = {
