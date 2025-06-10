@@ -17,7 +17,7 @@ WASTE_COLLECTORS = [
     "Almere", "AlphenAanDenRijn", "AreaReiniging", "Assen", "Avalex", "Avri", "BAR",
     "Berkelland", "Blink", "Circulus", "Cleanprofs", "Cranendonck",
     "Cyclus", "DAR", "DeAfvalApp", "DeFryskeMarren", "DenHaag", "Drimmelen", "GAD",
-    "Hellendoorn", "HVC", "Limburg.NET", "Lingewaard", "Meerlanden",
+    "Groningen", "Hellendoorn", "HVC", "Limburg.NET", "Lingewaard", "Meerlanden",
     "Middelburg-Vlissingen", "MijnAfvalwijzer", "Mijnafvalzaken", "Montferland",
     "Montfoort", "Omrin", "PeelEnMaas", "PreZero", "Purmerend",
     "RAD", "RecycleApp", "RD4", "RWM", "Reinis", "ROVA", "RMN", "Saver",

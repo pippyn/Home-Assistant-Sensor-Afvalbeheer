@@ -1,6 +1,6 @@
 {
     "sensor.afvalbeheer": {
-      "version": "5.6.4",
+      "version": "6.0.0",
       "local_location": "/custom_components/afvalbeheer/__init__.py",
       "remote_location": "https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/custom_components/afvalbeheer/__init__.py",
       "visit_repo": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer",
