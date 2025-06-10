@@ -128,6 +128,7 @@ XIMMIO_COLLECTOR_IDS = {
 BURGERPORTAAL_COLLECTOR_IDS = {
     'assen':            '138204213565303512',
     'bar':              '138204213564933497',
+    'groningen':        '452048812597326549',
     'rmn':              '138204213564933597',
 }
 
