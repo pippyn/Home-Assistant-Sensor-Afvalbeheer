@@ -29,6 +29,7 @@ This sensor works with the following waste collectors:
   - DenHaag
   - Drimmelen
   - GAD
+  - Groningen
   - Hellendoorn
   - HVC
   - Limburg.NET (don't forget the streetname and cityname option)
