@@ -55,8 +55,14 @@ class WasteCollectionRepository(object):
     def get_first_upcoming(self, waste_types=None):
         _LOGGER.debug(f"Getting first upcoming collection for waste types: {waste_types}")
         upcoming = self.get_upcoming()
-        first_item = upcoming[0] if upcoming else None
-        return list(filter(lambda x: x.date.date() == first_item.date.date() and x.waste_type.lower() in (waste_type.lower() for waste_type in waste_types), upcoming))
+        if not upcoming or not waste_types:
+            return []
+        waste_types_lc = [wt.lower() for wt in waste_types]
+        first = next(filter(lambda x: x.waste_type and x.waste_type.lower() in waste_types_lc, upcoming), None)
+        if not first:
+            return []
+        first_date = first.date.date()
+        return list(filter(lambda x: x.date.date() == first_date and x.waste_type and x.waste_type.lower() in waste_types_lc, upcoming))
 
     def get_upcoming_by_type(self, waste_type):
         _LOGGER.debug(f"Getting upcoming collections for waste type: {waste_type}")
@@ -415,7 +421,7 @@ class BurgerportaalCollector(WasteCollector):
 
         response = requests.post("https://securetoken.googleapis.com/v1/token?key={}".format(self.apikey), headers=headers, data=data).json()
         if not response:
-            _LOGGER.error('Unable to fetch refresh token!')
+            _LOGGER.error('Unable to fetch ID token!')
             return
         self.id_token = response['id_token']
 
@@ -428,7 +434,7 @@ class BurgerportaalCollector(WasteCollector):
         response = requests.get("https://europe-west3-burgerportaal-production.cloudfunctions.net/exposed/organisations/{}/address?zipcode={}&housenumber={}".format(
             self.company_code, self.postcode, self.street_number), headers=headers).json()
         if not response:
-            _LOGGER.error('Unable to fetch refresh token!')
+            _LOGGER.error('Unable to fetch address!')
             return
 
         for address in response:
@@ -1244,6 +1250,7 @@ class RecycleApp(WasteCollector):
         'zachte plastics': WASTE_TYPE_SOFT_PLASTIC,
         'roze zak': WASTE_TYPE_SOFT_PLASTIC,
         'déchets résiduels': WASTE_TYPE_GREY,
+        'déchets ménagers résiduels': WASTE_TYPE_GREY,
         'déchets organiques': WASTE_TYPE_GREEN,
         'omb': WASTE_TYPE_GREY,
     }
