@@ -1253,6 +1253,7 @@ class RecycleApp(WasteCollector):
         'déchets ménagers résiduels': WASTE_TYPE_GREY,
         'déchets organiques': WASTE_TYPE_GREEN,
         'omb': WASTE_TYPE_GREY,
+        'tuinafvalbak': WASTE_TYPE_BULKYGARDENWASTE
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping, street_name):
