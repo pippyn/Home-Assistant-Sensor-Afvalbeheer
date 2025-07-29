@@ -33,6 +33,57 @@ WASTE_COLLECTORS = [
 
 class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
+    async def async_step_import(self, import_config):
+        """Import a config entry from YAML configuration."""
+        _LOGGER.info("Importing YAML configuration for %s", import_config.get(CONF_WASTE_COLLECTOR))
+        
+        # Create a unique entry title
+        title = f"{import_config.get(CONF_WASTE_COLLECTOR)} (Imported from YAML)"
+        
+        # Check if this config already exists
+        for entry in self._async_current_entries():
+            existing_config = {**entry.data, **entry.options}
+            if (existing_config.get(CONF_WASTE_COLLECTOR) == import_config.get(CONF_WASTE_COLLECTOR) and
+                existing_config.get(CONF_POSTCODE) == import_config.get(CONF_POSTCODE) and
+                existing_config.get(CONF_STREET_NUMBER) == import_config.get(CONF_STREET_NUMBER)):
+                _LOGGER.info("Configuration already exists for %s at %s %s, skipping import", 
+                           import_config.get(CONF_WASTE_COLLECTOR),
+                           import_config.get(CONF_POSTCODE),
+                           import_config.get(CONF_STREET_NUMBER))
+                return self.async_abort(reason="already_configured")
+        
+        # Convert YAML config to config flow format
+        config_data = {}
+        
+        # Required fields
+        config_data[CONF_WASTE_COLLECTOR] = import_config[CONF_WASTE_COLLECTOR]
+        config_data[CONF_POSTCODE] = import_config[CONF_POSTCODE]
+        config_data[CONF_STREET_NUMBER] = str(import_config[CONF_STREET_NUMBER])
+        config_data[CONF_RESOURCES] = import_config[CONF_RESOURCES]
+        
+        # Optional fields with defaults
+        config_data[CONF_SUFFIX] = import_config.get(CONF_SUFFIX, DEFAULT_CONFIG[CONF_SUFFIX])
+        config_data[CONF_CITY_NAME] = import_config.get(CONF_CITY_NAME, "")
+        config_data[CONF_STREET_NAME] = import_config.get(CONF_STREET_NAME, "")
+        config_data[CONF_NAME] = import_config.get(CONF_NAME, DEFAULT_CONFIG[CONF_NAME])
+        config_data[CONF_NAME_PREFIX] = import_config.get(CONF_NAME_PREFIX, DEFAULT_CONFIG[CONF_NAME_PREFIX])
+        config_data[CONF_DATE_FORMAT] = import_config.get(CONF_DATE_FORMAT, DEFAULT_CONFIG[CONF_DATE_FORMAT])
+        config_data[CONF_UPCOMING] = import_config.get(CONF_UPCOMING, DEFAULT_CONFIG[CONF_UPCOMING])
+        config_data[CONF_DATE_ONLY] = import_config.get(CONF_DATE_ONLY, DEFAULT_CONFIG[CONF_DATE_ONLY])
+        config_data[CONF_DATE_OBJECT] = import_config.get(CONF_DATE_OBJECT, DEFAULT_CONFIG[CONF_DATE_OBJECT])
+        config_data[CONF_BUILT_IN_ICONS] = import_config.get(CONF_BUILT_IN_ICONS, DEFAULT_CONFIG[CONF_BUILT_IN_ICONS])
+        config_data[CONF_BUILT_IN_ICONS_NEW] = import_config.get(CONF_BUILT_IN_ICONS_NEW, DEFAULT_CONFIG[CONF_BUILT_IN_ICONS_NEW])
+        config_data[CONF_DISABLE_ICONS] = import_config.get(CONF_DISABLE_ICONS, DEFAULT_CONFIG[CONF_DISABLE_ICONS])
+        config_data[CONF_TRANSLATE_DAYS] = import_config.get(CONF_TRANSLATE_DAYS, DEFAULT_CONFIG[CONF_TRANSLATE_DAYS])
+        config_data[CONF_DAY_OF_WEEK] = import_config.get(CONF_DAY_OF_WEEK, DEFAULT_CONFIG[CONF_DAY_OF_WEEK])
+        config_data[CONF_DAY_OF_WEEK_ONLY] = import_config.get(CONF_DAY_OF_WEEK_ONLY, DEFAULT_CONFIG[CONF_DAY_OF_WEEK_ONLY])
+        config_data[CONF_ALWAYS_SHOW_DAY] = import_config.get(CONF_ALWAYS_SHOW_DAY, DEFAULT_CONFIG[CONF_ALWAYS_SHOW_DAY])
+        
+        # Generate unique ID for this configuration entry
+        config_data[CONF_ID] = str(uuid.uuid4())
+        
+        return self.async_create_entry(title=title, data=config_data)
+
     async def async_step_user(self, user_input=None):
         errors = {}
         if user_input is not None:
