@@ -34,6 +34,7 @@ CONF_PRINT_AVAILABLE_WASTE_TYPE_SLUGS = 'printwastetypeslugs'
 CONF_UPDATE_INTERVAL = 'updateinterval'
 CONF_CUSTOMER_ID = 'customerid'
 CONF_CUSTOM_MAPPING = 'custommapping'
+CONF_ENTRY_ID = 'entry_id'
 
 PLATFORM_SCHEMA = vol.Schema(
     {

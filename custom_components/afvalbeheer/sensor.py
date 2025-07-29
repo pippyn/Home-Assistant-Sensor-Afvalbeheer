@@ -54,6 +54,7 @@ async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
     """Set up Afvalbeheer sensors from a config entry."""
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
     config = dict({**entry.data, **entry.options})  # Make a mutable copy
+    config[CONF_ENTRY_ID] = entry.entry_id  # Add entry_id to config
 
     # --- Begin: Remove orphaned entities ---
     entity_registry = async_get_entity_registry(hass)
@@ -66,11 +67,11 @@ async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
     # Build expected unique_ids
     expected_unique_ids = set()
     for resource in waste_types:
-        expected_unique_ids.add(_format_sensor(name, name_prefix, collector, resource).lower())
+        expected_unique_ids.add(_format_unique_id(name, name_prefix, collector, resource, entry_id).lower())
     if config.get(CONF_UPCOMING):
-        expected_unique_ids.add(_format_sensor(name, name_prefix, collector, "eerstvolgende" if config.get(CONF_TRANSLATE_DAYS) else "first upcoming").lower())
-        expected_unique_ids.add(_format_sensor(name, name_prefix, collector, TODAY_STRING['nl'].lower() if config.get(CONF_TRANSLATE_DAYS) else TODAY_STRING['en'].lower()).lower())
-        expected_unique_ids.add(_format_sensor(name, name_prefix, collector, TOMORROW_STRING['nl'].lower() if config.get(CONF_TRANSLATE_DAYS) else TOMORROW_STRING['en'].lower()).lower())
+        expected_unique_ids.add(_format_unique_id(name, name_prefix, collector, "eerstvolgende" if config.get(CONF_TRANSLATE_DAYS) else "first upcoming", entry_id).lower())
+        expected_unique_ids.add(_format_unique_id(name, name_prefix, collector, TODAY_STRING['nl'].lower() if config.get(CONF_TRANSLATE_DAYS) else TODAY_STRING['en'].lower(), entry_id).lower())
+        expected_unique_ids.add(_format_unique_id(name, name_prefix, collector, TOMORROW_STRING['nl'].lower() if config.get(CONF_TRANSLATE_DAYS) else TOMORROW_STRING['en'].lower(), entry_id).lower())
     # Remove orphaned entities
     for entity in list(entity_registry.entities.values()):
         if entity.domain == domain and entity.config_entry_id == entry_id:
@@ -95,6 +96,7 @@ class BaseSensor(RestoreEntity, SensorEntity):
     def __init__(self, data, config):
         self.data = data
         self.waste_collector = config.get(CONF_WASTE_COLLECTOR, "").lower()
+        self.entry_id = config.get(CONF_ENTRY_ID)
         self.date_format = config.get(CONF_DATE_FORMAT)
         self.date_object = config.get(CONF_DATE_OBJECT)
         self.built_in_icons = config.get(CONF_BUILT_IN_ICONS)
@@ -188,7 +190,9 @@ class WasteTypeSensor(BaseSensor):
         self._name = _format_sensor(
             config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.waste_type
         )
-        self._attr_unique_id = self._name.lower()
+        self._attr_unique_id = _format_unique_id(
+            config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.waste_type, self.entry_id
+        ).lower()
         self._days_until = None
         self._sort_date = 0
         _LOGGER.debug("WasteTypeSensor initialized: %s", self._name)
@@ -289,7 +293,7 @@ class WasteDateSensor(BaseSensor):
         else:
             day = TOMORROW_STRING['nl'].lower() if self.dutch_days else TOMORROW_STRING['en'].lower()
         self._name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, day)
-        self._attr_unique_id = self._name.lower()
+        self._attr_unique_id = _format_unique_id(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, day, self.entry_id).lower()
 
     @property
     def name(self):
@@ -325,7 +329,7 @@ class WasteUpcomingSensor(BaseSensor):
         super().__init__(data, config)
         self.first_upcoming = "eerstvolgende" if self.dutch_days else "first upcoming"
         self._name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.first_upcoming)
-        self._attr_unique_id = self._name.lower()
+        self._attr_unique_id = _format_unique_id(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.first_upcoming, self.entry_id).lower()
         self.upcoming_day = None
         self.upcoming_waste_types = None
 
@@ -374,3 +378,20 @@ def _format_sensor(name, name_prefix, waste_collector, sensor_type):
         + (name + " " if name else "")
         + sensor_type
     )
+
+def _format_unique_id(name, name_prefix, waste_collector, sensor_type, entry_id):
+    """
+    Format a unique ID for the sensor that includes the entry_id to avoid conflicts.
+
+    Args:
+        name: The base name of the sensor.
+        name_prefix: Whether to include the waste collector's name as a prefix.
+        waste_collector: Name of the waste collector.
+        sensor_type: Type of the sensor (e.g., waste type or date).
+        entry_id: Config entry ID to make the unique ID truly unique.
+
+    Returns:
+        Formatted unique ID as a string.
+    """
+    sensor_name = _format_sensor(name, name_prefix, waste_collector, sensor_type)
+    return f"{entry_id}_{sensor_name}"
