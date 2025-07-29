@@ -1,0 +1,154 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Afvalbeheer Setup",
+        "description": "Select your waste collector",
+        "data": {
+          "wastecollector": "Waste Collector"
+        }
+      },
+      "address": {
+        "title": "Address Information", 
+        "description": "Enter your address details",
+        "data": {
+          "postcode": "Postal Code",
+          "streetnumber": "Street Number", 
+          "suffix": "Suffix (optional)",
+          "cityname": "City Name",
+          "streetname": "Street Name"
+        }
+      },
+      "resources": {
+        "title": "Configuration",
+        "description": "Select waste types and configure options",
+        "data": {
+          "resources": "Waste Types",
+          "name": "Custom Name",
+          "nameprefix": "Use Name Prefix", 
+          "dateformat": "Date Format",
+          "upcomingsensor": "Upcoming Sensors",
+          "dateonly": "Date Only",
+          "dateobject": "Date as Timestamp",
+          "dutch": "Dutch Language",
+          "dayofweek": "Show Day of Week",
+          "dayofweekonly": "Day Names Only",
+          "alwaysshowday": "Always Show Day Names",
+          "builtinicons": "Classic Icons",
+          "builtiniconsnew": "Modern Icons", 
+          "disableicons": "Disable Icons",
+          "updateinterval": "Update Interval (hours)",
+          "addressid": "Address ID",
+          "customerid": "Customer ID",
+          "custommapping": "Custom Waste Type Mapping"
+        },
+        "data_description": {
+          "resources": "Select the waste types you want to track",
+          "name": "Custom name for this integration instance (optional)",
+          "nameprefix": "Add waste collector name as prefix to sensor names",
+          "dateformat": "Date format for sensor values (Python strftime format)",
+          "upcomingsensor": "Create additional sensors for today, tomorrow, and next upcoming collection",
+          "dateonly": "Show only date without day names (overrides other day settings)",
+          "dateobject": "Use timestamp objects instead of formatted text (for automations)",
+          "dutch": "Show day and month names in Dutch instead of English",
+          "dayofweek": "Include day of week in sensor values (e.g., 'Monday, 01-01-2024')",
+          "dayofweekonly": "Show only day names for nearby dates (today, tomorrow, day names)",
+          "alwaysshowday": "Always show day names, even for dates more than a week away",
+          "builtinicons": "Use built-in icons for waste types (classic icon set)",
+          "builtiniconsnew": "Use built-in icons for waste types (modern icon set)",
+          "disableicons": "Disable all icons for waste type sensors",
+          "updateinterval": "How often to check for updated waste collection data (0 = use default interval)",
+          "addressid": "Address ID for Ximmio-based collectors (if required by your waste collector)",
+          "customerid": "Customer ID for Ximmio-based collectors (if required by your waste collector)",
+          "custommapping": "Custom waste type mappings in JSON format (for renaming waste types)"
+        }
+      }
+    },
+    "error": {
+      "import_error": "Failed to import API module",
+      "connection_error": "Connection error occurred", 
+      "invalid_collector": "Invalid collector data",
+      "no_resources": "No waste types found",
+      "unknown_error": "Unknown error occurred",
+      "invalid_custom_mapping": "Invalid JSON format in custom mapping",
+      "already_configured": "This configuration already exists"
+    },
+    "abort": {
+      "already_configured": "This waste collector configuration already exists"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Update Waste Collector",
+        "description": "Change your waste collector",
+        "data": {
+          "wastecollector": "Waste Collector"
+        }
+      },
+      "address": {
+        "title": "Update Address",
+        "description": "Update your address details", 
+        "data": {
+          "postcode": "Postal Code",
+          "streetnumber": "Street Number",
+          "suffix": "Suffix (optional)", 
+          "cityname": "City Name",
+          "streetname": "Street Name"
+        }
+      },
+      "resources": {
+        "title": "Update Configuration",
+        "description": "Update waste types and options",
+        "data": {
+          "resources": "Waste Types",
+          "name": "Custom Name",
+          "nameprefix": "Use Name Prefix",
+          "dateformat": "Date Format", 
+          "upcomingsensor": "Upcoming Sensors",
+          "dateonly": "Date Only",
+          "dateobject": "Date as Timestamp",
+          "dutch": "Dutch Language",
+          "dayofweek": "Show Day of Week",
+          "dayofweekonly": "Day Names Only",
+          "alwaysshowday": "Always Show Day Names",
+          "builtinicons": "Classic Icons",
+          "builtiniconsnew": "Modern Icons",
+          "disableicons": "Disable Icons",
+          "updateinterval": "Update Interval (hours)",
+          "addressid": "Address ID", 
+          "customerid": "Customer ID",
+          "custommapping": "Custom Waste Type Mapping"
+        },
+        "data_description": {
+          "resources": "Select the waste types you want to track",
+          "name": "Custom name for this integration instance (optional)",
+          "nameprefix": "Add waste collector name as prefix to sensor names",
+          "dateformat": "Date format for sensor values (Python strftime format)",
+          "upcomingsensor": "Create additional sensors for today, tomorrow, and next upcoming collection",
+          "dateonly": "Show only date without day names (overrides other day settings)",
+          "dateobject": "Use timestamp objects instead of formatted text (for automations)",
+          "dutch": "Show day and month names in Dutch instead of English",
+          "dayofweek": "Include day of week in sensor values (e.g., 'Monday, 01-01-2024')",
+          "dayofweekonly": "Show only day names for nearby dates (today, tomorrow, day names)",
+          "alwaysshowday": "Always show day names, even for dates more than a week away",
+          "builtinicons": "Use built-in icons for waste types (classic icon set)",
+          "builtiniconsnew": "Use built-in icons for waste types (modern icon set)",
+          "disableicons": "Disable all icons for waste type sensors",
+          "updateinterval": "How often to check for updated waste collection data (0 = use default interval)",
+          "addressid": "Address ID for Ximmio-based collectors (if required by your waste collector)",
+          "customerid": "Customer ID for Ximmio-based collectors (if required by your waste collector)",
+          "custommapping": "Custom waste type mappings in JSON format (for renaming waste types)"
+        }
+      }
+    },
+    "error": {
+      "import_error": "Failed to import API module",
+      "connection_error": "Connection error occurred",
+      "invalid_collector": "Invalid collector data", 
+      "no_resources": "No waste types found",
+      "unknown_error": "Unknown error occurred",
+      "invalid_custom_mapping": "Invalid JSON format in custom mapping"
+    }
+  }
+}

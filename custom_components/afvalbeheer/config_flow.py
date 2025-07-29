@@ -1,6 +1,7 @@
 import logging
 import voluptuous as vol
 import uuid
+import json
 from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.const import CONF_NAME
@@ -10,9 +11,9 @@ from .const import (
     CONF_RESOURCES, CONF_NAME_PREFIX, CONF_DATE_FORMAT, CONF_UPCOMING, CONF_DATE_ONLY,
     CONF_DATE_OBJECT, CONF_BUILT_IN_ICONS, CONF_BUILT_IN_ICONS_NEW, CONF_DISABLE_ICONS,
     CONF_TRANSLATE_DAYS, CONF_DAY_OF_WEEK, CONF_DAY_OF_WEEK_ONLY, CONF_ALWAYS_SHOW_DAY,
-    CONF_STREET_NAME, CONF_CITY_NAME, DEFAULT_CONFIG
+    CONF_STREET_NAME, CONF_CITY_NAME, CONF_ADDRESS_ID, CONF_CUSTOMER_ID, CONF_UPDATE_INTERVAL,
+    CONF_CUSTOM_MAPPING, DEFAULT_CONFIG, XIMMIO_COLLECTOR_IDS
 )
-import homeassistant.helpers.config_validation as cv
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -59,7 +60,49 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         config_data[CONF_WASTE_COLLECTOR] = import_config[CONF_WASTE_COLLECTOR]
         config_data[CONF_POSTCODE] = import_config[CONF_POSTCODE]
         config_data[CONF_STREET_NUMBER] = str(import_config[CONF_STREET_NUMBER])
-        config_data[CONF_RESOURCES] = import_config[CONF_RESOURCES]
+        
+        # Handle case-insensitive resource matching
+        yaml_resources = import_config[CONF_RESOURCES]
+        try:
+            # Try to get available resources to match against
+            temp_config = {
+                CONF_WASTE_COLLECTOR: import_config[CONF_WASTE_COLLECTOR],
+                CONF_POSTCODE: import_config[CONF_POSTCODE],
+                CONF_STREET_NUMBER: str(import_config[CONF_STREET_NUMBER]),
+                CONF_SUFFIX: import_config.get(CONF_SUFFIX, ""),
+                CONF_CITY_NAME: import_config.get(CONF_CITY_NAME, ""),
+                CONF_STREET_NAME: import_config.get(CONF_STREET_NAME, ""),
+                CONF_RESOURCES: ["restafval"],  # Dummy resource for API call
+            }
+            
+            from .API import get_wastedata_from_config
+            data = get_wastedata_from_config(self.hass, temp_config)
+            if data and hasattr(data, 'collections'):
+                # Get available resources from API
+                available_resources = data.collections.get_available_waste_types()
+                if available_resources:
+                    # Create case-insensitive mapping
+                    resource_mapping = {res.lower(): res for res in available_resources}
+                    
+                    # Map YAML resources to correct case
+                    matched_resources = []
+                    for yaml_res in yaml_resources:
+                        yaml_res_lower = yaml_res.lower()
+                        if yaml_res_lower in resource_mapping:
+                            matched_resources.append(resource_mapping[yaml_res_lower])
+                        else:
+                            # Keep original if no match found
+                            matched_resources.append(yaml_res)
+                    
+                    config_data[CONF_RESOURCES] = matched_resources
+                    _LOGGER.info("Mapped YAML resources %s to API resources %s", yaml_resources, matched_resources)
+                else:
+                    config_data[CONF_RESOURCES] = yaml_resources
+            else:
+                config_data[CONF_RESOURCES] = yaml_resources
+        except Exception as e:
+            _LOGGER.warning("Could not fetch resources for case matching during import: %s", e)
+            config_data[CONF_RESOURCES] = yaml_resources
         
         # Optional fields with defaults
         config_data[CONF_SUFFIX] = import_config.get(CONF_SUFFIX, DEFAULT_CONFIG[CONF_SUFFIX])
@@ -78,6 +121,12 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         config_data[CONF_DAY_OF_WEEK] = import_config.get(CONF_DAY_OF_WEEK, DEFAULT_CONFIG[CONF_DAY_OF_WEEK])
         config_data[CONF_DAY_OF_WEEK_ONLY] = import_config.get(CONF_DAY_OF_WEEK_ONLY, DEFAULT_CONFIG[CONF_DAY_OF_WEEK_ONLY])
         config_data[CONF_ALWAYS_SHOW_DAY] = import_config.get(CONF_ALWAYS_SHOW_DAY, DEFAULT_CONFIG[CONF_ALWAYS_SHOW_DAY])
+        
+        # Advanced options
+        config_data[CONF_ADDRESS_ID] = import_config.get(CONF_ADDRESS_ID, DEFAULT_CONFIG[CONF_ADDRESS_ID])
+        config_data[CONF_CUSTOMER_ID] = import_config.get(CONF_CUSTOMER_ID, DEFAULT_CONFIG[CONF_CUSTOMER_ID])
+        config_data[CONF_UPDATE_INTERVAL] = import_config.get(CONF_UPDATE_INTERVAL, DEFAULT_CONFIG[CONF_UPDATE_INTERVAL])
+        config_data[CONF_CUSTOM_MAPPING] = import_config.get(CONF_CUSTOM_MAPPING, DEFAULT_CONFIG[CONF_CUSTOM_MAPPING])
         
         # Generate unique ID for this configuration entry
         config_data[CONF_ID] = str(uuid.uuid4())
@@ -139,41 +188,102 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors["base"] = error_map.get(result["error"], "unknown_error")
         
         available_resources = result["resources"]
+        collector_lower = address[CONF_WASTE_COLLECTOR].lower()
+        is_ximmio_collector = collector_lower in XIMMIO_COLLECTOR_IDS
+        
         if user_input is not None:
-            data = {**self._address_input, **user_input}
-            # Generate unique ID for this configuration entry
-            data[CONF_ID] = str(uuid.uuid4())
-            return self.async_create_entry(
-                title=data.get(CONF_NAME) or data[CONF_WASTE_COLLECTOR],
-                data=data,
+            # Validate and parse custom mapping JSON
+            if CONF_CUSTOM_MAPPING in user_input:
+                try:
+                    mapping_str = user_input[CONF_CUSTOM_MAPPING].strip()
+                    if mapping_str == "":
+                        user_input[CONF_CUSTOM_MAPPING] = {}
+                    else:
+                        user_input[CONF_CUSTOM_MAPPING] = json.loads(mapping_str)
+                except json.JSONDecodeError:
+                    errors["base"] = "invalid_custom_mapping"
+                    return self.async_show_form(
+                        step_id="resources",
+                        data_schema=vol.Schema(schema_dict),
+                        errors=errors,
+                    )
+            
+            if not errors:
+                data = {**self._address_input, **user_input}
+                # Generate unique ID for this configuration entry
+                data[CONF_ID] = str(uuid.uuid4())
+                return self.async_create_entry(
+                    title=data.get(CONF_NAME) or data[CONF_WASTE_COLLECTOR],
+                    data=data,
+                )
+        
+        # Build schema with conditional fields
+        schema_dict = {
+            vol.Required(CONF_RESOURCES, default=available_resources): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=available_resources,
+                    multiple=True,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
+            vol.Optional(CONF_NAME, default=DEFAULT_CONFIG[CONF_NAME]): selector.TextSelector(
+                selector.TextSelectorConfig(
+                    type=selector.TextSelectorType.TEXT
+                )
+            ),
+            vol.Optional(CONF_NAME_PREFIX, default=DEFAULT_CONFIG[CONF_NAME_PREFIX]): selector.BooleanSelector(),
+        }
+        
+        # Date and time settings
+        schema_dict.update({
+            vol.Optional(CONF_DATE_FORMAT, default=DEFAULT_CONFIG[CONF_DATE_FORMAT]): selector.TextSelector(),
+            vol.Optional(CONF_UPCOMING, default=DEFAULT_CONFIG[CONF_UPCOMING]): selector.BooleanSelector(),
+            vol.Optional(CONF_DATE_ONLY, default=DEFAULT_CONFIG[CONF_DATE_ONLY]): selector.BooleanSelector(),
+            vol.Optional(CONF_DATE_OBJECT, default=DEFAULT_CONFIG[CONF_DATE_OBJECT]): selector.BooleanSelector(),
+            vol.Optional(CONF_TRANSLATE_DAYS, default=DEFAULT_CONFIG[CONF_TRANSLATE_DAYS]): selector.BooleanSelector(),
+            vol.Optional(CONF_DAY_OF_WEEK, default=DEFAULT_CONFIG[CONF_DAY_OF_WEEK]): selector.BooleanSelector(),
+            vol.Optional(CONF_DAY_OF_WEEK_ONLY, default=DEFAULT_CONFIG[CONF_DAY_OF_WEEK_ONLY]): selector.BooleanSelector(),
+            vol.Optional(CONF_ALWAYS_SHOW_DAY, default=DEFAULT_CONFIG[CONF_ALWAYS_SHOW_DAY]): selector.BooleanSelector(),
+        })
+        
+        # Icon settings
+        schema_dict.update({
+            vol.Optional(CONF_BUILT_IN_ICONS, default=DEFAULT_CONFIG[CONF_BUILT_IN_ICONS]): selector.BooleanSelector(),
+            vol.Optional(CONF_BUILT_IN_ICONS_NEW, default=DEFAULT_CONFIG[CONF_BUILT_IN_ICONS_NEW]): selector.BooleanSelector(),
+            vol.Optional(CONF_DISABLE_ICONS, default=DEFAULT_CONFIG[CONF_DISABLE_ICONS]): selector.BooleanSelector(),
+        })
+        
+        # Advanced settings
+        schema_dict.update({
+            vol.Optional(CONF_UPDATE_INTERVAL, default=DEFAULT_CONFIG[CONF_UPDATE_INTERVAL]): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=0,
+                    max=168,  # Max 1 week in hours
+                    step=1,
+                    mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="hours"
+                )
+            ),
+        })
+        
+        # Add Ximmio-specific fields conditionally
+        if is_ximmio_collector:
+            schema_dict.update({
+                vol.Optional(CONF_ADDRESS_ID, default=DEFAULT_CONFIG[CONF_ADDRESS_ID]): selector.TextSelector(),
+                vol.Optional(CONF_CUSTOMER_ID, default=DEFAULT_CONFIG[CONF_CUSTOMER_ID]): selector.TextSelector(),
+            })
+        
+        # Custom mapping - show as textarea for JSON input
+        schema_dict[vol.Optional(CONF_CUSTOM_MAPPING, default="{}")] = selector.TextSelector(
+            selector.TextSelectorConfig(
+                multiline=True,
+                type=selector.TextSelectorType.TEXT
             )
+        )
+        
         return self.async_show_form(
             step_id="resources",
-            data_schema=vol.Schema({
-                vol.Required(
-                    CONF_RESOURCES,
-                    default=available_resources
-                ): selector.SelectSelector(
-                    selector.SelectSelectorConfig(
-                        options=available_resources,
-                        multiple=True,
-                        mode=selector.SelectSelectorMode.DROPDOWN,
-                    )
-                ),
-                vol.Optional(CONF_NAME, default=DEFAULT_CONFIG[CONF_NAME]): str,
-                vol.Optional(CONF_NAME_PREFIX, default=DEFAULT_CONFIG[CONF_NAME_PREFIX]): cv.boolean,
-                vol.Optional(CONF_DATE_FORMAT, default=DEFAULT_CONFIG[CONF_DATE_FORMAT]): str,
-                vol.Optional(CONF_UPCOMING, default=DEFAULT_CONFIG[CONF_UPCOMING]): cv.boolean,
-                vol.Optional(CONF_DATE_ONLY, default=DEFAULT_CONFIG[CONF_DATE_ONLY]): cv.boolean,
-                vol.Optional(CONF_DATE_OBJECT, default=DEFAULT_CONFIG[CONF_DATE_OBJECT]): cv.boolean,
-                vol.Optional(CONF_BUILT_IN_ICONS, default=DEFAULT_CONFIG[CONF_BUILT_IN_ICONS]): cv.boolean,
-                vol.Optional(CONF_BUILT_IN_ICONS_NEW, default=DEFAULT_CONFIG[CONF_BUILT_IN_ICONS_NEW]): cv.boolean,
-                vol.Optional(CONF_DISABLE_ICONS, default=DEFAULT_CONFIG[CONF_DISABLE_ICONS]): cv.boolean,
-                vol.Optional(CONF_TRANSLATE_DAYS, default=DEFAULT_CONFIG[CONF_TRANSLATE_DAYS]): cv.boolean,
-                vol.Optional(CONF_DAY_OF_WEEK, default=DEFAULT_CONFIG[CONF_DAY_OF_WEEK]): cv.boolean,
-                vol.Optional(CONF_DAY_OF_WEEK_ONLY, default=DEFAULT_CONFIG[CONF_DAY_OF_WEEK_ONLY]): cv.boolean,
-                vol.Optional(CONF_ALWAYS_SHOW_DAY, default=DEFAULT_CONFIG[CONF_ALWAYS_SHOW_DAY]): cv.boolean,
-            }),
+            data_schema=vol.Schema(schema_dict),
             errors=errors,
         )
 
@@ -287,36 +397,94 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
             errors["base"] = error_map.get(result["error"], "unknown_error")
         
         available_resources = result["resources"]
-
         current = {**self.config_entry.data, **self.config_entry.options}
+        collector_lower = self._address_input[CONF_WASTE_COLLECTOR].lower()
+        is_ximmio_collector = collector_lower in XIMMIO_COLLECTOR_IDS
 
         if user_input is not None:
-            data = {**self._address_input, **user_input}
-            return self.async_create_entry(title="", data=data)
+            # Validate and parse custom mapping JSON
+            if CONF_CUSTOM_MAPPING in user_input:
+                try:
+                    mapping_str = user_input[CONF_CUSTOM_MAPPING].strip()
+                    if mapping_str == "":
+                        user_input[CONF_CUSTOM_MAPPING] = {}
+                    else:
+                        user_input[CONF_CUSTOM_MAPPING] = json.loads(mapping_str)
+                except json.JSONDecodeError:
+                    errors["base"] = "invalid_custom_mapping"
+                    
+            if not errors:
+                data = {**self._address_input, **user_input}
+                return self.async_create_entry(title="", data=data)
+
+        # Build schema with conditional fields
+        schema_dict = {
+            vol.Required(CONF_RESOURCES, default=current.get(CONF_RESOURCES, available_resources)): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=available_resources,
+                    multiple=True,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
+            vol.Optional(CONF_NAME, default=current.get(CONF_NAME, DEFAULT_CONFIG[CONF_NAME])): selector.TextSelector(),
+            vol.Optional(CONF_NAME_PREFIX, default=current.get(CONF_NAME_PREFIX, DEFAULT_CONFIG[CONF_NAME_PREFIX])): selector.BooleanSelector(),
+        }
+        
+        # Date and time settings
+        schema_dict.update({
+            vol.Optional(CONF_DATE_FORMAT, default=current.get(CONF_DATE_FORMAT, DEFAULT_CONFIG[CONF_DATE_FORMAT])): selector.TextSelector(),
+            vol.Optional(CONF_UPCOMING, default=current.get(CONF_UPCOMING, DEFAULT_CONFIG[CONF_UPCOMING])): selector.BooleanSelector(),
+            vol.Optional(CONF_DATE_ONLY, default=current.get(CONF_DATE_ONLY, DEFAULT_CONFIG[CONF_DATE_ONLY])): selector.BooleanSelector(),
+            vol.Optional(CONF_DATE_OBJECT, default=current.get(CONF_DATE_OBJECT, DEFAULT_CONFIG[CONF_DATE_OBJECT])): selector.BooleanSelector(),
+            vol.Optional(CONF_TRANSLATE_DAYS, default=current.get(CONF_TRANSLATE_DAYS, DEFAULT_CONFIG[CONF_TRANSLATE_DAYS])): selector.BooleanSelector(),
+            vol.Optional(CONF_DAY_OF_WEEK, default=current.get(CONF_DAY_OF_WEEK, DEFAULT_CONFIG[CONF_DAY_OF_WEEK])): selector.BooleanSelector(),
+            vol.Optional(CONF_DAY_OF_WEEK_ONLY, default=current.get(CONF_DAY_OF_WEEK_ONLY, DEFAULT_CONFIG[CONF_DAY_OF_WEEK_ONLY])): selector.BooleanSelector(),
+            vol.Optional(CONF_ALWAYS_SHOW_DAY, default=current.get(CONF_ALWAYS_SHOW_DAY, DEFAULT_CONFIG[CONF_ALWAYS_SHOW_DAY])): selector.BooleanSelector(),
+        })
+        
+        # Icon settings
+        schema_dict.update({
+            vol.Optional(CONF_BUILT_IN_ICONS, default=current.get(CONF_BUILT_IN_ICONS, DEFAULT_CONFIG[CONF_BUILT_IN_ICONS])): selector.BooleanSelector(),
+            vol.Optional(CONF_BUILT_IN_ICONS_NEW, default=current.get(CONF_BUILT_IN_ICONS_NEW, DEFAULT_CONFIG[CONF_BUILT_IN_ICONS_NEW])): selector.BooleanSelector(),
+            vol.Optional(CONF_DISABLE_ICONS, default=current.get(CONF_DISABLE_ICONS, DEFAULT_CONFIG[CONF_DISABLE_ICONS])): selector.BooleanSelector(),
+        })
+        
+        # Advanced settings
+        schema_dict.update({
+            vol.Optional(CONF_UPDATE_INTERVAL, default=current.get(CONF_UPDATE_INTERVAL, DEFAULT_CONFIG[CONF_UPDATE_INTERVAL])): selector.NumberSelector(
+                selector.NumberSelectorConfig(
+                    min=0,
+                    max=168,  # Max 1 week in hours
+                    step=1,
+                    mode=selector.NumberSelectorMode.BOX,
+                    unit_of_measurement="hours"
+                )
+            ),
+        })
+        
+        # Add Ximmio-specific fields conditionally
+        if is_ximmio_collector:
+            schema_dict.update({
+                vol.Optional(CONF_ADDRESS_ID, default=current.get(CONF_ADDRESS_ID, DEFAULT_CONFIG[CONF_ADDRESS_ID])): selector.TextSelector(),
+                vol.Optional(CONF_CUSTOMER_ID, default=current.get(CONF_CUSTOMER_ID, DEFAULT_CONFIG[CONF_CUSTOMER_ID])): selector.TextSelector(),
+            })
+        
+        # Custom mapping - show as textarea for JSON input
+        current_mapping = current.get(CONF_CUSTOM_MAPPING, DEFAULT_CONFIG[CONF_CUSTOM_MAPPING])
+        if isinstance(current_mapping, dict):
+            current_mapping_str = json.dumps(current_mapping, indent=2) if current_mapping else "{}"
+        else:
+            current_mapping_str = str(current_mapping)
+            
+        schema_dict[vol.Optional(CONF_CUSTOM_MAPPING, default=current_mapping_str)] = selector.TextSelector(
+            selector.TextSelectorConfig(
+                multiline=True,
+                type=selector.TextSelectorType.TEXT
+            )
+        )
 
         return self.async_show_form(
             step_id="resources",
-            data_schema=vol.Schema({
-                vol.Required(CONF_RESOURCES, default=current.get(CONF_RESOURCES, available_resources)): selector.SelectSelector(
-                    selector.SelectSelectorConfig(
-                        options=available_resources,
-                        multiple=True,
-                        mode=selector.SelectSelectorMode.DROPDOWN,
-                    )
-                ),
-                vol.Optional(CONF_NAME, default=current.get(CONF_NAME, DEFAULT_CONFIG[CONF_NAME])): str,
-                vol.Optional(CONF_NAME_PREFIX, default=current.get(CONF_NAME_PREFIX, DEFAULT_CONFIG[CONF_NAME_PREFIX])): cv.boolean,
-                vol.Optional(CONF_DATE_FORMAT, default=current.get(CONF_DATE_FORMAT, DEFAULT_CONFIG[CONF_DATE_FORMAT])): str,
-                vol.Optional(CONF_UPCOMING, default=current.get(CONF_UPCOMING, DEFAULT_CONFIG[CONF_UPCOMING])): cv.boolean,
-                vol.Optional(CONF_DATE_ONLY, default=current.get(CONF_DATE_ONLY, DEFAULT_CONFIG[CONF_DATE_ONLY])): cv.boolean,
-                vol.Optional(CONF_DATE_OBJECT, default=current.get(CONF_DATE_OBJECT, DEFAULT_CONFIG[CONF_DATE_OBJECT])): cv.boolean,
-                vol.Optional(CONF_BUILT_IN_ICONS, default=current.get(CONF_BUILT_IN_ICONS, DEFAULT_CONFIG[CONF_BUILT_IN_ICONS])): cv.boolean,
-                vol.Optional(CONF_BUILT_IN_ICONS_NEW, default=current.get(CONF_BUILT_IN_ICONS_NEW, DEFAULT_CONFIG[CONF_BUILT_IN_ICONS_NEW])): cv.boolean,
-                vol.Optional(CONF_DISABLE_ICONS, default=current.get(CONF_DISABLE_ICONS, DEFAULT_CONFIG[CONF_DISABLE_ICONS])): cv.boolean,
-                vol.Optional(CONF_TRANSLATE_DAYS, default=current.get(CONF_TRANSLATE_DAYS, DEFAULT_CONFIG[CONF_TRANSLATE_DAYS])): cv.boolean,
-                vol.Optional(CONF_DAY_OF_WEEK, default=current.get(CONF_DAY_OF_WEEK, DEFAULT_CONFIG[CONF_DAY_OF_WEEK])): cv.boolean,
-                vol.Optional(CONF_DAY_OF_WEEK_ONLY, default=current.get(CONF_DAY_OF_WEEK_ONLY, DEFAULT_CONFIG[CONF_DAY_OF_WEEK_ONLY])): cv.boolean,
-                vol.Optional(CONF_ALWAYS_SHOW_DAY, default=current.get(CONF_ALWAYS_SHOW_DAY, DEFAULT_CONFIG[CONF_ALWAYS_SHOW_DAY])): cv.boolean,
-            }),
+            data_schema=vol.Schema(schema_dict),
             errors=errors,
         )

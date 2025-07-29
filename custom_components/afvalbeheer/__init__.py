@@ -61,7 +61,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
             f"**Next Steps:**\n"
             f"1. Go to **Settings > Devices & Services > Afvalbeheer** to manage your configurations\n"
             f"2. Verify the imported settings are correct\n"
-            f"3. Once confirmed, you can remove the YAML configuration from your `configuration.yaml` file\n\n"
+            f"3. **Remove the YAML configuration from your `configuration.yaml` file** to avoid duplicates\n"
+            f"4. Restart Home Assistant after removing the YAML configuration\n\n"
             f"The Config Flow system provides a better user experience and allows for easier management "
             f"of multiple waste collectors."
         )
@@ -72,21 +73,12 @@ async def async_setup(hass: HomeAssistant, config: ConfigType):
             title="Afvalbeheer: YAML Import Complete",
             notification_id=f"{NOTIFICATION_ID}_yaml_import"
         )
-
-    # Still support legacy YAML setup for backward compatibility during transition
-    for conf in yaml_config:
-        data = get_wastedata_from_config(hass, conf)
-        hass.data.setdefault(DOMAIN, {})[conf[CONF_ID]] = data
-
-        await async_load_platform(
-            hass, Platform.SENSOR, DOMAIN, {"config": conf}, conf
+        
+        _LOGGER.warning(
+            "YAML configuration detected and imported to Config Flow. "
+            "To avoid duplicate sensors, please remove the YAML configuration from configuration.yaml "
+            "and restart Home Assistant."
         )
-
-        load_platform(
-            hass, Platform.CALENDAR, DOMAIN, {"config": conf}, conf
-        )
-
-        await data.schedule_update(timedelta())
 
     return True
 
