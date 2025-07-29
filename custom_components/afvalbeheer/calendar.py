@@ -38,9 +38,10 @@ async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
     """Set up Afvalbeheer calendar from a config entry."""
     config = dict({**entry.data, **entry.options})
 
-    if CONF_ID not in config or not config[CONF_ID]:
-        import uuid
-        config[CONF_ID] = str(uuid.uuid4())
+    # CONF_ID should now be provided by config flow
+    if CONF_ID not in config:
+        _LOGGER.error("Missing CONF_ID in calendar configuration")
+        return
 
     # Always create a new WasteData object with the latest config
     waste_data = get_wastedata_from_config(hass, config)

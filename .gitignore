@@ -1,1 +1,6 @@
 .DS_Store
+CLAUDE.md
+CONFIG_FLOW_FIX_PLAN.md
+API_SPLIT_PLAN.md
+.claude/
+custom_components/afvalbeheer/__pycache__/
