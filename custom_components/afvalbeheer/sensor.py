@@ -356,19 +356,34 @@ def _format_sensor(name, name_prefix, waste_collector, sensor_type):
         + sensor_type
     )
 
-def _format_unique_id(name, name_prefix, waste_collector, sensor_type, entry_id):
+def _format_unique_id(name, name_prefix, waste_collector, sensor_type, entry_id, postcode=None, street_number=None):
     """
-    Format a unique ID for the sensor that includes the entry_id to avoid conflicts.
+    Format a unique ID for the sensor that is consistent between YAML and Config Flow.
 
     Args:
         name: The base name of the sensor.
         name_prefix: Whether to include the waste collector's name as a prefix.
         waste_collector: Name of the waste collector.
         sensor_type: Type of the sensor (e.g., waste type or date).
-        entry_id: Config entry ID to make the unique ID truly unique.
+        entry_id: Config entry ID (used for compatibility, but unique ID is based on config values).
+        postcode: Postal code for uniqueness (optional).
+        street_number: Street number for uniqueness (optional).
 
     Returns:
         Formatted unique ID as a string.
     """
-    sensor_name = _format_sensor(name, name_prefix, waste_collector, sensor_type)
-    return f"{entry_id}_{sensor_name}"
+    # Use a consistent format based on configuration values, not entry_id
+    # This ensures YAML and Config Flow create the same unique IDs for the same config
+    parts = [waste_collector, sensor_type]
+    
+    # Add location data if available for uniqueness
+    if postcode and street_number:
+        parts = [waste_collector, postcode, str(street_number), sensor_type]
+    
+    # Add custom name if provided
+    if name:
+        parts.insert(0, name)
+    
+    # Create consistent unique ID
+    unique_id = "_".join(parts).replace(" ", "_").replace("-", "_").lower()
+    return unique_id

@@ -34,104 +34,21 @@ WASTE_COLLECTORS = [
 
 class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     
-    VERSION = 2  # Increment this when config structure changes
+    VERSION = 3  # Increment this when config structure changes  
     MINOR_VERSION = 1
     
-    @staticmethod
-    @callback
-    def async_migrate_entry(hass, config_entry):
-        """Migrate old config entries to new format."""
-        _LOGGER.info("Migrating config entry from version %s.%s to %s.%s", 
-                     config_entry.version, config_entry.minor_version,
-                     AfvalbeheerConfigFlow.VERSION, AfvalbeheerConfigFlow.MINOR_VERSION)
-        
-        # Version 1 -> Version 2: Migrate entity unique IDs to new format
-        if config_entry.version == 1:
-            return AfvalbeheerConfigFlow._migrate_v1_to_v2(hass, config_entry)
-        
-        return True
-    
-    @staticmethod
-    def _migrate_v1_to_v2(hass, config_entry):
-        """Migrate from version 1 to version 2 - update entity unique IDs."""
-        from homeassistant.helpers import entity_registry as er
-        
-        try:
-            entity_registry = er.async_get(hass)
-            config_data = {**config_entry.data, **config_entry.options}
-            
-            waste_collector = config_data.get(CONF_WASTE_COLLECTOR, "").lower()
-            postcode = config_data.get(CONF_POSTCODE, "")
-            street_number = str(config_data.get(CONF_STREET_NUMBER, ""))
-            name = config_data.get(CONF_NAME, "")
-            
-            _LOGGER.info("Migrating entities for waste_collector=%s, postcode=%s, street_number=%s", 
-                        waste_collector, postcode, street_number)
-            
-            migrated_count = 0
-            
-            # Find entities belonging to this config entry
-            for entity in list(entity_registry.entities.values()):
-                if (entity.domain == "sensor" and 
-                    entity.platform == DOMAIN and 
-                    entity.config_entry_id == config_entry.entry_id):
-                    
-                    # Determine the sensor type from the old unique_id or entity_id
-                    old_unique_id = entity.unique_id
-                    sensor_type = None
-                    
-                    # Try to extract sensor type from old unique_id patterns
-                    if old_unique_id:
-                        # Handle old patterns like "entry_id_sensor_name" or just "sensor_name"
-                        parts = old_unique_id.split("_")
-                        sensor_type = parts[-1]  # Last part should be the sensor type
-                    
-                    if not sensor_type:
-                        # Fallback: extract from entity_id
-                        entity_name = entity.entity_id.replace("sensor.", "")
-                        if "_" in entity_name:
-                            sensor_type = entity_name.split("_")[-1]
-                        else:
-                            sensor_type = entity_name
-                    
-                    if sensor_type:
-                        # Generate new unique_id using the new format
-                        parts = [waste_collector, sensor_type]
-                        if postcode and street_number:
-                            parts = [waste_collector, postcode, street_number, sensor_type]
-                        if name:
-                            parts.insert(0, name)
-                        
-                        new_unique_id = "_".join(parts).replace(" ", "_").replace("-", "_").lower()
-                        
-                        if new_unique_id != old_unique_id:
-                            _LOGGER.info("Migrating entity %s: %s -> %s", 
-                                       entity.entity_id, old_unique_id, new_unique_id)
-                            
-                            entity_registry.async_update_entity(
-                                entity.entity_id,
-                                new_unique_id=new_unique_id
-                            )
-                            migrated_count += 1
-            
-            _LOGGER.info("Migration completed. Updated %d entities.", migrated_count)
-            
-            # Update config entry version
-            hass.config_entries.async_update_entry(
-                config_entry,
-                version=AfvalbeheerConfigFlow.VERSION,
-                minor_version=AfvalbeheerConfigFlow.MINOR_VERSION
-            )
-            
-            return True
-            
-        except Exception as e:
-            _LOGGER.error("Migration failed: %s", e)
-            return False
 
     async def async_step_import(self, import_config):
         """Import a config entry from YAML configuration."""
-        _LOGGER.info("Importing YAML configuration for %s", import_config.get(CONF_WASTE_COLLECTOR))
+        _LOGGER.warning("=== YAML IMPORT STARTED ===")
+        _LOGGER.warning("Importing YAML configuration for %s", import_config.get(CONF_WASTE_COLLECTOR))
+        
+        # Check existing config entries
+        existing_entries = self._async_current_entries()
+        _LOGGER.warning("Found %d existing config entries", len(existing_entries))
+        for entry in existing_entries:
+            _LOGGER.warning("Existing entry: %s (version %s.%s)", 
+                          entry.title, entry.version, entry.minor_version)
         
         # Create a unique entry title
         title = f"{import_config.get(CONF_WASTE_COLLECTOR)} (Imported from YAML)"
@@ -226,7 +143,53 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         # Generate unique ID for this configuration entry
         config_data[CONF_ID] = str(uuid.uuid4())
         
+        # Clean up old YAML entities before creating new config entry
+        await self._cleanup_yaml_entities(import_config)
+        
         return self.async_create_entry(title=title, data=config_data)
+    
+    async def _cleanup_yaml_entities(self, import_config):
+        """Remove old YAML entities that don't have a config_entry_id."""
+        from homeassistant.helpers import entity_registry as er
+        
+        entity_registry = er.async_get(self.hass)
+        waste_collector = import_config.get(CONF_WASTE_COLLECTOR, "").lower()
+        resources = import_config.get(CONF_RESOURCES, [])
+        
+        _LOGGER.info("Cleaning up old YAML entities for waste collector: %s", waste_collector)
+        
+        entities_to_remove = []
+        
+        # Find entities that likely belong to this YAML config but have no config_entry_id
+        for entity in entity_registry.entities.values():
+            if (entity.domain == "sensor" and 
+                entity.platform == DOMAIN and 
+                entity.config_entry_id is None):  # Pure YAML entities have no config_entry_id
+                
+                entity_name = entity.entity_id.replace("sensor.", "")
+                
+                # Check if entity matches this waste collector's resources
+                matches_collector = waste_collector in entity_name.lower()
+                matches_resource = any(resource.lower() in entity_name.lower() for resource in resources)
+                matches_upcoming = any(keyword in entity_name.lower() for keyword in 
+                                     ["today", "tomorrow", "vandaag", "morgen", "eerstvolgende", "first", "upcoming"])
+                
+                if matches_collector or matches_resource or matches_upcoming:
+                    entities_to_remove.append(entity.entity_id)
+                    _LOGGER.info("Found YAML entity to remove: %s (unique_id: %s)", 
+                               entity.entity_id, entity.unique_id)
+        
+        # Remove the old YAML entities
+        removed_count = 0
+        for entity_id in entities_to_remove:
+            try:
+                _LOGGER.info("Removing YAML entity: %s", entity_id)
+                entity_registry.async_remove(entity_id)
+                removed_count += 1
+            except Exception as e:
+                _LOGGER.error("Failed to remove YAML entity %s: %s", entity_id, e)
+        
+        _LOGGER.info("YAML cleanup completed. Removed %d entities", removed_count)
 
     async def async_step_user(self, user_input=None):
         errors = {}
