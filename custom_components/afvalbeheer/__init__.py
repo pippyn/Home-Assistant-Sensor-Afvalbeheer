@@ -12,7 +12,6 @@ from homeassistant.const import Platform
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
-from homeassistant.helpers.discovery import async_load_platform, load_platform
 from homeassistant.components import persistent_notification
 
 from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID, NOTIFICATION_ID, CONF_WASTE_COLLECTOR
