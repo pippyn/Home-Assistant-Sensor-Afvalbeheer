@@ -146,6 +146,9 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         # Clean up old YAML entities before creating new config entry
         await self._cleanup_yaml_entities(import_config)
         
+        _LOGGER.warning("Creating config entry with data: postcode=%s, street_number=%s", 
+                       config_data.get(CONF_POSTCODE), config_data.get(CONF_STREET_NUMBER))
+        
         return self.async_create_entry(title=title, data=config_data)
     
     async def _cleanup_yaml_entities(self, import_config):
@@ -188,6 +191,18 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 removed_count += 1
             except Exception as e:
                 _LOGGER.error("Failed to remove YAML entity %s: %s", entity_id, e)
+        
+        # Force registry save to ensure entities are fully removed
+        if removed_count > 0:
+            _LOGGER.info("Forcing entity registry save to ensure cleanup")
+            try:
+                # Force the registry to save and clear its cache
+                await entity_registry.async_load()
+                # Small delay to ensure registry is updated
+                import asyncio
+                await asyncio.sleep(0.1)
+            except Exception as e:
+                _LOGGER.warning("Could not force registry update: %s", e)
         
         _LOGGER.info("YAML cleanup completed. Removed %d entities", removed_count)
 

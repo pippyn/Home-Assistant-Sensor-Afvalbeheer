@@ -170,14 +170,14 @@ async def _migrate_entry_to_v3(hass, config_entry):
                         sensor_type = entity_name
                 
                 if sensor_type:
-                    # Generate new unique_id using the new format
-                    parts = [waste_collector, sensor_type]
-                    if postcode and street_number:
-                        parts = [waste_collector, postcode, street_number, sensor_type]
-                    if name:
-                        parts.insert(0, name)
-                    
-                    new_unique_id = "_".join(parts).replace(" ", "_").replace("-", "_").lower()
+                    # Generate new unique_id using the consistent format
+                    if not name:
+                        # Simple format like YAML used: just the sensor type  
+                        new_unique_id = sensor_type.lower()
+                    else:
+                        # If custom name is provided, include it for uniqueness
+                        parts = [name, sensor_type]
+                        new_unique_id = "_".join(parts).replace(" ", "_").replace("-", "_").lower()
                     
                     if new_unique_id != old_unique_id:
                         _LOGGER.info("Migrating entity %s: %s -> %s", 
