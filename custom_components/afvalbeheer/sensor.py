@@ -264,7 +264,7 @@ class WasteTypeSensor(BaseSensor):
 
     def _set_picture(self, collection):
         """Set the entity picture based on collection data."""
-        if self.built_in_icons and not self.disable_icons:
+        if (self.built_in_icons or self.built_in_icons_new) and not self.disable_icons:
             self._entity_picture = self._get_entity_picture()
             _LOGGER.debug("Entity picture set for %s: %s", self._name, self._entity_picture)
 
@@ -273,7 +273,7 @@ class WasteTypeSensor(BaseSensor):
         waste_type_lower = self.waste_type.lower()
         if self.built_in_icons_new and waste_type_lower in FRACTION_ICONS_NEW:
             return FRACTION_ICONS_NEW[waste_type_lower]
-        elif waste_type_lower in FRACTION_ICONS:
+        elif self.built_in_icons and waste_type_lower in FRACTION_ICONS:
             return FRACTION_ICONS[waste_type_lower]
         return None
 
