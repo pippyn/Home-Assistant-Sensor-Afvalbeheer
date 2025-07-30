@@ -33,6 +33,101 @@ WASTE_COLLECTORS = [
 
 
 class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    
+    VERSION = 2  # Increment this when config structure changes
+    MINOR_VERSION = 1
+    
+    @staticmethod
+    @callback
+    def async_migrate_entry(hass, config_entry):
+        """Migrate old config entries to new format."""
+        _LOGGER.info("Migrating config entry from version %s.%s to %s.%s", 
+                     config_entry.version, config_entry.minor_version,
+                     AfvalbeheerConfigFlow.VERSION, AfvalbeheerConfigFlow.MINOR_VERSION)
+        
+        # Version 1 -> Version 2: Migrate entity unique IDs to new format
+        if config_entry.version == 1:
+            return AfvalbeheerConfigFlow._migrate_v1_to_v2(hass, config_entry)
+        
+        return True
+    
+    @staticmethod
+    def _migrate_v1_to_v2(hass, config_entry):
+        """Migrate from version 1 to version 2 - update entity unique IDs."""
+        from homeassistant.helpers import entity_registry as er
+        
+        try:
+            entity_registry = er.async_get(hass)
+            config_data = {**config_entry.data, **config_entry.options}
+            
+            waste_collector = config_data.get(CONF_WASTE_COLLECTOR, "").lower()
+            postcode = config_data.get(CONF_POSTCODE, "")
+            street_number = str(config_data.get(CONF_STREET_NUMBER, ""))
+            name = config_data.get(CONF_NAME, "")
+            
+            _LOGGER.info("Migrating entities for waste_collector=%s, postcode=%s, street_number=%s", 
+                        waste_collector, postcode, street_number)
+            
+            migrated_count = 0
+            
+            # Find entities belonging to this config entry
+            for entity in list(entity_registry.entities.values()):
+                if (entity.domain == "sensor" and 
+                    entity.platform == DOMAIN and 
+                    entity.config_entry_id == config_entry.entry_id):
+                    
+                    # Determine the sensor type from the old unique_id or entity_id
+                    old_unique_id = entity.unique_id
+                    sensor_type = None
+                    
+                    # Try to extract sensor type from old unique_id patterns
+                    if old_unique_id:
+                        # Handle old patterns like "entry_id_sensor_name" or just "sensor_name"
+                        parts = old_unique_id.split("_")
+                        sensor_type = parts[-1]  # Last part should be the sensor type
+                    
+                    if not sensor_type:
+                        # Fallback: extract from entity_id
+                        entity_name = entity.entity_id.replace("sensor.", "")
+                        if "_" in entity_name:
+                            sensor_type = entity_name.split("_")[-1]
+                        else:
+                            sensor_type = entity_name
+                    
+                    if sensor_type:
+                        # Generate new unique_id using the new format
+                        parts = [waste_collector, sensor_type]
+                        if postcode and street_number:
+                            parts = [waste_collector, postcode, street_number, sensor_type]
+                        if name:
+                            parts.insert(0, name)
+                        
+                        new_unique_id = "_".join(parts).replace(" ", "_").replace("-", "_").lower()
+                        
+                        if new_unique_id != old_unique_id:
+                            _LOGGER.info("Migrating entity %s: %s -> %s", 
+                                       entity.entity_id, old_unique_id, new_unique_id)
+                            
+                            entity_registry.async_update_entity(
+                                entity.entity_id,
+                                new_unique_id=new_unique_id
+                            )
+                            migrated_count += 1
+            
+            _LOGGER.info("Migration completed. Updated %d entities.", migrated_count)
+            
+            # Update config entry version
+            hass.config_entries.async_update_entry(
+                config_entry,
+                version=AfvalbeheerConfigFlow.VERSION,
+                minor_version=AfvalbeheerConfigFlow.MINOR_VERSION
+            )
+            
+            return True
+            
+        except Exception as e:
+            _LOGGER.error("Migration failed: %s", e)
+            return False
 
     async def async_step_import(self, import_config):
         """Import a config entry from YAML configuration."""
