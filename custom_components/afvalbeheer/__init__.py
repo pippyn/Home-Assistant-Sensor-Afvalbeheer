@@ -20,7 +20,6 @@ from .API import get_wastedata_from_config
 
 __version__ = "6.0.0"
 
-
 _LOGGER = logging.getLogger(__name__)
 
 

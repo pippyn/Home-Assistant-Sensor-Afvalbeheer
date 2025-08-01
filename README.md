@@ -123,7 +123,6 @@ afvalbeheer:
     postcode: 1111AA
     streetnumber: 2
 ```
-
 </details>
 
 ---
