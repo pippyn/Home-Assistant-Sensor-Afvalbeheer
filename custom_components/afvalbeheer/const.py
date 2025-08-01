@@ -79,15 +79,15 @@ NOTIFICATION_ID = "Afvalbeheer"
 # Default configuration values for Config Flow
 DEFAULT_CONFIG = {
     CONF_NAME: "",
-    CONF_NAME_PREFIX: True,
+    CONF_NAME_PREFIX: False,
     CONF_DATE_FORMAT: "%d-%m-%Y",
-    CONF_UPCOMING: False,  # Standardized to False to match YAML schema
+    CONF_UPCOMING: True,
     CONF_DATE_ONLY: False,
     CONF_DATE_OBJECT: False,
     CONF_BUILT_IN_ICONS: False,
     CONF_BUILT_IN_ICONS_NEW: False,
     CONF_DISABLE_ICONS: False,
-    CONF_TRANSLATE_DAYS: False,  # Standardized to False to match YAML schema
+    CONF_TRANSLATE_DAYS: True,
     CONF_DAY_OF_WEEK: True,
     CONF_DAY_OF_WEEK_ONLY: False,
     CONF_ALWAYS_SHOW_DAY: False,
