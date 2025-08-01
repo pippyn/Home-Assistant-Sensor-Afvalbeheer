@@ -79,7 +79,7 @@ NOTIFICATION_ID = "Afvalbeheer"
 # Default configuration values for Config Flow
 DEFAULT_CONFIG = {
     CONF_NAME: "",
-    CONF_NAME_PREFIX: False,
+    CONF_NAME_PREFIX: True,
     CONF_DATE_FORMAT: "%d-%m-%Y",
     CONF_UPCOMING: True,
     CONF_DATE_ONLY: False,
