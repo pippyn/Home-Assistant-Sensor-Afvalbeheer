@@ -473,6 +473,24 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
         current = {**self.config_entry.data, **self.config_entry.options}
         collector_lower = self._address_input[CONF_WASTE_COLLECTOR].lower()
         is_ximmio_collector = collector_lower in XIMMIO_COLLECTOR_IDS
+        
+        # Handle case-insensitive resource matching for current resources
+        current_resources = current.get(CONF_RESOURCES, [])
+        if available_resources and current_resources:
+            # Create case-insensitive mapping
+            resource_mapping = {res.lower(): res for res in available_resources}
+            
+            # Map current resources to correct case
+            matched_resources = []
+            for current_res in current_resources:
+                current_res_lower = current_res.lower()
+                if current_res_lower in resource_mapping:
+                    matched_resources.append(resource_mapping[current_res_lower])
+                else:
+                    # Keep original if no match found
+                    matched_resources.append(current_res)
+            
+            current[CONF_RESOURCES] = matched_resources
 
         if user_input is not None:
             # Validate and parse custom mapping JSON
