@@ -194,9 +194,11 @@ Select which waste types you want sensors for. At least one is required. Availab
 - **Disable Icons**: Disable entity pictures to use custom MDI icons
 
 **Built-in Icons:**
+
 ![Built-in Icons](https://user-images.githubusercontent.com/7591990/196623891-bf169e71-9f65-4d32-bade-befecb1263d8.jpg)
 
 **New Built-in Icons:**
+
 ![New Built-in Icons](https://user-images.githubusercontent.com/7591990/196623742-002840d9-6ecc-4100-9609-1b1f7302f86d.jpg)
 
 ### Language Options
