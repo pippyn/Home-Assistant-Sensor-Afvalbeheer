@@ -34,6 +34,7 @@ CONF_PRINT_AVAILABLE_WASTE_TYPE_SLUGS = 'printwastetypeslugs'
 CONF_UPDATE_INTERVAL = 'updateinterval'
 CONF_CUSTOMER_ID = 'customerid'
 CONF_CUSTOM_MAPPING = 'custommapping'
+CONF_ENTRY_ID = 'entry_id'
 
 PLATFORM_SCHEMA = vol.Schema(
     {
@@ -74,6 +75,28 @@ ATTR_SORT_DATE = 'Sort_date'
 ATTR_DAYS_UNTIL = 'Days_until'
 
 NOTIFICATION_ID = "Afvalbeheer"
+
+# Default configuration values for Config Flow
+DEFAULT_CONFIG = {
+    CONF_NAME: "",
+    CONF_NAME_PREFIX: True,
+    CONF_DATE_FORMAT: "%d-%m-%Y",
+    CONF_UPCOMING: True,
+    CONF_DATE_ONLY: False,
+    CONF_DATE_OBJECT: False,
+    CONF_BUILT_IN_ICONS: False,
+    CONF_BUILT_IN_ICONS_NEW: False,
+    CONF_DISABLE_ICONS: False,
+    CONF_TRANSLATE_DAYS: True,
+    CONF_DAY_OF_WEEK: True,
+    CONF_DAY_OF_WEEK_ONLY: False,
+    CONF_ALWAYS_SHOW_DAY: False,
+    CONF_SUFFIX: "",
+    CONF_ADDRESS_ID: "",
+    CONF_CUSTOMER_ID: "",
+    CONF_UPDATE_INTERVAL: 24,
+    CONF_CUSTOM_MAPPING: {},
+}
 
 OPZET_COLLECTOR_URLS = {
     'alphenaandenrijn':         'https://afvalkalender.alphenaandenrijn.nl',
@@ -126,10 +149,14 @@ XIMMIO_COLLECTOR_IDS = {
 }
 
 BURGERPORTAAL_COLLECTOR_IDS = {
+    # 'amsterdam':        '138204213565341829',
     'assen':            '138204213565303512',
     'bar':              '138204213564933497',
     'groningen':        '452048812597326549',
+    # 'maassluis':        '138204213564933097',
     'rmn':              '138204213564933597',
+    # 'saver':            '138204213565265087',
+    # 'zaanstad':         '138204213564932198',
 }
 
 DEPRECATED_AND_NEW_WASTECOLLECTORS = {

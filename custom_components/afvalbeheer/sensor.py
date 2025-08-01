@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime, timedelta
 
+from homeassistant.config_entries import ConfigEntry
+
 from homeassistant.const import CONF_RESOURCES
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -47,6 +49,19 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         await data.schedule_update(timedelta())
 
 
+async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
+    """Set up Afvalbeheer sensors from a config entry."""
+    entry.async_on_unload(entry.add_update_listener(async_reload_entry))
+    config = dict({**entry.data, **entry.options})  # Make a mutable copy
+    config[CONF_ENTRY_ID] = entry.entry_id  # Add entry_id to config
+
+
+    await async_setup_platform(hass, config, async_add_entities)
+
+async def async_reload_entry(hass, entry):
+    await hass.config_entries.async_reload(entry.entry_id)
+
+
 class BaseSensor(RestoreEntity, SensorEntity):
     """
     Base class for waste management sensors.
@@ -58,6 +73,7 @@ class BaseSensor(RestoreEntity, SensorEntity):
     def __init__(self, data, config):
         self.data = data
         self.waste_collector = config.get(CONF_WASTE_COLLECTOR, "").lower()
+        self.entry_id = config.get(CONF_ENTRY_ID)
         self.date_format = config.get(CONF_DATE_FORMAT)
         self.date_object = config.get(CONF_DATE_OBJECT)
         self.built_in_icons = config.get(CONF_BUILT_IN_ICONS)
@@ -151,7 +167,9 @@ class WasteTypeSensor(BaseSensor):
         self._name = _format_sensor(
             config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.waste_type
         )
-        self._attr_unique_id = self._name.lower()
+        self._attr_unique_id = _format_unique_id(
+            config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.waste_type, self.entry_id, config.get(CONF_POSTCODE), config.get(CONF_STREET_NUMBER)
+        ).lower()
         self._days_until = None
         self._sort_date = 0
         _LOGGER.debug("WasteTypeSensor initialized: %s", self._name)
@@ -223,7 +241,7 @@ class WasteTypeSensor(BaseSensor):
 
     def _set_picture(self, collection):
         """Set the entity picture based on collection data."""
-        if self.built_in_icons and not self.disable_icons:
+        if (self.built_in_icons or self.built_in_icons_new) and not self.disable_icons:
             self._entity_picture = self._get_entity_picture()
             _LOGGER.debug("Entity picture set for %s: %s", self._name, self._entity_picture)
 
@@ -232,7 +250,7 @@ class WasteTypeSensor(BaseSensor):
         waste_type_lower = self.waste_type.lower()
         if self.built_in_icons_new and waste_type_lower in FRACTION_ICONS_NEW:
             return FRACTION_ICONS_NEW[waste_type_lower]
-        elif waste_type_lower in FRACTION_ICONS:
+        elif self.built_in_icons and waste_type_lower in FRACTION_ICONS:
             return FRACTION_ICONS[waste_type_lower]
         return None
 
@@ -252,7 +270,7 @@ class WasteDateSensor(BaseSensor):
         else:
             day = TOMORROW_STRING['nl'].lower() if self.dutch_days else TOMORROW_STRING['en'].lower()
         self._name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, day)
-        self._attr_unique_id = self._name.lower()
+        self._attr_unique_id = _format_unique_id(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, day, self.entry_id, config.get(CONF_POSTCODE), config.get(CONF_STREET_NUMBER)).lower()
 
     @property
     def name(self):
@@ -288,7 +306,7 @@ class WasteUpcomingSensor(BaseSensor):
         super().__init__(data, config)
         self.first_upcoming = "eerstvolgende" if self.dutch_days else "first upcoming"
         self._name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.first_upcoming)
-        self._attr_unique_id = self._name.lower()
+        self._attr_unique_id = _format_unique_id(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.first_upcoming, self.entry_id, config.get(CONF_POSTCODE), config.get(CONF_STREET_NUMBER)).lower()
         self.upcoming_day = None
         self.upcoming_waste_types = None
 
@@ -337,3 +355,30 @@ def _format_sensor(name, name_prefix, waste_collector, sensor_type):
         + (name + " " if name else "")
         + sensor_type
     )
+
+def _format_unique_id(name, name_prefix, waste_collector, sensor_type, entry_id, postcode=None, street_number=None):
+    """
+    Format a unique ID for the sensor that is consistent between YAML and Config Flow.
+
+    Args:
+        name: The base name of the sensor.
+        name_prefix: Whether to include the waste collector's name as a prefix.
+        waste_collector: Name of the waste collector.
+        sensor_type: Type of the sensor (e.g., waste type or date).
+        entry_id: Config entry ID (used for compatibility, but unique ID is based on config values).
+        postcode: Postal code for uniqueness (optional).
+        street_number: Street number for uniqueness (optional).
+
+    Returns:
+        Formatted unique ID as a string.
+    """
+    # For backward compatibility with YAML configs, use simple format when no custom name
+    # This ensures YAML and Config Flow create the same unique IDs
+    if not name:
+        # Simple format like YAML used: just the sensor type
+        return sensor_type.lower()
+    
+    # If custom name is provided, include it for uniqueness
+    parts = [name, sensor_type]
+    unique_id = "_".join(parts).replace(" ", "_").replace("-", "_").lower()
+    return unique_id

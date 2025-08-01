@@ -1,9 +1,22 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/pippyn)
-## Home Assisant sensor component for Afvalbeheer
 
-Provides Home Assistant sensors for multiple Dutch and Belgium waste collectors using REST API. 
-This sensor works with the following waste collectors:
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/pippyn)
+## Home Assistant Sensor & Calendar Component for Afvalbeheer
+
+Provides Home Assistant sensors and calendar entities for multiple Dutch and Belgian waste collectors using REST APIs.
+
+> **⚠️ Important:** YAML configuration is deprecated as of v6.0.0. Use Home Assistant UI (Config Flow) for configuration.
+
+## Configuration
+
+**Recommended:** Use Home Assistant UI
+1. Go to **Settings** → **Devices & Services**
+2. Click **Add Integration** and search for "Afvalbeheer"
+3. Follow the configuration wizard
+
+## Supported Waste Collectors
+
+This integration works with the following waste collectors:
   - ACV
   - Afval3xBeter
   - Afvalstoffendienstkalender
@@ -69,27 +82,14 @@ This sensor works with the following waste collectors:
 
 ![alt text](https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/example.png)
 
-### Example config:
+## Features
 
-```yaml
-  afvalbeheer:
-      wastecollector: Blink
-      resources:
-        - restafval
-        - gft
-        - papier
-        - pmd
-      postcode: 1111AA
-      streetnumber: 1
-      suffix: a                        # (optional)
-      upcomingsensor: 0                # (optional)
-      dateformat: '%d-%m-%Y'           # (optional)
-      dateonly: 0                      # (optional)
-      name: ""                         # (optional)
-      nameprefix: 1                    # (optional)
-      builtinicons: 0                  # (optional)
-      dutch: 0                         # (optional)
-```
+- **Sensor entities** for each waste type and upcoming collections
+- **Calendar entity** showing all waste collection events  
+- Easy configuration through Home Assistant UI
+- Support for 50+ Dutch and Belgian waste collectors
+- Custom naming, icons, and display options
+
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/pippyn)
 
 [For more information visit the repository](https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/)
