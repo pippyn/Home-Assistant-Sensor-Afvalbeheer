@@ -88,6 +88,7 @@ This integration works with the following waste collectors:
 - Easy configuration through Home Assistant UI
 - Support for 50+ Dutch and Belgian waste collectors
 - Custom naming, icons, and display options
+
 [!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/pippyn)
 
 [For more information visit the repository](https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/)
