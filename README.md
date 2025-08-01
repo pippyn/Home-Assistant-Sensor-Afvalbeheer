@@ -5,6 +5,8 @@
 
 Afvalbeheer provides Home Assistant sensors and a calendar entity for multiple Dutch and Belgian waste collectors using REST APIs.
 
+> **⚠️ Important Notice:** YAML configuration is deprecated as of v6.0.0. All new installations and configurations should use the Home Assistant UI (Config Flow). Existing YAML configurations will continue to work but are no longer recommended.
+
 ---
 
 ## Supported Waste Collectors
@@ -36,7 +38,7 @@ ACV, Afval3xBeter, Afvalstoffendienstkalender, AfvalAlert, Alkmaar, Almere, Alph
 - **Sensor entities** for each waste type and for upcoming collections (today, tomorrow, next upcoming)
 - **Calendar entity** showing all upcoming waste collection events (see below)
 - Support for custom naming, icons, translations, and advanced mapping
-- Works with both YAML and UI (Config Flow) configuration
+- Easy configuration through Home Assistant UI (Config Flow)
 
 ---
 
@@ -46,45 +48,38 @@ This integration automatically creates a calendar entity (`calendar.afvalbeheer_
 
 ---
 
-## Configuration Options
+## Configuration
 
-Some options can be set via the Home Assistant UI (Config Flow), others only via YAML.
+### Adding the Integration (Recommended)
 
-### UI (Config Flow) and YAML Options
-- `wastecollector`
-- `resources`
-- `postcode`
-- `streetnumber`
-- `suffix`
-- `cityname` (Limburg.NET)
-- `streetname` (Limburg.NET, RecycleApp)
-- `name`
-- `nameprefix`
-- `dateformat`
-- `upcomingsensor`
-- `dateonly`
-- `dateobject`
-- `builtinicons`
-- `builtiniconsnew`
-- `disableicons`
-- `dutch`
-- `dayofweek`
-- `dayofweekonly`
-- `alwaysshowday`
+1. Go to **Settings** → **Devices & Services** in Home Assistant
+2. Click **Add Integration** and search for "Afvalbeheer"
+3. Follow the multi-step configuration wizard:
+   - **Step 1:** Select your waste collector from the dropdown
+   - **Step 2:** Enter your address details (postcode, street number, and suffix if applicable)
+   - **Step 3:** Select which waste types you want sensors for
+   - **Step 4:** Configure display options (date format, icons, naming, etc.)
 
-### YAML-Only Options
-- `printwastetypes`
-- `printwastetypeslugs`
-- `updateinterval`
-- `customerid`
-- `custommapping`
-- `addressid`
+All configuration options are available through the UI, including:
+- Waste collector selection
+- Address information (postcode, street number, suffix)
+- Special address fields (streetname for RecycleApp/Limburg.NET, cityname for Limburg.NET)
+- Waste type selection from available resources
+- Display options (date format, upcoming sensors, icons, Dutch translation)
+- Custom naming and prefixes
 
-> **If you need YAML-only options, configure via YAML instead of the UI.**
+### Multiple Instances
+
+To set up multiple instances (e.g., for different addresses), simply add the integration multiple times through the UI. Each instance will have its own set of sensors and calendar entity with unique naming based on your configuration.
 
 ---
 
-## Example Configuration
+## YAML Configuration (Deprecated)
+
+> **⚠️ YAML configuration is deprecated as of v6.0.0** and will be removed in a future version. Please migrate to Config Flow (UI configuration) for new installations.
+
+<details>
+<summary>Click to view legacy YAML configuration examples</summary>
 
 ### Single Instance
 ```yaml
@@ -128,156 +123,85 @@ afvalbeheer:
     streetnumber: 2
 ```
 
+</details>
+
 ---
 
 ## Entity Naming
 
-Sensor and calendar entity names are built as follows:
-- If `nameprefix` is enabled (default): `<WasteCollector> <Custom Name> <WasteType>`
-- If `nameprefix` is disabled: `<Custom Name> <WasteType>`
-- If `name` is empty: `<WasteCollector> <WasteType>`
+### Sensor Entities
+Sensor names are built as: `[WasteCollector] [CustomName] WasteType`
+- If **Name Prefix** is enabled (default): `WasteCollector CustomName WasteType`
+- If **Name Prefix** is disabled: `CustomName WasteType`  
+- If **Custom Name** is empty: `WasteCollector WasteType`
 
-For example, with `wastecollector: Blink`, `name: Buiten`, and `nameprefix: 1`, you get: `sensor.blink_buiten_restafval`.
+Examples:
+- With waste collector "Blink", custom name "Buiten", name prefix enabled: `sensor.blink_buiten_restafval`
+- With waste collector "Blink", no custom name, name prefix enabled: `sensor.blink_restafval`
+- With custom name "Buiten", name prefix disabled: `sensor.buiten_restafval`
+
+### Calendar Entity
+Calendar names are always: `Afvalbeheer WasteCollector`
+- Example: `calendar.afvalbeheer_blink`
 
 ---
 
-## Configuration Reference
+## Configuration Options Reference
+
+All configuration options are available through the Home Assistant UI (Config Flow). Here's what each option does:
 
 ### Waste Collector
-Choose from the supported list above.
+Choose from the supported list above. This determines which API the integration will use to fetch your waste collection data.
 
-### Resources
-A list of waste types you want sensors for. At least one is required. Not all types work with all collectors.
+### Address Information
+- **Postcode**: Required for all collectors
+- **Street Number**: Required for all collectors  
+- **Suffix**: Optional (e.g., "a", "bis")
+- **Street Name**: Required for Limburg.NET and RecycleApp collectors
+- **City Name**: Required for Limburg.NET collector
 
-**Main options:**
-- restafval
-- gft
-- papier
-- pmd
+### Waste Types (Resources)
+Select which waste types you want sensors for. At least one is required. Available options depend on your collector:
 
-**Other options (collector-dependent):**
+**Common types:**
+- restafval (residual waste)
+- gft (organic waste)
+- papier (paper)
+- pmd (plastic/metal/drink cartons)
+
+**Additional types (collector-dependent):**
 - gftgratis, textiel, glas, grofvuil, asbest, apparaten, chemisch, sloopafval, takken, pbd, duobak, restwagen, sortibak
 
-### Address
-- `postcode`: Required
-- `streetnumber`: Required
-- `suffix`: Optional
-- `streetname`: Required for Limburg.NET and RecycleApp
-- `cityname`: Required for Limburg.NET
+### Display Options
 
-### Print All Available Waste Fractions
-```yaml
-printwastetypes: 1
-```
-Prints all possible waste fractions for your address/collector in persistent notifications on every HA restart.
+- **Upcoming Sensor**: Adds 3 extra sensors (today, tomorrow, next upcoming) for automations
+- **Date Format**: Customize how dates are displayed using [Python strftime options](http://strftime.org/). Default: '%d-%m-%Y'
+- **Date Only**: Remove day name/today/tomorrow prefix from sensor states
+- **Day of Week**: Add day name to sensor state if collection is within 7 days
+- **Day of Week Only**: Show only day name when `Day of Week` is enabled
+- **Always Show Day**: Remove 7-day limit for showing day names
+- **Date Object**: Return sensor state as date-time object instead of string
 
-### Upcoming Sensor
-```yaml
-upcomingsensor: 1
-```
-Adds 3 extra sensors (today, tomorrow, next upcoming) for automations. Default: 0.
+### Naming Options
 
-### Date Format
-```yaml
-dateformat: '%d-%m-%Y'
-```
-All [Python strftime options](http://strftime.org/) are supported. Default: '%d-%m-%Y'.
+- **Name**: Custom name for your sensors (useful for multiple instances)
+- **Name Prefix**: Include waste collector name in sensor names (enabled by default)
 
-### Date Only
-```yaml
-dateonly: 1
-```
-Removes dayname/today/tomorrow prefix. Default: 0.
+### Icon Options
 
-### Day of Week
-```yaml
-dayofweek: 1
-```
-Adds day name to sensor state if within 7 days. Default: 1.
+- **Built-in Icons**: Use integration's built-in icons instead of collector-provided icons
+- **New Built-in Icons**: Use newer icon set (requires Built-in Icons enabled)
+- **Disable Icons**: Disable entity pictures to use custom MDI icons
 
-### Day of Week Only
-```yaml
-dayofweekonly: 1
-```
-Removes date if `dayofweek` is active. Default: 0.
-
-### Always Show Day
-```yaml
-alwaysshowday: 1
-```
-Removes 7-day limit of `dayofweek`. Default: 0.
-
-### Date Object
-```yaml
-dateobject: 1
-```
-Sensor state as a date-time object. Default: 0 (string).
-
-### Name
-```yaml
-name: 'your custom name'
-```
-Custom name for the sensor. Useful for multiple sensors.
-
-### Name Prefix
-```yaml
-nameprefix: 0
-```
-Removes waste collector name from sensor name. Default: 1.
-
-### Built-in Icons
-```yaml
-builtinicons: 1
-```
-Use built-in icons instead of collector icons. Default: 0.
-
-Supported: gft, gftgratis, glas, papier, pmd, pbd, restafval
-
+**Built-in Icons:**
 ![Built-in Icons](https://user-images.githubusercontent.com/7591990/196623891-bf169e71-9f65-4d32-bade-befecb1263d8.jpg)
 
-### New Built-in Icons
-```yaml
-builtiniconsnew: 1
-```
-Use new built-in icons (requires `builtinicons: 1`). Default: 0.
-
-Supported: gft, gftgratis, glas, papier, pmd, pbd, plastic, zacht-plastic, restafval, kca, textiel, kerstbomen, grofvuil, tuinafval
-
+**New Built-in Icons:**
 ![New Built-in Icons](https://user-images.githubusercontent.com/7591990/196623742-002840d9-6ecc-4100-9609-1b1f7302f86d.jpg)
 
-### Disable Entity Picture
-```yaml
-disableicons: 1
-```
-Disables entity_picture so you can assign MDI icons in customize. Default: 0.
+### Language Options
 
-### Translation
-```yaml
-dutch: 1
-```
-Display day names in Dutch. Default: 0.
-
-### Update Interval
-```yaml
-updateinterval: 12
-```
-Update interval in hours. Default: 12.
-
-### Custom Mapping
-```yaml
-custommapping:
-  keukenafval: VET-goed
-  fraction2: New name for fraction2
-  papier: Papier (blauw)
-  pmd: PMD-Rest
-```
-Override default mapping for waste fractions. Default: empty.
-
-### Customer ID (Ximmio Commercial Address)
-```yaml
-customerid: 123456
-```
-For commercial addresses using Ximmio collectors. Default: empty.
+- **Dutch**: Display day names in Dutch instead of English
 
 ---
 
