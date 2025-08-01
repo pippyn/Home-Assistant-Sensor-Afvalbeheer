@@ -420,10 +420,22 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
             self._collector = user_input[CONF_WASTE_COLLECTOR]
             return await self.async_step_address()
 
+        # Get current collector and find case-insensitive match
+        current_collector = self.config_entry.data.get(CONF_WASTE_COLLECTOR, "")
+        default_collector = current_collector
+        
+        # Find case-insensitive match in WASTE_COLLECTORS
+        if current_collector:
+            current_lower = current_collector.lower()
+            for collector in WASTE_COLLECTORS:
+                if collector.lower() == current_lower:
+                    default_collector = collector
+                    break
+
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema({
-                vol.Required(CONF_WASTE_COLLECTOR, default=self.config_entry.data.get(CONF_WASTE_COLLECTOR)): vol.In(WASTE_COLLECTORS),
+                vol.Required(CONF_WASTE_COLLECTOR, default=default_collector): vol.In(WASTE_COLLECTORS),
             }),
         )
 
