@@ -372,20 +372,11 @@ def _format_unique_id(name, name_prefix, waste_collector, sensor_type, entry_id,
     Returns:
         Formatted unique ID as a string.
     """
-    # For backward compatibility with YAML configs, use simple format when no custom name
-    # This ensures YAML and Config Flow create the same unique IDs
-    if not name:
-        # Simple format like YAML used: just the sensor type
-        base_id = sensor_type.lower()
-        # If waste_collector is cleanprofs, add it to the unique id
-        if str(waste_collector).lower() == "cleanprofs":
-            base_id = f"cleanprofs_{base_id}"
-        return base_id
+    parts = [sensor_type]
 
-    # If custom name is provided, include it for uniqueness
-    parts = [name, sensor_type]
-    # If waste_collector is cleanprofs, add it to the unique id
-    if str(waste_collector).lower() == "cleanprofs":
-        parts.insert(0, "cleanprofs")
+    if str(waste_collector).lower() == "cleanprofs" or name_prefix:
+        parts.insert(0, str(waste_collector))
+    if name:
+        parts.insert(1, name)
     unique_id = "_".join(parts).replace(" ", "_").replace("-", "_").lower()
     return unique_id

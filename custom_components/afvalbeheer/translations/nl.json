@@ -25,7 +25,7 @@
         "data": {
           "resources": "Afvaltypes",
           "name": "Aangepaste naam",
-          "nameprefix": "Gebruik naam voorvoegsel", 
+          "wastecollectornameprefix": "Gebruik naam voorvoegsel", 
           "dateformat": "Datumformaat",
           "upcomingsensor": "Komende sensoren",
           "dateonly": "Alleen datum",
@@ -45,7 +45,7 @@
         "data_description": {
           "resources": "Selecteer de afvaltypes die u wilt volgen",
           "name": "Aangepaste naam voor deze integratie-instantie (optioneel)",
-          "nameprefix": "Voeg afvalinzamelaarnaam toe als voorvoegsel aan sensornamen",
+          "wastecollectornameprefix": "Voeg afvalinzamelaarnaam toe als voorvoegsel aan sensornamen",
           "dateformat": "Datumformaat voor sensorwaarden (Python strftime formaat)",
           "upcomingsensor": "Maak extra sensoren voor vandaag, morgen en volgende komende ophaaldag",
           "dateonly": "Toon alleen datum zonder dagnamen (overschrijft andere daginstellingen)",
@@ -103,7 +103,7 @@
         "data": {
           "resources": "Afvaltypes",
           "name": "Aangepaste naam",
-          "nameprefix": "Gebruik naam voorvoegsel",
+          "wastecollectornameprefix": "Gebruik naam voorvoegsel",
           "dateformat": "Datumformaat", 
           "upcomingsensor": "Komende sensoren",
           "dateonly": "Alleen datum",
@@ -123,7 +123,7 @@
         "data_description": {
           "resources": "Selecteer de afvaltypes die u wilt volgen",
           "name": "Aangepaste naam voor deze integratie-instantie (optioneel)",
-          "nameprefix": "Voeg afvalinzamelaarnaam toe als voorvoegsel aan sensornamen",
+          "wastecollectornameprefix": "Voeg afvalinzamelaarnaam toe als voorvoegsel aan sensornamen",
           "dateformat": "Datumformaat voor sensorwaarden (Python strftime formaat)",
           "upcomingsensor": "Maak extra sensoren voor vandaag, morgen en volgende komende ophaaldag",
           "dateonly": "Toon alleen datum zonder dagnamen (overschrijft andere daginstellingen)",

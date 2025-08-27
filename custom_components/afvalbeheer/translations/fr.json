@@ -25,7 +25,7 @@
         "data": {
           "resources": "Types de Déchets",
           "name": "Nom Personnalisé",
-          "nameprefix": "Utiliser Préfixe de Nom", 
+          "wastecollectornameprefix": "Utiliser Préfixe de Nom", 
           "dateformat": "Format de Date",
           "upcomingsensor": "Capteurs à Venir",
           "dateonly": "Date Uniquement",
@@ -45,7 +45,7 @@
         "data_description": {
           "resources": "Sélectionnez les types de déchets que vous souhaitez suivre",
           "name": "Nom personnalisé pour cette instance d'intégration (optionnel)",
-          "nameprefix": "Ajouter le nom du collecteur de déchets comme préfixe aux noms de capteurs",
+          "wastecollectornameprefix": "Ajouter le nom du collecteur de déchets comme préfixe aux noms de capteurs",
           "dateformat": "Format de date pour les valeurs des capteurs (format Python strftime)",
           "upcomingsensor": "Créer des capteurs supplémentaires pour aujourd'hui, demain et la prochaine collecte",
           "dateonly": "Afficher seulement la date sans les noms des jours (remplace les autres paramètres de jour)",
@@ -103,7 +103,7 @@
         "data": {
           "resources": "Types de Déchets",
           "name": "Nom Personnalisé",
-          "nameprefix": "Utiliser Préfixe de Nom",
+          "wastecollectornameprefix": "Utiliser Préfixe de Nom",
           "dateformat": "Format de Date", 
           "upcomingsensor": "Capteurs à Venir",
           "dateonly": "Date Uniquement",
@@ -123,7 +123,7 @@
         "data_description": {
           "resources": "Sélectionnez les types de déchets que vous souhaitez suivre",
           "name": "Nom personnalisé pour cette instance d'intégration (optionnel)",
-          "nameprefix": "Ajouter le nom du collecteur de déchets comme préfixe aux noms de capteurs",
+          "wastecollectornameprefix": "Ajouter le nom du collecteur de déchets comme préfixe aux noms de capteurs",
           "dateformat": "Format de date pour les valeurs des capteurs (format Python strftime)",
           "upcomingsensor": "Créer des capteurs supplémentaires pour aujourd'hui, demain et la prochaine collecte",
           "dateonly": "Afficher seulement la date sans les noms des jours (remplace les autres paramètres de jour)",

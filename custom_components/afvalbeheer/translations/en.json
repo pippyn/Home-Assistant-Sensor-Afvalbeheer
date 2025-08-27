@@ -25,7 +25,7 @@
         "data": {
           "resources": "Waste Types",
           "name": "Custom Name",
-          "nameprefix": "Use Name Prefix", 
+          "wastecollectornameprefix": "Use Name Prefix", 
           "dateformat": "Date Format",
           "upcomingsensor": "Upcoming Sensors",
           "dateonly": "Date Only",
@@ -45,7 +45,7 @@
         "data_description": {
           "resources": "Select the waste types you want to track",
           "name": "Custom name for this integration instance (optional)",
-          "nameprefix": "Add waste collector name as prefix to sensor names",
+          "wastecollectornameprefix": "Add waste collector name as prefix to sensor names",
           "dateformat": "Date format for sensor values (Python strftime format)",
           "upcomingsensor": "Create additional sensors for today, tomorrow, and next upcoming collection",
           "dateonly": "Show only date without day names (overrides other day settings)",
@@ -103,7 +103,7 @@
         "data": {
           "resources": "Waste Types",
           "name": "Custom Name",
-          "nameprefix": "Use Name Prefix",
+          "wastecollectornameprefix": "Use Name Prefix",
           "dateformat": "Date Format", 
           "upcomingsensor": "Upcoming Sensors",
           "dateonly": "Date Only",
@@ -123,7 +123,7 @@
         "data_description": {
           "resources": "Select the waste types you want to track",
           "name": "Custom name for this integration instance (optional)",
-          "nameprefix": "Add waste collector name as prefix to sensor names",
+          "wastecollectornameprefix": "Add waste collector name as prefix to sensor names",
           "dateformat": "Date format for sensor values (Python strftime format)",
           "upcomingsensor": "Create additional sensors for today, tomorrow, and next upcoming collection",
           "dateonly": "Show only date without day names (overrides other day settings)",
