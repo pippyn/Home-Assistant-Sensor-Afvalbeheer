@@ -29,17 +29,21 @@ class StraatbeeldCollector(WasteCollector):
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
         super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
-        self.main_url = "https://drimmelen-afvalkalender-api.straatbeeld.online"
+        self.main_url = "https://drimmelen.api.straatbeeld.online"
 
     def __get_data(self):
         _LOGGER.debug("Fetching data from Straatbeeld")
+        headers = {
+            "accept": "application/json",
+            "content-type": "application/json",
+        }
         data = {
             "postal_code": self.postcode,
             "house_number": self.street_number,
             "house_letter": self.suffix,
         }
 
-        return requests.post(f"{self.main_url}/find-address", data=data)
+        return requests.post(f"{self.main_url}/v1/waste-calendar", headers=headers, json=data)
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Straatbeeld API")
@@ -65,14 +69,14 @@ class StraatbeeldCollector(WasteCollector):
 
                         for item in day['data']:
 
-                            waste_type = self.map_waste_type(item['id'])
+                            waste_type = self.map_waste_type(item['name'])
                             if not waste_type:
                                 continue
 
                             collection = WasteCollection.create(
                                 date=date,
                                 waste_type=waste_type,
-                                waste_type_slug=item['id']
+                                waste_type_slug=item['name']
                             )
                             if collection not in self.collections:
                                 self.collections.add(collection)
