@@ -406,15 +406,18 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @staticmethod
     @callback
     def async_get_options_flow(config_entry):
-        return AfvalbeheerOptionsFlowHandler(config_entry)
+        return AfvalbeheerOptionsFlowHandler()
 
 
 class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
-    def __init__(self, config_entry):
-        self.config_entry = config_entry
+    def __init__(self):
         self._collector = None
         self._address_input = {}
 
+    @property
+    def config_entry(self):
+        return self.hass.config_entries.async_get_entry(self.handler)
+    
     async def async_step_init(self, user_input=None):
         if user_input is not None:
             self._collector = user_input[CONF_WASTE_COLLECTOR]
