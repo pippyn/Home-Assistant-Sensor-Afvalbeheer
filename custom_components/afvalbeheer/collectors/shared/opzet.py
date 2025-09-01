@@ -5,6 +5,9 @@ Used by 5+ municipalities with common API structure.
 import logging
 from datetime import datetime
 import requests
+import socket
+from contextlib import contextmanager
+import urllib3.util.connection as _urllib3_connection
 
 from ..base import WasteCollector
 from ...models import WasteCollection
@@ -16,6 +19,26 @@ from ...const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+@contextmanager
+def _force_ipv4_resolution():
+    """
+    Temporarily force urllib3 to resolve only IPv4 addresses by overriding
+    allowed_gai_family(). This is safer than tweaking internal constants like
+    HAS_IPV6, and it's scoped to just the wrapped call.
+    """
+    if _urllib3_connection is None:
+        # If urllib3 can't be imported for some reason, just no-op.
+        yield
+        return
+
+    original = getattr(_urllib3_connection, "allowed_gai_family", None)
+    try:
+        _urllib3_connection.allowed_gai_family = lambda: socket.AF_INET
+        yield
+    finally:
+        if original is not None:
+            _urllib3_connection.allowed_gai_family = original
 
 
 class OpzetCollector(WasteCollector):
@@ -54,10 +77,14 @@ class OpzetCollector(WasteCollector):
         else:
             self._verify = True
 
+        self._session = requests.Session()
+
     def __fetch_address(self):
         _LOGGER.debug("Fetching address from Opzet")
-        response = requests.get(
-            "{}/rest/adressen/{}-{}".format(self.main_url, self.postcode, self.street_number), verify=self._verify).json()
+        url = "{}/rest/adressen/{}-{}".format(self.main_url, self.postcode, self.street_number)
+
+        with _force_ipv4_resolution():
+            response = self._session.get(url, verify=self._verify).json()
 
         if not response:
             _LOGGER.error('Address not found!')
@@ -73,10 +100,10 @@ class OpzetCollector(WasteCollector):
 
     def __get_data(self):
         _LOGGER.debug("Fetching data from Opzet")
-        get_url = "{}/rest/adressen/{}/afvalstromen".format(
-                self.main_url,
-                self.bag_id)
-        return requests.get(get_url, verify=self._verify)
+        url = "{}/rest/adressen/{}/afvalstromen".format(self.main_url, self.bag_id)
+
+        with _force_ipv4_resolution():
+            return self._session.get(url, verify=self._verify)
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Opzet API")
@@ -91,7 +118,7 @@ class OpzetCollector(WasteCollector):
             if not response:
                 _LOGGER.error('No Waste data found!')
                 return
-            
+
             self.collections.remove_all()
 
             for item in response:
@@ -102,11 +129,14 @@ class OpzetCollector(WasteCollector):
                 if not waste_type:
                     continue
 
+                # icon_data may not always exist, so we check before using it
+                icon_data = item['icon_data'] if 'icon_data' in item else None
+
                 collection = WasteCollection.create(
                     date=datetime.strptime(item['ophaaldatum'], '%Y-%m-%d'),
                     waste_type=waste_type,
                     waste_type_slug=item['menu_title'],
-                    icon_data=item['icon_data']
+                    icon_data=icon_data,
                 )
                 if collection not in self.collections:
                     self.collections.add(collection)
