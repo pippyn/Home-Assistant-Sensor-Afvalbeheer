@@ -19,6 +19,18 @@
           "streetname": "Street Name"
         }
       },
+      "mapping": {
+        "title": "Custom Mapping (Optional)",
+        "description": "Configure custom waste type mapping",
+        "data": {
+          "use_custom_mapping": "Use Custom Mapping",
+          "custommapping": "Custom Waste Type Mapping"
+        },
+        "data_description": {
+          "use_custom_mapping": "Enable custom mapping to rename waste types from the API",
+          "custommapping": "Custom waste type mappings in JSON format"
+        }
+      },
       "resources": {
         "title": "Configuration",
         "description": "Select waste types and configure options",
@@ -39,8 +51,7 @@
           "disableicons": "Disable Icons",
           "updateinterval": "Update Interval (hours)",
           "addressid": "Address ID",
-          "customerid": "Customer ID",
-          "custommapping": "Custom Waste Type Mapping"
+          "customerid": "Customer ID"
         },
         "data_description": {
           "resources": "Select the waste types you want to track",
@@ -59,8 +70,7 @@
           "disableicons": "Disable all icons for waste type sensors",
           "updateinterval": "How often to check for updated waste collection data (0 = use default interval)",
           "addressid": "Address ID for Ximmio-based collectors (if required by your waste collector)",
-          "customerid": "Customer ID for Ximmio-based collectors (if required by your waste collector)",
-          "custommapping": "Custom waste type mappings in JSON format (for renaming waste types)"
+          "customerid": "Customer ID for Ximmio-based collectors (if required by your waste collector)"
         }
       }
     },
@@ -97,6 +107,18 @@
           "streetname": "Street Name"
         }
       },
+      "mapping": {
+        "title": "Update Custom Mapping (Optional)",
+        "description": "Update custom waste type mapping",
+        "data": {
+          "use_custom_mapping": "Use Custom Mapping",
+          "custommapping": "Custom Waste Type Mapping"
+        },
+        "data_description": {
+          "use_custom_mapping": "Enable custom mapping to rename waste types from the API",
+          "custommapping": "Custom waste type mappings in JSON format"
+        }
+      },
       "resources": {
         "title": "Update Configuration",
         "description": "Update waste types and options",
@@ -117,8 +139,7 @@
           "disableicons": "Disable Icons",
           "updateinterval": "Update Interval (hours)",
           "addressid": "Address ID", 
-          "customerid": "Customer ID",
-          "custommapping": "Custom Waste Type Mapping"
+          "customerid": "Customer ID"
         },
         "data_description": {
           "resources": "Select the waste types you want to track",
@@ -137,8 +158,7 @@
           "disableicons": "Disable all icons for waste type sensors",
           "updateinterval": "How often to check for updated waste collection data (0 = use default interval)",
           "addressid": "Address ID for Ximmio-based collectors (if required by your waste collector)",
-          "customerid": "Customer ID for Ximmio-based collectors (if required by your waste collector)",
-          "custommapping": "Custom waste type mappings in JSON format (for renaming waste types)"
+          "customerid": "Customer ID for Ximmio-based collectors (if required by your waste collector)"
         }
       }
     },

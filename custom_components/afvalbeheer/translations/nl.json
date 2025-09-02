@@ -19,6 +19,18 @@
           "streetname": "Straatnaam"
         }
       },
+      "mapping": {
+        "title": "Aangepaste Mapping (Optioneel)",
+        "description": "Configureer aangepaste afvaltype mapping",
+        "data": {
+          "use_custom_mapping": "Gebruik Aangepaste Mapping",
+          "custommapping": "Aangepaste Afvaltype Mapping"
+        },
+        "data_description": {
+          "use_custom_mapping": "Schakel aangepaste mapping in om afvaltypes van de API te hernoemen",
+          "custommapping": "Aangepaste afvaltype mappings in JSON formaat"
+        }
+      },
       "resources": {
         "title": "Configuratie",
         "description": "Selecteer afvaltypes en configureer opties",
@@ -39,8 +51,7 @@
           "disableicons": "Pictogrammen uitschakelen",
           "updateinterval": "Update-interval (uren)",
           "addressid": "Adres ID",
-          "customerid": "Klant ID",
-          "custommapping": "Aangepaste afvaltype mapping"
+          "customerid": "Klant ID"
         },
         "data_description": {
           "resources": "Selecteer de afvaltypes die u wilt volgen",
@@ -59,8 +70,7 @@
           "disableicons": "Schakel alle pictogrammen uit voor afvaltype sensoren",
           "updateinterval": "Hoe vaak controleren voor bijgewerkte afvalophaaldgegevens (0 = gebruik standaard interval)",
           "addressid": "Adres ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
-          "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
-          "custommapping": "Aangepaste afvaltype mappings in JSON formaat (voor hernoemen van afvaltypes)"
+          "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)"
         }
       }
     },
@@ -97,6 +107,18 @@
           "streetname": "Straatnaam"
         }
       },
+      "mapping": {
+        "title": "Aangepaste Mapping Bijwerken (Optioneel)",
+        "description": "Werk aangepaste afvaltype mapping bij",
+        "data": {
+          "use_custom_mapping": "Gebruik Aangepaste Mapping",
+          "custommapping": "Aangepaste Afvaltype Mapping"
+        },
+        "data_description": {
+          "use_custom_mapping": "Schakel aangepaste mapping in om afvaltypes van de API te hernoemen",
+          "custommapping": "Aangepaste afvaltype mappings in JSON formaat"
+        }
+      },
       "resources": {
         "title": "Configuratie bijwerken",
         "description": "Werk afvaltypes en opties bij",
@@ -117,8 +139,7 @@
           "disableicons": "Pictogrammen uitschakelen",
           "updateinterval": "Update-interval (uren)",
           "addressid": "Adres ID", 
-          "customerid": "Klant ID",
-          "custommapping": "Aangepaste afvaltype mapping"
+          "customerid": "Klant ID"
         },
         "data_description": {
           "resources": "Selecteer de afvaltypes die u wilt volgen",
@@ -137,8 +158,7 @@
           "disableicons": "Schakel alle pictogrammen uit voor afvaltype sensoren",
           "updateinterval": "Hoe vaak controleren voor bijgewerkte afvalophaaldgegevens (0 = gebruik standaard interval)",
           "addressid": "Adres ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
-          "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
-          "custommapping": "Aangepaste afvaltype mappings in JSON formaat (voor hernoemen van afvaltypes)"
+          "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)"
         }
       }
     },

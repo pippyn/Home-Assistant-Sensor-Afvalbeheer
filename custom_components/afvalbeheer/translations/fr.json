@@ -19,6 +19,18 @@
           "streetname": "Nom de la Rue"
         }
       },
+      "mapping": {
+        "title": "Mappage Personnalisé (Optionnel)",
+        "description": "Configurer le mappage personnalisé des types de déchets",
+        "data": {
+          "use_custom_mapping": "Utiliser Mappage Personnalisé",
+          "custommapping": "Mappage Personnalisé des Types de Déchets"
+        },
+        "data_description": {
+          "use_custom_mapping": "Activer le mappage personnalisé pour renommer les types de déchets de l'API",
+          "custommapping": "Mappages personnalisés des types de déchets au format JSON"
+        }
+      },
       "resources": {
         "title": "Configuration",
         "description": "Sélectionnez les types de déchets et configurez les options",
@@ -39,8 +51,7 @@
           "disableicons": "Désactiver les Icônes",
           "updateinterval": "Intervalle de Mise à Jour (heures)",
           "addressid": "ID d'Adresse",
-          "customerid": "ID Client",
-          "custommapping": "Mappage Personnalisé des Types de Déchets"
+          "customerid": "ID Client"
         },
         "data_description": {
           "resources": "Sélectionnez les types de déchets que vous souhaitez suivre",
@@ -59,8 +70,7 @@
           "disableicons": "Désactiver toutes les icônes pour les capteurs de types de déchets",
           "updateinterval": "Fréquence de vérification des données de collecte de déchets mises à jour (0 = utiliser l'intervalle par défaut)",
           "addressid": "ID d'adresse pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
-          "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
-          "custommapping": "Mappages personnalisés des types de déchets au format JSON (pour renommer les types de déchets)"
+          "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)"
         }
       }
     },
@@ -97,6 +107,18 @@
           "streetname": "Nom de la Rue"
         }
       },
+      "mapping": {
+        "title": "Mettre à Jour le Mappage Personnalisé (Optionnel)",
+        "description": "Mettre à jour le mappage personnalisé des types de déchets",
+        "data": {
+          "use_custom_mapping": "Utiliser Mappage Personnalisé",
+          "custommapping": "Mappage Personnalisé des Types de Déchets"
+        },
+        "data_description": {
+          "use_custom_mapping": "Activer le mappage personnalisé pour renommer les types de déchets de l'API",
+          "custommapping": "Mappages personnalisés des types de déchets au format JSON"
+        }
+      },
       "resources": {
         "title": "Mettre à Jour la Configuration",
         "description": "Mettre à jour les types de déchets et les options",
@@ -117,8 +139,7 @@
           "disableicons": "Désactiver les Icônes",
           "updateinterval": "Intervalle de Mise à Jour (heures)",
           "addressid": "ID d'Adresse", 
-          "customerid": "ID Client",
-          "custommapping": "Mappage Personnalisé des Types de Déchets"
+          "customerid": "ID Client"
         },
         "data_description": {
           "resources": "Sélectionnez les types de déchets que vous souhaitez suivre",
@@ -137,8 +158,7 @@
           "disableicons": "Désactiver toutes les icônes pour les capteurs de types de déchets",
           "updateinterval": "Fréquence de vérification des données de collecte de déchets mises à jour (0 = utiliser l'intervalle par défaut)",
           "addressid": "ID d'adresse pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
-          "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
-          "custommapping": "Mappages personnalisés des types de déchets au format JSON (pour renommer les types de déchets)"
+          "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)"
         }
       }
     },
