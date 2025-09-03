@@ -10,7 +10,7 @@ from ..base import WasteCollector
 from ...models import WasteCollection
 from ...const import (
     WASTE_TYPE_GREEN, WASTE_TYPE_PAPER, WASTE_TYPE_PMD_GREY, WASTE_TYPE_GREY,
-    BURGERPORTAAL_COLLECTOR_IDS
+    WASTE_TYPE_PACKAGES, BURGERPORTAAL_COLLECTOR_IDS
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -25,6 +25,8 @@ class BurgerportaalCollector(WasteCollector):
         'opk': WASTE_TYPE_PAPER,
         'pmdrest': WASTE_TYPE_PMD_GREY,
         'rest': WASTE_TYPE_GREY,
+        'pmd': WASTE_TYPE_PACKAGES,
+        'papier': WASTE_TYPE_PAPER
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
