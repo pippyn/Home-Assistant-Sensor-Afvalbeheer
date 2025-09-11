@@ -6,6 +6,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_RESOURCES
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.helpers.device_registry import DeviceInfo
 
 from .const import *
 from .API import get_wastedata_from_config
@@ -90,6 +91,7 @@ class BaseSensor(RestoreEntity, SensorEntity):
         self._attrs = {}
         self._entity_picture = None
         self._attr_unique_id = None
+        self._config = config
         _LOGGER.debug("BaseSensor initialized with configuration: %s", config)
 
     @property
@@ -106,6 +108,17 @@ class BaseSensor(RestoreEntity, SensorEntity):
     def entity_picture(self):
         """Return the entity picture for the sensor."""
         return self._entity_picture
+
+    @property
+    def device_info(self):
+        """Return device information for grouping entities."""
+        return DeviceInfo(
+            identifiers={(DOMAIN, self.entry_id)},
+            name=f"Afvalbeheer {self.waste_collector.capitalize()}",
+            manufacturer="Afvalbeheer",
+            model=self.waste_collector.capitalize(),
+            entry_type="service",
+        )
 
     async def async_added_to_hass(self):
         """Restore the last known state upon adding to Home Assistant."""

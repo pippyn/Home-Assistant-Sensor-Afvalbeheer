@@ -10,8 +10,9 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_RESOURCES
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceInfo
 
-from .const import DOMAIN, CONF_ID
+from .const import DOMAIN, CONF_ID, CONF_WASTE_COLLECTOR, CONF_ENTRY_ID
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,6 +38,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
     """Set up Afvalbeheer calendar from a config entry."""
     config = dict({**entry.data, **entry.options})
+    config[CONF_ENTRY_ID] = entry.entry_id  # Add entry_id to config
 
     # CONF_ID should now be provided by config flow
     if CONF_ID not in config:
@@ -76,8 +78,21 @@ class AfvalbeheerCalendar(CalendarEntity):
 
         self._attr_name = f"{DOMAIN.capitalize()} {WasteData.waste_collector}"
         self._attr_unique_id = f"{DOMAIN}_{config[CONF_ID]}"
+        self.entry_id = config.get(CONF_ENTRY_ID)
+        self.waste_collector = config.get(CONF_WASTE_COLLECTOR, "").lower()
 
         self._event = None
+
+    @property
+    def device_info(self):
+        """Return device information for grouping entities."""
+        return DeviceInfo(
+            identifiers={(DOMAIN, self.entry_id)},
+            name=f"Afvalbeheer {self.waste_collector.capitalize()}",
+            manufacturer="Afvalbeheer",
+            model=self.waste_collector.capitalize(),
+            entry_type="service",
+        )
 
     @property
     def event(self) -> Optional[CalendarEvent]:
