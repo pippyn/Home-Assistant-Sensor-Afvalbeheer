@@ -32,14 +32,14 @@ class DeAfvalAppCollector(WasteCollector):
         _LOGGER.debug("Fetching data from DeAfvalApp")
         get_url = '{}/dataservice/DataServiceServlet?service=OPHAALSCHEMA&land=NL&postcode={}&straatId=0&huisnr={}&huisnrtoev={}'.format(
                 self.main_url, self.postcode, self.street_number, self.suffix)
-        return requests.get(get_url)
+        response = requests.get(get_url)
+        return response.text
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using DeAfvalApp API")
 
         try:
-            r = await self.hass.async_add_executor_job(self.__get_data)
-            response = r.text
+            response = await self.hass.async_add_executor_job(self.__get_data)
 
             if not response:
                 _LOGGER.error('No Waste data found!')
