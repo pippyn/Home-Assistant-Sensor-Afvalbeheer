@@ -6,7 +6,7 @@ from .shared import XimmioCollector, BurgerportaalCollector, OpzetCollector
 from .individual import (
     AfvalAlertCollector, AfvalwijzerCollector, CirculusCollector, CleanprofsCollector,
     DeAfvalAppCollector, LimburgNetCollector, MontferlandNetCollector, OmrinCollector,
-    RD4Collector, RecycleApp, ROVACollector, StraatbeeldCollector
+    RD4Collector, RecycleApp, ReinisCollector, ROVACollector, StraatbeeldCollector
 )
 
 __all__ = [
@@ -14,5 +14,5 @@ __all__ = [
     "XimmioCollector", "BurgerportaalCollector", "OpzetCollector",
     "AfvalAlertCollector", "AfvalwijzerCollector", "CirculusCollector", "CleanprofsCollector",
     "DeAfvalAppCollector", "LimburgNetCollector", "MontferlandNetCollector", "OmrinCollector",
-    "RD4Collector", "RecycleApp", "ROVACollector", "StraatbeeldCollector"
+    "RD4Collector", "RecycleApp", "ReinisCollector", "ROVACollector", "StraatbeeldCollector"
 ]

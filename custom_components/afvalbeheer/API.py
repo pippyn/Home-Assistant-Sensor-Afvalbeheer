@@ -11,7 +11,7 @@ from .collectors import (
     XimmioCollector, BurgerportaalCollector, OpzetCollector,
     AfvalAlertCollector, AfvalwijzerCollector, CirculusCollector, CleanprofsCollector,
     DeAfvalAppCollector, LimburgNetCollector, MontferlandNetCollector, OmrinCollector,
-    RD4Collector, RecycleApp, ROVACollector, StraatbeeldCollector
+    RD4Collector, RecycleApp, ReinisCollector, ROVACollector, StraatbeeldCollector
 )
 
 
@@ -55,6 +55,7 @@ class WasteData(object):
             "montferland": (MontferlandNetCollector, common_args),
             "omrin": (OmrinCollector, common_args),
             "recycleapp": (RecycleApp, common_args + [self.street_name]),
+            "reinis": (ReinisCollector, common_args),
             "rd4": (RD4Collector, common_args),
             "cleanprofs": (CleanprofsCollector, common_args),
             "rova": (ROVACollector, common_args),
