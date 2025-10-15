@@ -86,6 +86,8 @@ class BaseSensor(RestoreEntity, SensorEntity):
         self.always_show_day = config.get(CONF_ALWAYS_SHOW_DAY)
         self.waste_types = config[CONF_RESOURCES]
         self.date_only = 1 if self.date_object else config.get(CONF_DATE_ONLY)
+        self._today = TODAY_STRING['nl'] if self.dutch_days else TODAY_STRING['en']
+        self._tomorrow = TOMORROW_STRING['nl'] if self.dutch_days else TOMORROW_STRING['en']
         self._hidden = False
         self._state = None
         self._attrs = {}
@@ -150,7 +152,6 @@ class BaseSensor(RestoreEntity, SensorEntity):
             _LOGGER.debug("Restored entity picture: %s", self._entity_picture)
 
     def _translate_state(self, state):
-        """Translate state based on format and translation dictionary."""
         translations = {
             "%B": DUTCH_TRANSLATION_MONTHS,
             "%b": DUTCH_TRANSLATION_MONTHS_SHORT,
@@ -158,11 +159,42 @@ class BaseSensor(RestoreEntity, SensorEntity):
             "%a": DUTCH_TRANSLATION_DAYS_SHORT,
         }
         for fmt, trans_dict in translations.items():
-            if fmt in self.date_format:
-                for en_term, nl_term in trans_dict.items():
-                    state = state.replace(en_term, nl_term)
+            for en_term, nl_term in trans_dict.items():
+                state = state.replace(en_term, nl_term)
         _LOGGER.debug("Translated state: %s", state)
         return state
+
+    def _format_date(self, collection_date):
+        """
+        Format a collection date with smart date display logic.
+        """
+        date_diff = (collection_date - datetime.now()).days + 1
+        if self.date_object:
+            return collection_date
+
+        if self.date_only or (date_diff >= 8 and not self.always_show_day):
+            formatted = collection_date.strftime(self.date_format)
+        elif date_diff > 1:
+            if self.day_of_week:
+                if self.day_of_week_only:
+                    formatted = collection_date.strftime("%A")
+                else:
+                    if "%A" not in self.date_format:
+                        self.date_format = "%A, " + self.date_format
+                    formatted = collection_date.strftime(self.date_format)
+            else:
+                formatted = collection_date.strftime(self.date_format)
+        elif date_diff == 1:
+            formatted = self._tomorrow if self.day_of_week_only else f"{self._tomorrow}, {collection_date.strftime(self.date_format)}"
+        elif date_diff == 0:
+            formatted = self._today if self.day_of_week_only else f"{self._today}, {collection_date.strftime(self.date_format)}"
+        else:
+            formatted = collection_date.strftime(self.date_format)
+
+        if self.dutch_days:
+            formatted = self._translate_state(formatted)
+
+        return formatted
 
 
 class WasteTypeSensor(BaseSensor):
@@ -175,8 +207,6 @@ class WasteTypeSensor(BaseSensor):
     def __init__(self, data, waste_type, config):
         super().__init__(data, config)
         self.waste_type = waste_type
-        self._today = TODAY_STRING['nl'] if self.dutch_days else TODAY_STRING['en']
-        self._tomorrow = TOMORROW_STRING['nl'] if self.dutch_days else TOMORROW_STRING['en']
         self._name = _format_sensor(
             config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.waste_type
         )
@@ -217,30 +247,7 @@ class WasteTypeSensor(BaseSensor):
         """Set the state of the sensor based on collection data."""
         date_diff = (collection.date - datetime.now()).days + 1
         self._days_until = date_diff
-        if self.date_object:
-            self._state = collection.date
-        elif self.date_only or (date_diff >= 8 and not self.always_show_day):
-            self._state = collection.date.strftime(self.date_format)
-        elif date_diff > 1:
-            if self.day_of_week:
-                if self.day_of_week_only:
-                    self._state = collection.date.strftime("%A")
-                    self.date_format = "%A"
-                else:
-                    if "%A" not in self.date_format:
-                        self.date_format = "%A, " + self.date_format
-                    self._state = collection.date.strftime(self.date_format)
-            else:
-                self._state = collection.date.strftime(self.date_format)
-        elif date_diff == 1:
-            self._state = collection.date.strftime(self._tomorrow if self.day_of_week_only else self._tomorrow + ", " + self.date_format)
-        elif date_diff == 0:
-            self._state = collection.date.strftime(self._today if self.day_of_week_only else self._today + ", " + self.date_format)
-        else:
-            self._state = None
-
-        if self.dutch_days and not self.date_object:
-            self._state = self._translate_state(self._state)
+        self._state = self._format_date(collection.date)
         _LOGGER.debug("State set for %s: %s", self._name, self._state)
 
     def _set_attr(self, collection):
@@ -337,11 +344,11 @@ class WasteUpcomingSensor(BaseSensor):
             return
         else:
             self._hidden = False
-            self.upcoming_day = self._translate_state(collections[0].date.strftime(self.date_format))
+            self.upcoming_day = self._format_date(collections[0].date)
             self.upcoming_waste_types = ", ".join(sorted([x.waste_type for x in collections]))
             self._state = f"{self.upcoming_day}: {self.upcoming_waste_types}"
         self._set_attr()
-    
+
     def _set_attr(self):
         """Set the attributes of the sensor."""
         self._attrs[ATTR_WASTE_COLLECTOR] = self.waste_collector
