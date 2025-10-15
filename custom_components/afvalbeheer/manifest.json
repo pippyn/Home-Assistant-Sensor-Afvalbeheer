@@ -8,6 +8,6 @@
     "rsa",
     "pycryptodome"
   ],
-  "version": "6.1.1",
+  "version": "6.1.2",
   "config_flow": true
 }
