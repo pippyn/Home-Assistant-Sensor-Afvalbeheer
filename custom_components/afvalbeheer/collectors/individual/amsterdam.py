@@ -2,9 +2,8 @@
 Amsterdam collector for waste data from Amsterdam API.
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
-from datetime import timedelta
 
 from ..base import WasteCollector
 from ...models import WasteCollection
