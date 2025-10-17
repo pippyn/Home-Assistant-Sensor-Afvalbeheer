@@ -9,7 +9,7 @@ from .const import *
 from .models import WasteCollectionRepository
 from .collectors import (
     XimmioCollector, BurgerportaalCollector, OpzetCollector,
-    AfvalAlertCollector, AfvalwijzerCollector, CirculusCollector, CleanprofsCollector,
+    AfvalAlertCollector, AfvalwijzerCollector, AmsterdamCollector, CirculusCollector, CleanprofsCollector,
     DeAfvalAppCollector, LimburgNetCollector, MontferlandNetCollector, OmrinCollector,
     RD4Collector, RecycleApp, ReinisCollector, ROVACollector, StraatbeeldCollector
 )
@@ -49,6 +49,7 @@ class WasteData(object):
             "mijnafvalwijzer": (AfvalwijzerCollector, common_args),
             "afvalstoffendienstkalender": (AfvalwijzerCollector, common_args),
             "afvalalert": (AfvalAlertCollector, common_args),
+            "amsterdam": (AmsterdamCollector, common_args),
             "deafvalapp": (DeAfvalAppCollector, common_args),
             "circulus": (CirculusCollector, common_args),
             "limburg.net": (LimburgNetCollector, common_args + [self.street_name, self.city_name]),

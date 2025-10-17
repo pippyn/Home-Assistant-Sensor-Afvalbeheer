@@ -3,6 +3,7 @@ Individual collectors for specific APIs.
 """
 from .afval_alert import AfvalAlertCollector
 from .afvalwijzer import AfvalwijzerCollector
+from .amsterdam import AmsterdamCollector
 from .circulus import CirculusCollector
 from .cleanprofs import CleanprofsCollector
 from .deafvalapp import DeAfvalAppCollector
@@ -16,7 +17,7 @@ from .rova import ROVACollector
 from .straatbeeld import StraatbeeldCollector
 
 __all__ = [
-    "AfvalAlertCollector", "AfvalwijzerCollector", "CirculusCollector", "CleanprofsCollector",
+    "AfvalAlertCollector", "AfvalwijzerCollector", "AmsterdamCollector", "CirculusCollector", "CleanprofsCollector",
     "DeAfvalAppCollector", "LimburgNetCollector", "MontferlandNetCollector", "OmrinCollector",
     "RD4Collector", "RecycleApp", "ReinisCollector", "ROVACollector", "StraatbeeldCollector"
 ]
