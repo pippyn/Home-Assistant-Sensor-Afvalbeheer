@@ -1,0 +1,81 @@
+name: Close Stale Issues
+
+on:
+  schedule:
+    # Run once a day at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # Allow manual triggering
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          # General settings
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Days before marking as stale
+          days-before-stale: 60
+
+          # Days before closing after being marked stale
+          days-before-close: 14
+
+          # Stale issue settings
+          stale-issue-message: >
+            This issue has been automatically marked as stale because it has not had
+            recent activity. It will be closed in 14 days if no further activity occurs.
+
+            If this issue is still relevant, please add a comment to keep it open.
+            Thank you for your contributions!
+
+          stale-issue-label: 'stale'
+          close-issue-message: >
+            This issue has been automatically closed due to inactivity.
+
+            If you believe this issue is still relevant, please reopen it or create a new issue
+            with updated information. Thank you!
+
+          # Stale PR settings
+          stale-pr-message: >
+            This pull request has been automatically marked as stale because it has not had
+            recent activity. It will be closed in 14 days if no further activity occurs.
+
+            If this PR is still relevant, please add a comment to keep it open.
+            Thank you for your contributions!
+
+          stale-pr-label: 'stale'
+          close-pr-message: >
+            This pull request has been automatically closed due to inactivity.
+
+            If you would like to continue working on this, please reopen it or create a new PR.
+            Thank you!
+
+          # Days before closing PRs (can be different from issues)
+          days-before-pr-close: 14
+
+          # Labels to exempt from being marked stale
+          exempt-issue-labels: 'pinned,security,bug,enhancement,help-wanted,good-first-issue'
+          exempt-pr-labels: 'pinned,security,work-in-progress'
+
+          # Only process issues/PRs with these labels (leave empty to process all)
+          # only-labels: ''
+
+          # Issues/PRs with any of these labels will be exempted
+          exempt-all-milestones: true
+
+          # Remove stale label when issue/PR is updated
+          remove-stale-when-updated: true
+
+          # Enable debug logging
+          # debug-only: true
+
+          # Limit operations per run to avoid rate limiting
+          operations-per-run: 100
+
+          # Ascending order processes oldest first
+          ascending: true
