@@ -54,6 +54,7 @@ This integration works with the following waste collectors:
   - Mijnafvalzaken
   - Montferland
   - Montfoort
+  - Nijkerk
   - Ôffalkalinder
   - Omrin
   - PeelEnMaas

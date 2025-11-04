@@ -14,7 +14,7 @@ Afvalbeheer provides Home Assistant sensors and a calendar entity for multiple D
 
 This integration works with many waste collectors, including:
 
-ACV, Afval3xBeter, Afvalstoffendienstkalender, AfvalAlert, Alkmaar, Almere, AlphenAanDenRijn, AreaReiniging, Assen, Avalex, Avri, BAR, Berkelland, Blink, Circulus, Cleanprofs, Cranendonck, Cure (use MijnAfvalwijzer), Cyclus, DAR, DeAfvalApp, DeFryskeMarren, DenHaag, Drimmelen, GAD, Hellendoorn, HVC, Limburg.NET (requires `streetname` and `cityname`), Lingewaard, Meerlanden, Meppel, Middelburg-Vlissingen, MijnAfvalwijzer, Mijnafvalzaken, Montferland, Montfoort, Ôffalkalinder, Omrin, PeelEnMaas, PreZero, Purmerend, RAD, RecycleApp (requires `streetname`), RD4, RWM, Reinis, ROVA, RMN, Saver, Schouwen-Duiveland, Sliedrecht, Spaarnelanden, SudwestFryslan, TwenteMilieu, Venray, Voorschoten, Waalre, Waardlanden, Westland, Woerden, ZRD, Groningen.
+ACV, Afval3xBeter, Afvalstoffendienstkalender, AfvalAlert, Alkmaar, Almere, AlphenAanDenRijn, AreaReiniging, Assen, Avalex, Avri, BAR, Berkelland, Blink, Circulus, Cleanprofs, Cranendonck, Cure (use MijnAfvalwijzer), Cyclus, DAR, DeAfvalApp, DeFryskeMarren, DenHaag, Drimmelen, GAD, Hellendoorn, HVC, Limburg.NET (requires `streetname` and `cityname`), Lingewaard, Meerlanden, Meppel, Middelburg-Vlissingen, MijnAfvalwijzer, Mijnafvalzaken, Montferland, Montfoort, Nijkerk Ôffalkalinder, Omrin, PeelEnMaas, PreZero, Purmerend, RAD, RecycleApp (requires `streetname`), RD4, RWM, Reinis, ROVA, RMN, Saver, Schouwen-Duiveland, Sliedrecht, Spaarnelanden, SudwestFryslan, TwenteMilieu, Venray, Voorschoten, Waalre, Waardlanden, Westland, Woerden, ZRD, Groningen.
 
 > **Note:** Cure users should switch to MijnAfvalwijzer. Ophaalkalender users should switch to RecycleApp.
 
