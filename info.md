@@ -47,6 +47,7 @@ This integration works with the following waste collectors:
   - HVC
   - Limburg.NET (don't forget the streetname and cityname option)
   - Lingewaard
+  - Maassluis
   - Meerlanden
   - Meppel
   - Middelburg-Vlissingen
@@ -57,6 +58,7 @@ This integration works with the following waste collectors:
   - Nijkerk
   - Ôffalkalinder
   - Omrin
+  - OudeIJsselstreek
   - PeelEnMaas
   - PreZero
   - Purmerend
@@ -73,6 +75,7 @@ This integration works with the following waste collectors:
   - Spaarnelanden
   - SudwestFryslan
   - TwenteMilieu
+  - Uithoorn
   - Venray
   - Voorschoten
   - Waalre
