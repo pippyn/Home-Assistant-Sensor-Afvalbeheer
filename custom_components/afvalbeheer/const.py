@@ -160,6 +160,21 @@ BURGERPORTAAL_COLLECTOR_IDS = {
     # 'zaanstad':         '138204213564932198',
 }
 
+KLIKOGROEP_COLLECTOR_IDS = {
+    'oudeijsselstreek': {
+        'id': '454',
+        'url': 'cp-oudeijsselstreek.klikocontainermanager.com',
+    },
+    'uithoorn': {
+        'id': '474',
+        'url': 'cp-uithoorn.klikocontainermanager.com',
+    },
+    'maassluis': {
+        'id': '505',
+        'url': 'cp-maassluis.klikocontainermanager.com',
+    },
+}
+
 DEPRECATED_AND_NEW_WASTECOLLECTORS = {
     'cure':             'mijnafvalwijzer',
     'meppel':           'mijnafvalwijzer',

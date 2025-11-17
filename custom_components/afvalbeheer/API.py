@@ -8,7 +8,7 @@ from homeassistant.components import persistent_notification
 from .const import *
 from .models import WasteCollectionRepository
 from .collectors import (
-    XimmioCollector, BurgerportaalCollector, OpzetCollector,
+    XimmioCollector, BurgerportaalCollector, OpzetCollector, KlikogroepCollector,
     AfvalAlertCollector, AfvalwijzerCollector, AmsterdamCollector, CirculusCollector, CleanprofsCollector,
     DeAfvalAppCollector, LimburgNetCollector, MontferlandNetCollector, OmrinCollector,
     RD4Collector, RecycleApp, ReinisCollector, ROVACollector, StraatbeeldCollector
@@ -63,6 +63,7 @@ class WasteData(object):
             "drimmelen": (StraatbeeldCollector, common_args),
             **{key: (BurgerportaalCollector, common_args) for key in BURGERPORTAAL_COLLECTOR_IDS.keys()},
             **{key: (OpzetCollector, common_args) for key in OPZET_COLLECTOR_URLS.keys()},
+            **{key: (KlikogroepCollector, common_args) for key in KLIKOGROEP_COLLECTOR_IDS.keys()},
         }
 
         collector_class, args = collector_mapping.get(self.waste_collector, (None, None))
