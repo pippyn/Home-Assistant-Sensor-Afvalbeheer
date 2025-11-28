@@ -47,7 +47,7 @@ class WasteData(object):
         collector_mapping = {
             **{key: (XimmioCollector, common_args + [self.address_id, self.customer_id]) for key in XIMMIO_COLLECTOR_IDS.keys()},
             "mijnafvalwijzer": (AfvalwijzerCollector, common_args),
-            "afvalstoffendienstkalender": (AfvalwijzerCollector, common_args),
+            # "afvalstoffendienstkalender": (AfvalwijzerCollector, common_args),
             "afvalalert": (AfvalAlertCollector, common_args),
             "amsterdam": (AmsterdamCollector, common_args),
             "deafvalapp": (DeAfvalAppCollector, common_args),
