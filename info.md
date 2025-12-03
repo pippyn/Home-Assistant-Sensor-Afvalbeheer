@@ -45,6 +45,7 @@ This integration works with the following waste collectors:
   - Groningen
   - Hellendoorn
   - HVC
+  - Irado
   - Limburg.NET (don't forget the streetname and cityname option)
   - Lingewaard
   - Maassluis
