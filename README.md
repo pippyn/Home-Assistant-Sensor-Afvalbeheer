@@ -16,8 +16,6 @@ This integration works with many waste collectors, including:
 
 ACV, Afval3xBeter, Afvalstoffendienstkalender, AfvalAlert, Alkmaar, Almere, AlphenAanDenRijn, AreaReiniging, Assen, Avalex, Avri, BAR, Berkelland, Blink, Circulus, Cleanprofs, Cranendonck, Cure (use MijnAfvalwijzer), Cyclus, DAR, DeAfvalApp, DeFryskeMarren, DenHaag, Drimmelen, GAD, Hellendoorn, HVC, Irado, Limburg.NET (requires `streetname` and `cityname`), Lingewaard, Maassluis, Meerlanden, Meppel, Middelburg-Vlissingen, MijnAfvalwijzer, Mijnafvalzaken, Montferland, Montfoort, Nijkerk Ôffalkalinder, Omrin, OudeIJsselstreek, PeelEnMaas, PreZero, Purmerend, RAD, RecycleApp (requires `streetname`), RD4, RWM, Reinis, ROVA, RMN, Saver, Schouwen-Duiveland, Sliedrecht, Spaarnelanden, SudwestFryslan, TwenteMilieu, Uithoorn, Venray, Voorschoten, Waalre, Waardlanden, Westland, Woerden, ZRD, Groningen.
 
-> **Note:** Cure users should switch to MijnAfvalwijzer. Ophaalkalender users should switch to RecycleApp.
-
 ---
 
 ![Example](https://raw.githubusercontent.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/master/example.png)
