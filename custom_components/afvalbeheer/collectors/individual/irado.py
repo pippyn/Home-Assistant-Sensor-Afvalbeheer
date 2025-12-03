@@ -7,7 +7,7 @@ import requests
 
 from ..base import WasteCollector
 from ...models import WasteCollection
-from ...const import WASTE_TYPE_GREEN, WASTE_TYPE_PAPER
+from ...const import WASTE_TYPE_GREEN, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -17,9 +17,10 @@ class IradoCollector(WasteCollector):
     Collector for Irado waste data.
     """
     WASTE_TYPE_MAPPING = {
-        'GFT': WASTE_TYPE_GREEN,
-        'Papier': WASTE_TYPE_PAPER,
-
+        'gft': WASTE_TYPE_GREEN,
+        'papier': WASTE_TYPE_PAPER,
+        'pmd': WASTE_TYPE_PACKAGES,
+        'rest': WASTE_TYPE_GREY,
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
@@ -28,7 +29,7 @@ class IradoCollector(WasteCollector):
 
     def __get_data(self):
         _LOGGER.debug("Fetching data from Irado")
-        get_url = '{}location/address/calendar/pickups?zipcode={}&number={}&extension={}'.format(
+        get_url = '{}location/address/calendar/pickups?zipcode={}&number={}&extention={}'.format(
                 self.main_url, self.postcode, self.street_number, self.suffix)
         return requests.get(get_url)
 
