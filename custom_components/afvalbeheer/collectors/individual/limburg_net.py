@@ -51,7 +51,7 @@ class LimburgNetCollector(WasteCollector):
     def __fetch_address(self):
         _LOGGER.debug("Fetching address from Limburg.net")
         response = requests.get('{}/afval-kalender/gemeenten/search?query={}'.format(
-            self.main_url, self.city_name), verify='custom_components/afvalbeheer/certificates/limburg_net.pem').json()
+            self.main_url, self.city_name)).json()
 
         if not response[0]['nisCode']:
             _LOGGER.error('City not found!')
@@ -60,7 +60,7 @@ class LimburgNetCollector(WasteCollector):
         self.city_id = response[0]["nisCode"]
 
         response = requests.get('{}/afval-kalender/gemeente/{}/straten/search?query={}'.format(
-            self.main_url, self.city_id, self.street_name), verify='custom_components/afvalbeheer/certificates/limburg_net.pem').json()
+            self.main_url, self.city_id, self.street_name)).json()
 
         if not response[0]['nummer']:
             _LOGGER.error('Street not found!')
@@ -81,7 +81,7 @@ class LimburgNetCollector(WasteCollector):
             month = today.month
             get_url = '{}/kalender/{}/{}-{}?straatNummer={}&huisNummer={}&toevoeging={}'.format(
                     self.main_url, self.city_id, year, month, self.street_id, self.street_number, self.suffix)
-            month_json = requests.get(get_url, verify='custom_components/afvalbeheer/certificates/limburg_net.pem').json()
+            month_json = requests.get(get_url).json()
             data = data + month_json['events']
 
         return data
