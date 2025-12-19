@@ -75,6 +75,7 @@ This integration works with the following waste collectors:
   - Sliedrecht
   - Spaarnelanden
   - SudwestFryslan
+  - Tilburg
   - TwenteMilieu
   - Uithoorn
   - Venray
