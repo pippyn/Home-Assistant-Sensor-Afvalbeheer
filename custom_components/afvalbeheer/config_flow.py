@@ -26,7 +26,7 @@ WASTE_COLLECTORS = [
     "Middelburg-Vlissingen", "MijnAfvalwijzer", "Mijnafvalzaken", "Montferland",
     "Montfoort", "Offalkalinder", "Nijkerk", "Omrin", "OudeIJsselstreek", "PeelEnMaas", "PreZero", "Purmerend",
     "RAD", "RecycleApp", "RD4", "RWM", "Reinis", "ROVA", "RMN", "Saver",
-    "Schouwen-Duiveland", "Sliedrecht", "Spaarnelanden", "SudwestFryslan",
+    "Schouwen-Duiveland", "Sliedrecht", "Spaarnelanden", "SudwestFryslan", "Tilburg",
     "TwenteMilieu", "Uithoorn", "Venray", "Voorschoten", "Waalre", "Waardlanden", "Westland",
     "Woerden", "ZRD"
 ]
