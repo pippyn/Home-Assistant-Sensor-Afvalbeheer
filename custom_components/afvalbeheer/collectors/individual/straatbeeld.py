@@ -22,7 +22,7 @@ class StraatbeeldCollector(WasteCollector):
     WASTE_TYPE_MAPPING = {
         'gft': WASTE_TYPE_GREEN,
         'rest': WASTE_TYPE_GREY,
-        'pmd': WASTE_TYPE_PACKAGES,
+        'pbd': WASTE_TYPE_PACKAGES,
         'papier': WASTE_TYPE_PAPER,
         'kerstboom': WASTE_TYPE_TREE,
     }
