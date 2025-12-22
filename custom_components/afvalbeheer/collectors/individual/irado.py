@@ -87,13 +87,13 @@ class IradoCollector(WasteCollector):
 
                 waste_type = self.map_waste_type(waste_type_raw)
                 if not waste_type:
-                    _LOGGER.debug("Skipping unknown waste type: %s", waste_type_raw)
+                    _LOGGER.debug("Skipping unknown waste type: %s", waste_type)
                     continue
 
                 collection = WasteCollection.create(
                     date=date,
                     waste_type=waste_type,
-                    waste_type_slug=waste_type_raw
+                    waste_type_slug=waste_type
                 )
 
                 if collection not in self.collections:
