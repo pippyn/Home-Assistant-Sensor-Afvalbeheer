@@ -27,23 +27,50 @@ class IradoCollector(WasteCollector):
         super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.main_url = "https://irado.nl/wp-json/wsa/v1/"
 
-    def __get_data(self):
+    def __fetch_irado_data(self):
         _LOGGER.debug("Fetching data from Irado")
-        get_url = '{}location/address/calendar/pickups?zipcode={}&number={}&extention={}'.format(
-                self.main_url, self.postcode, self.street_number, self.suffix)
-        return requests.get(get_url)
 
-    async def update(self):
-        _LOGGER.debug("Updating Waste collection dates using Irado API")
+        query_params = "zipcode={}&number={}".format(self.postcode, self.street_number)
+
+        # Add extention only if suffix contains a non-empty string
+        if isinstance(self.suffix, str) and self.suffix.strip():
+            query_params += "&extention={}".format(self.suffix.strip())
+
+        get_url = "{}location/address/calendar/pickups?{}".format(self.main_url, query_params)
+        
+        get_headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Home-Assistant-Sensor-Afvalbeheer',
+        }
+
+        return requests.get(url=get_url, headers=get_headers)
+
+    def __parse_irado_date(self, date_str):
+        if not date_str:
+            return None
 
         try:
-            r = await self.hass.async_add_executor_job(self.__get_data)
-            response = r.json()
+            return datetime.strptime(date_str, "%d/%m/%Y")
+        except ValueError:
+            _LOGGER.warning("Invalid date format: %s", date_str)
+            return None
 
-            if not response:
-                _LOGGER.error('No Waste data found!')
+    async def update(self):
+        _LOGGER.debug("Updating waste collection dates using Irado API")
+
+        try:
+            r = await self.hass.async_add_executor_job(self.__fetch_irado_data)
+
+            if r.status_code != 200:
+                _LOGGER.error("Irado API error %s", r.status_code)
                 return
-            
+    
+            try:
+                response = r.json()
+            except ValueError:
+                _LOGGER.error("Irado API returned invalid JSON: %s", r.text[:500])
+                return
+           
             items = response.get("data")
             if not items:
                 _LOGGER.error("No waste data found in response object!")
@@ -53,23 +80,22 @@ class IradoCollector(WasteCollector):
 
             for item in items:
                 waste_type_raw = item.get("type")
-                if not waste_type_raw:
+                date = self.__parse_irado_date(item.get("date"))
+                
+                if not waste_type_raw or not date:
                     continue
 
                 waste_type = self.map_waste_type(waste_type_raw)
                 if not waste_type:
-                    continue
-
-                # New format: date is dd/mm/YYYY
-                date_str = item.get("date")
-                if not date_str:
+                    _LOGGER.debug("Skipping unknown waste type: %s", waste_type)
                     continue
 
                 collection = WasteCollection.create(
-                    date=datetime.strptime(date_str, '%d-%m-%Y').replace(tzinfo=None),
+                    date=date,
                     waste_type=waste_type,
-                    waste_type_slug=item['type']
+                    waste_type_slug=waste_type
                 )
+
                 if collection not in self.collections:
                     self.collections.add(collection)
 
