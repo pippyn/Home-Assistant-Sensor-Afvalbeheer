@@ -78,6 +78,7 @@ This integration works with the following waste collectors:
   - Tilburg
   - TwenteMilieu
   - Uithoorn
+  - Venlo
   - Venray
   - Voorschoten
   - Waalre

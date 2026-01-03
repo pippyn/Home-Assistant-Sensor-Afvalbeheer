@@ -148,7 +148,6 @@ XIMMIO_COLLECTOR_IDS = {
     'waardlanden':      '942abcf6-3775-400d-ae5d-7380d728b23c',
     'westland':         '6fc75608-126a-4a50-9241-a002ce8c8a6c',
     'woerden':          '06856f74-6826-4c6a-aabf-69bc9d20b5a6',
-    'blink':            '252d30d0-2e74-469c-8f1e-c0e2e434eb58',
     # 'reinis':           '9dc25c8a-175a-4a41-b7a1-83f237a80b77',
 }
 
