@@ -126,6 +126,7 @@ OPZET_COLLECTOR_URLS = {
     'spaarnelanden':                'https://afvalwijzer.spaarnelanden.nl',
     'sudwestfryslan':               'https://afvalkalender.sudwestfryslan.nl',
     'suez':                         'https://inzamelwijzer.prezero.nl',
+    'uithoorn':                     'https://cyclusnv.nl',
     'venray':                       'https://afvalkalender.venray.nl',
     'voorschoten':                  'https://afvalkalender.voorschoten.nl',
     'waalre':                       'https://afvalkalender.waalre.nl',
@@ -167,10 +168,10 @@ KLIKOGROEP_COLLECTOR_IDS = {
         'id': '454',
         'url': 'cp-oudeijsselstreek.klikocontainermanager.com',
     },
-    'uithoorn': {
-        'id': '474',
-        'url': 'cp-uithoorn.klikocontainermanager.com',
-    },
+    # 'uithoorn': {
+    #     'id': '474',
+    #     'url': 'cp-uithoorn.klikocontainermanager.com',
+    # },
     'maassluis': {
         'id': '505',
         'url': 'cp-maassluis.klikocontainermanager.com',
