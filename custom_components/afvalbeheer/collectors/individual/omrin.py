@@ -62,7 +62,7 @@ class OmrinCollector(WasteCollector):
                 'DeviceId': self.device_id,
                 'Platform': 'HomeAssistant',
                 'AppVersion': '4.0.3.273',
-                'OsVersion': 'HomeAssistant'
+                'OsVersion': 'HomeAssistant 2024.1'
             }
         )
         response.raise_for_status()
