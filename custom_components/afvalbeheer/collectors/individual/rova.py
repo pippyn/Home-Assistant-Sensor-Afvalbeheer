@@ -28,8 +28,6 @@ class ROVACollector(WasteCollector):
 
     def __get_data(self):
         _LOGGER.debug("Fetching data from ROVA")
-        self.today = datetime.today()
-        self.year = self.today.year
         response = requests.get(
             '{}/api/waste-calendar/upcoming?houseNumber={}&addition={}&postalcode={}&take=10'.format(self.main_url, self.street_number, self.suffix, self.postcode)
         )
