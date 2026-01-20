@@ -60,7 +60,7 @@ class OmrinCollector(WasteCollector):
                 'HouseNumber': int(self.street_number),
                 'HouseNumberExtension': self.suffix,
                 'DeviceId': self.device_id,
-                'Platform': 'HomeAssistant',
+                'Platform': 'Android',
                 'AppVersion': '4.0.3.273',
                 'OsVersion': 'HomeAssistant 2024.1'
             }
