@@ -8,7 +8,7 @@ import requests
 
 from ..base import WasteCollector
 from ...models import WasteCollection
-from ...const import WASTE_TYPE_PAPER, WASTE_TYPE_GREEN, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES
+from ...const import WASTE_TYPE_PAPER, WASTE_TYPE_GREEN, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_TREE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ class CirculusCollector(WasteCollector):
         'PMD': WASTE_TYPE_PACKAGES,
         'PAP': WASTE_TYPE_PAPER,
         # 'TEXTILE': WASTE_TYPE_TEXTILE,
-        # 'TREE': WASTE_TYPE_TREE,
+        'KERST': WASTE_TYPE_TREE,
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
