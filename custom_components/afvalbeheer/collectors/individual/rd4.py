@@ -45,31 +45,38 @@ class RD4Collector(WasteCollector):
 
     def __get_data(self):
         _LOGGER.debug("Fetching data from RD4")
-        self.today = datetime.today()
-        self.year = self.today.year
-        response = requests.get(
-            '{}?postal_code={}&house_number={}&house_number_extension={}&year={}'.format(self.main_url, self.postcode, self.street_number, self.suffix, self.year)
-        )
-        return response
+        today = datetime.today()
+        items = []
+
+        for year in (today.year, today.year + 1):
+            response = requests.get(
+                '{}?postal_code={}&house_number={}&house_number_extension={}&year={}'.format(
+                    self.main_url, self.postcode, self.street_number, self.suffix, year
+                )
+            )
+            year_data = response.json()
+
+            if not year_data or not year_data.get("success"):
+                _LOGGER.debug("No RD4 data found for year %s", year)
+                continue
+
+            items.extend(year_data["data"]["items"][0])
+
+        return items
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using RD4 API")
 
         try:
-            r = await self.hass.async_add_executor_job(self.__get_data)
-            response = r.json()
+            items = await self.hass.async_add_executor_job(self.__get_data)
 
-            if not response:
+            if not items:
                 _LOGGER.error('No Waste data found!')
                 return
 
-            if not response["success"]:
-                _LOGGER.error('Address not found!')
-                return
-            
             self.collections.remove_all()
 
-            for item in response["data"]["items"][0]:
+            for item in items:
 
                 waste_type = self.map_waste_type(item["type"])
                 date = item["date"]

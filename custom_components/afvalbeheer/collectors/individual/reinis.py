@@ -55,12 +55,19 @@ class ReinisCollector(WasteCollector):
 
     def __get_data(self):
         _LOGGER.debug("Fetching data from Reinis")
-        combined_response = {}
         now = datetime.now()
-
-        response = requests.get(
-            "{}/rest/adressen/{}/kalender/{}".format(self.main_url, self.bagid, now.year), timeout=60, verify=False).json()
-        return response
+        data = []
+        for year in (now.year, now.year + 1):
+            year_data = requests.get(
+                "{}/rest/adressen/{}/kalender/{}".format(self.main_url, self.bagid, year),
+                timeout=60,
+                verify=False,
+            ).json()
+            if year_data:
+                data.extend(year_data)
+            else:
+                _LOGGER.debug("No Reinis data found for year %s", year)
+        return data
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Reinis API")

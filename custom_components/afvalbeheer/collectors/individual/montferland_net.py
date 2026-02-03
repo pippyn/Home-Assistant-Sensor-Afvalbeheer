@@ -54,14 +54,18 @@ class MontferlandNetCollector(WasteCollector):
 
     def __get_data(self):
         _LOGGER.debug("Fetching data from Montferland")
+        today = datetime.today()
         data = []
 
-        today = datetime.today()
-        year = today.year
-
-        get_url = '{}/OphaalDatums.ashx/{}&ADM_ID={}&ADR_ID={}&Jaar={}'.format(
-                self.main_url, self.query_start, self.administratie_id, self.adres_id, year)
-        data = requests.get(get_url).json()
+        for year in (today.year, today.year + 1):
+            get_url = "{}/OphaalDatums.ashx/{}&ADM_ID={}&ADR_ID={}&Jaar={}".format(
+                self.main_url, self.query_start, self.administratie_id, self.adres_id, year
+            )
+            year_data = requests.get(get_url).json()
+            if year_data:
+                data.extend(year_data)
+            else:
+                _LOGGER.debug("No Montferland data found for year %s", year)
 
         return data
 
