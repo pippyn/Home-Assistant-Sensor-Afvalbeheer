@@ -60,9 +60,9 @@ class OmrinCollector(WasteCollector):
                 'HouseNumber': int(self.street_number),
                 'HouseNumberExtension': self.suffix,
                 'DeviceId': self.device_id,
-                'Platform': 'Android',
+                'Platform': 'iOS',
                 'AppVersion': '4.0.3.273',
-                'OsVersion': 'HomeAssistant 2024.1'
+                'OsVersion': 'iPhone15,3 26.2.1'
             }
         )
         response.raise_for_status()
