@@ -193,11 +193,12 @@ Select which waste types you want sensors for. At least one is required. Availab
 
 **Built-in Icons:**
 
-![Built-in Icons](https://user-images.githubusercontent.com/7591990/196623891-bf169e71-9f65-4d32-bade-befecb1263d8.jpg)
+<img width="230" height="471" src="https://github.com/user-attachments/assets/57c8b4fd-5978-41e5-8da0-671e982c2870" />
 
 **New Built-in Icons:**
 
-![New Built-in Icons](https://user-images.githubusercontent.com/7591990/196623742-002840d9-6ecc-4100-9609-1b1f7302f86d.jpg)
+<img width="270" height="931" src="https://github.com/user-attachments/assets/7dc264ce-642d-41a4-bbd1-18374f4adb12" />
+
 
 ### Language Options
 
