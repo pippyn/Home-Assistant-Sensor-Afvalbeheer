@@ -141,6 +141,7 @@ XIMMIO_COLLECTOR_IDS = {
     'blink':            '252d30d0-2e74-469c-8f1e-c0e2e434eb58',
     'hellendoorn':      '24434f5b-7244-412b-9306-3a2bd1e22bc1',
     'meerlanden':       '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
+    'oostzaan':         '6eb81e8f-ca5a-4bad-af0a-667650325511',
     'ximmio':           '800bf8d7-6dd1-4490-ba9d-b419d6dc8a45',
     'rad':              '13a2cad9-36d0-4b01-b877-efcb421a864d',
     'twentemilieu':     '8d97bb56-5afd-4cbc-a651-b4f7314264b4',
