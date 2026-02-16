@@ -24,8 +24,8 @@ WASTE_COLLECTORS = [
     "Cyclus", "DAR", "DeAfvalApp", "DeFryskeMarren", "DenHaag", "Drimmelen", "GAD",
     "Groningen", "Hellendoorn", "HVC", "Irado", "Limburg.NET", "Lingewaard", "Maassluis", "Meerlanden",
     "Middelburg-Vlissingen", "MijnAfvalwijzer", "Mijnafvalzaken", "Montferland",
-    "Montfoort", "Offalkalinder", "Nijkerk", "Omrin", "OudeIJsselstreek", "PeelEnMaas", "PreZero", "Purmerend",
-    "RAD", "RecycleApp", "RD4", "RWM", "Reinis", "ROVA", "RMN", "Saver",
+    "Montfoort", "Nijkerk", "Offalkalinder", "Omrin", "Oostzaan", "OudeIJsselstreek", "PeelEnMaas", "PreZero",
+    "Purmerend", "RAD", "RecycleApp", "RD4", "RWM", "Reinis", "ROVA", "RMN", "Saver",
     "Schouwen-Duiveland", "Sliedrecht", "Spaarnelanden", "SudwestFryslan", "Tilburg",
     "TwenteMilieu", "Uithoorn", "Venlo","Venray", "Voorschoten", "Waalre", "Waardlanden", "Westland",
     "Woerden", "ZRD"

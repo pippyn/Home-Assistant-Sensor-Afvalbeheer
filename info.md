@@ -59,6 +59,7 @@ This integration works with the following waste collectors:
   - Nijkerk
   - Ôffalkalinder
   - Omrin
+  - Oostzaan
   - OudeIJsselstreek
   - PeelEnMaas
   - PreZero
