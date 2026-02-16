@@ -44,6 +44,7 @@ class XimmioCollector(WasteCollector):
     XIMMIO_URLS = {
         'avalex': "https://wasteprod2api.ximmio.com",
         'meerlanden': "https://wasteprod2api.ximmio.com",
+        'oostzaan': "https://wasteprod2api.ximmio.com",
         'rad': "https://wasteprod2api.ximmio.com",
         'westland': "https://wasteprod2api.ximmio.com",
         'woerden': "https://wasteprod2api.ximmio.com",
