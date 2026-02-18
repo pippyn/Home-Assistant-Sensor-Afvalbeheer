@@ -10,7 +10,7 @@ from ...models import WasteCollection
 from ...const import (
     WASTE_TYPE_BULKLITTER, WASTE_TYPE_GLASS, WASTE_TYPE_GREEN, WASTE_TYPE_GREY,
     WASTE_TYPE_PAPER, WASTE_TYPE_TEXTILE, WASTE_TYPE_PACKAGES, WASTE_TYPE_PLASTIC,
-    WASTE_TYPE_BRANCHES, WASTE_TYPE_SOFT_PLASTIC
+    WASTE_TYPE_BRANCHES, WASTE_TYPE_SOFT_PLASTIC, WASTE_TYPE_TREE
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class RecycleApp(WasteCollector):
         # 'plastic': WASTE_TYPE_PACKAGES,
         'papier': WASTE_TYPE_PAPER,
         'textiel': WASTE_TYPE_TEXTILE,
-        # 'kerstb': WASTE_TYPE_TREE,
+        'kerstbomen': WASTE_TYPE_TREE,
         'pmd': WASTE_TYPE_PACKAGES,
         'gemengde': WASTE_TYPE_PLASTIC,
         'snoeihout': WASTE_TYPE_BRANCHES,
