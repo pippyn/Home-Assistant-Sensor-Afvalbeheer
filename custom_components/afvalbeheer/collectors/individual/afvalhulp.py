@@ -21,21 +21,6 @@ class AfvalhulpCollector(WasteCollector):
         "pmd+": WASTE_TYPE_PMD_GREY
     }
 
-    MONTHS = {
-        "januari": 1,
-        "februari": 2,
-        "maart": 3,
-        "april": 4,
-        "mei": 5,
-        "juni": 6,
-        "juli": 7,
-        "augustus": 8,
-        "september": 9,
-        "oktober": 10,
-        "november": 11,
-        "december": 12,
-    }
-
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
         super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.base_url = "https://mijn.afvalhulp.nl"
@@ -54,73 +39,85 @@ class AfvalhulpCollector(WasteCollector):
 
         return None
 
-    def _parse_dutch_date(self, raw_date):
+    def _get_ical_url(self, html):
         """
-        Parse date strings
+        Extract iCal URL
         """
-        raw_date = raw_date.strip().lower()
-
         match = re.search(
-            r"(?:maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag)\s+(\d{1,2})\s+([a-z]+)\s+(\d{4})",
-            raw_date,
+            r"https://mijn\.afvalhulp\.nl/api/v1/ical/[a-f0-9-]{36}/calendar\.ics",
+            html,
         )
         if not match:
-            raise ValueError(f"Unsupported format: {raw_date}")
+            raise ValueError("Could not find iCal URL")
+        return match.group(0)
 
-        day = int(match.group(1))
-        month_name = match.group(2)
-        year = int(match.group(3))
-
-        month = self.MONTHS.get(month_name)
-        if not month:
-            raise ValueError(f"Unknown month: {month_name}")
-
-        return datetime(year, month, day)
-
-    def _parse_collections(self, html):
+    def _parse_ical(self, ical_text):
         """
-        Parse upcoming dates from HTML
+        Parse upcoming dates from iCal
         """
+        if not ical_text:
+            return []
+
         collections = []
+        event = {}
+        lines = []
+        for raw_line in ical_text.splitlines():
+            if raw_line.startswith((" ", "\t")) and lines:
+                lines[-1] += raw_line[1:]
+            else:
+                lines.append(raw_line)
 
-        pattern = re.compile(
-            r'<p class="font-bold">\s*(?P<type>[^<]+?)\s*</p>\s*<p>\s*(?P<date>[^<]+?)\s*</p>',
-            re.IGNORECASE,
-        )
-
-        for match in pattern.finditer(html):
-            raw_type = match.group("type").strip()
-            raw_date = match.group("date").strip()
-
-            waste_type = self.map_waste_type(raw_type.lower())
-            if not waste_type:
-                _LOGGER.debug("Unknown waste type: %s", raw_type)
+        for line in lines:
+            if ":" not in line:
                 continue
 
-            try:
-                collection = WasteCollection.create(
-                    date=self._parse_dutch_date(raw_date),
-                    waste_type=waste_type,
-                    waste_type_slug=raw_type.lower(),
-                )
-            except ValueError as err:
-                _LOGGER.debug("Could not parse date '%s': %s", raw_date, err)
-                continue
+            key, value = line.split(":", 1)
+            field = key.split(";", 1)[0].strip().upper()
+            value = value.strip()
 
-            if collection not in self.collections and collection not in collections:
-                collections.append(collection)
+            if field == "BEGIN" and value == "VEVENT":
+                event = {}
+
+            elif field == "SUMMARY":
+                event["summary"] = value
+                event["waste_type"] = self.map_waste_type(value.lower())
+
+            elif field == "DTSTART":
+                date_str = value[:8]
+                if date_str.isdigit() and len(date_str) == 8:
+                    event["date"] = datetime.strptime(date_str, "%Y%m%d")
+                else:
+                    _LOGGER.debug("Unsupported DTSTART format %s", value)
+
+            elif field == "END" and value == "VEVENT":
+                waste_type = event.get("waste_type")
+                date = event.get("date")
+                summary = event.get("summary", "").lower()
+
+                if waste_type and date:
+                    collection = WasteCollection.create(
+                        date=date,
+                        waste_type=waste_type,
+                        waste_type_slug=summary,
+                    )
+                    if collection not in self.collections and collection not in collections:
+                        collections.append(collection)
+                else:
+                    _LOGGER.debug("Incomplete iCal event %s", event)
+
+                event = {}
 
         return collections
 
     def __get_data(self):
         """
-        Fetch HTML after POST
+        Fetch iCal data
         """
         session = requests.Session()
 
         headers = {
             "User-Agent": "Mozilla/5.0",
-            "Referer": f"{self.base_url}/postcode",
+            "Referer": f"{self.base_url}/",
         }
 
         form_page = session.get(f"{self.base_url}/postcode", headers=headers, timeout=30)
@@ -146,7 +143,23 @@ class AfvalhulpCollector(WasteCollector):
         )
         result.raise_for_status()
 
-        return result.text
+        schedule_page = session.get(
+            f"{self.base_url}/pickup-schedule",
+            headers={**headers, "Referer": result.url},
+            timeout=30,
+        )
+        schedule_page.raise_for_status()
+
+        ical_url = self._get_ical_url(schedule_page.text)
+
+        ical_response = session.get(
+            ical_url,
+            headers=headers,
+            timeout=30,
+        )
+        ical_response.raise_for_status()
+
+        return ical_response.text or ""
 
     async def update(self):
         """
@@ -155,8 +168,8 @@ class AfvalhulpCollector(WasteCollector):
         _LOGGER.debug("Updating waste collection dates")
 
         try:
-            html = await self.hass.async_add_executor_job(self.__get_data)
-            collections = self._parse_collections(html)
+            ical_text = await self.hass.async_add_executor_job(self.__get_data)
+            collections = self._parse_ical(ical_text)
 
             self.collections.remove_all()
 
