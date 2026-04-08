@@ -4,6 +4,7 @@ AfvalhulpCollector for waste data from Afvalhulp.nl
 
 import logging
 from datetime import datetime
+import asyncio
 import requests
 import re
 
@@ -168,8 +169,18 @@ class AfvalhulpCollector(WasteCollector):
         _LOGGER.debug("Updating waste collection dates")
 
         try:
-            ical_text = await self.hass.async_add_executor_job(self.__get_data)
-            collections = self._parse_ical(ical_text)
+            collections = []
+
+            for attempt in range(2):
+                ical_text = await self.hass.async_add_executor_job(self.__get_data)
+                collections = self._parse_ical(ical_text)
+
+                if collections:
+                    break
+
+                if attempt == 0:
+                    _LOGGER.warning("No waste collection dates found, retrying in 10 seconds")
+                    await asyncio.sleep(10)
 
             self.collections.remove_all()
 
@@ -178,6 +189,7 @@ class AfvalhulpCollector(WasteCollector):
 
             if not collections:
                 _LOGGER.warning("No waste collection dates found")
+                return False
 
             return True
 
