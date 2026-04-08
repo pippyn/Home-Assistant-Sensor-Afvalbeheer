@@ -182,14 +182,14 @@ class AfvalhulpCollector(WasteCollector):
                     _LOGGER.warning("No waste collection dates found, retrying in 10 seconds")
                     await asyncio.sleep(10)
 
+            if not collections:
+                _LOGGER.warning("No waste collection dates found")
+                return False
+
             self.collections.remove_all()
 
             for collection in collections:
                 self.collections.add(collection)
-
-            if not collections:
-                _LOGGER.warning("No waste collection dates found")
-                return False
 
             return True
 
