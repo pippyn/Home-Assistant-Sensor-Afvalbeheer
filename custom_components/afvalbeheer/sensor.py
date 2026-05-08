@@ -37,6 +37,12 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     entities = [WasteTypeSensor(data, resource, config_data) for resource in config_data[CONF_RESOURCES]]
     _LOGGER.debug("Created WasteTypeSensor entities: %s", entities)
 
+    # Add diftar sensors for Omrin if credentials are provided
+    if hasattr(data, 'collector') and hasattr(data.collector, 'diftar_data') and hasattr(data.collector, 'has_credentials') and data.collector.has_credentials:
+        for waste_type in config_data[CONF_RESOURCES]:
+            entities.append(OmrinDiftarSensor(data, waste_type, config_data))
+        _LOGGER.debug("Added OmrinDiftarSensor entities for waste types: %s", config_data[CONF_RESOURCES])
+
     if config_data.get(CONF_UPCOMING):
         entities.extend([WasteDateSensor(data, config_data, timedelta(days=delta)) for delta in (0, 1)])
         entities.append(WasteUpcomingSensor(data, config_data))
@@ -400,3 +406,65 @@ def _format_unique_id(name, name_prefix, waste_collector, sensor_type, entry_id,
         parts.insert(1, name)
     unique_id = "_".join(parts).replace(" ", "_").replace("-", "_").lower()
     return unique_id
+
+
+class OmrinDiftarSensor(BaseSensor):
+    """
+    Sensor showing diftar (emptying history) data for an Omrin waste type.
+
+    State: number of times emptied this year.
+    Attributes: last emptied date, all emptied dates this year, total weight.
+    """
+    def __init__(self, data, waste_type, config):
+        super().__init__(data, config)
+        self.waste_type = waste_type
+        self._name = _format_sensor(
+            config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, f"{self.waste_type} aantal ophalingen dit jaar"
+        )
+        self._attr_unique_id = _format_unique_id(
+            config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, f"{self.waste_type}_aantal_ophalingen_dit_jaar", self.entry_id, config.get(CONF_POSTCODE), config.get(CONF_STREET_NUMBER)
+        ).lower()
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return self._name
+
+    @property
+    def icon(self):
+        """Return the icon for the sensor."""
+        return "mdi:delete-clock"
+
+    def update(self):
+        """Update the state and attributes of the diftar sensor."""
+        diftar_data = getattr(self.data.collector, 'diftar_data', {})
+        waste_info = diftar_data.get(self.waste_type, None)
+
+        if not waste_info:
+            self._state = 0
+            self._attrs = {
+                ATTR_WASTE_COLLECTOR: self.waste_collector,
+                'last_emptied': None,
+                'emptied_dates_this_year': [],
+                'total_count_this_year': 0,
+                'total_weight': 0,
+            }
+            return
+
+        self._state = waste_info['current_year_count']
+
+        last_emptied = waste_info.get('last_emptied')
+        current_year_dates = waste_info.get('current_year_dates', [])
+
+        self._attrs = {
+            ATTR_WASTE_COLLECTOR: self.waste_collector,
+            'last_emptied': last_emptied.strftime('%Y-%m-%d') if last_emptied else None,
+            'emptied_dates_this_year': [d.strftime('%Y-%m-%d') for d in current_year_dates],
+            'total_count_this_year': waste_info.get('current_year_count', 0),
+            'total_weight': waste_info.get('total_weight', 0),
+        }
+
+        # Add per-year pickup counts as attributes (e.g. ophalingen_2024: 5)
+        per_year_counts = waste_info.get('per_year_counts', {})
+        for year, count in sorted(per_year_counts.items()):
+            self._attrs[f'ophalingen_{year}'] = count

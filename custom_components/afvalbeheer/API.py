@@ -23,7 +23,7 @@ class WasteData(object):
     Manages waste data and schedules updates.
     """
 
-    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, custom_mapping, address_id, print_waste_type, print_waste_type_slugs, update_interval, customer_id):
+    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, custom_mapping, address_id, print_waste_type, print_waste_type_slugs, update_interval, customer_id, email=None, password=None):
         self.hass = hass
         self.waste_collector = waste_collector
         self.city_name = city_name
@@ -37,6 +37,8 @@ class WasteData(object):
         self.collector = None
         self.update_interval = update_interval
         self.customer_id = customer_id
+        self.email = email
+        self.password = password
         self.custom_mapping = custom_mapping
         self.__select_collector()
 
@@ -55,7 +57,7 @@ class WasteData(object):
             "limburg.net": (LimburgNetCollector, common_args + [self.street_name, self.city_name]),
             "irado": (IradoCollector, common_args),
             "montferland": (MontferlandNetCollector, common_args),
-            "omrin": (OmrinCollector, common_args),
+            "omrin": (OmrinCollector, common_args + [self.email, self.password]),
             "recycleapp": (RecycleApp, common_args + [self.street_name]),
             "reinis": (ReinisCollector, common_args),
             "rd4": (RD4Collector, common_args),
@@ -125,6 +127,8 @@ def get_wastedata_from_config(hass, config):
     print_waste_type_slugs = config.get(CONF_PRINT_AVAILABLE_WASTE_TYPE_SLUGS)
     update_interval = config.get(CONF_UPDATE_INTERVAL)
     customer_id = config.get(CONF_CUSTOMER_ID)
+    email = config.get(CONF_EMAIL)
+    password = config.get(CONF_PASSWORD)
     custom_mapping = config.get(CONF_CUSTOM_MAPPING)
     config["id"] = _format_id(waste_collector, postcode, street_number)
 
@@ -169,6 +173,8 @@ def get_wastedata_from_config(hass, config):
         print_waste_type_slugs,
         update_interval,
         customer_id,
+        email,
+        password,
     )
 
 

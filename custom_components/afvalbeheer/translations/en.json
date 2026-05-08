@@ -19,6 +19,18 @@
           "streetname": "Street Name"
         }
       },
+      "omrin_credentials": {
+        "title": "Omrin Credentials (Optional)",
+        "description": "Log in with your Omrin account to get a sensor showing the number of pickups this year per waste type. Leave empty to skip.",
+        "data": {
+          "email": "Email address",
+          "password": "Password"
+        },
+        "data_description": {
+          "email": "Your Omrin account email address (optional)",
+          "password": "Your Omrin account password (optional)"
+        }
+      },
       "mapping": {
         "title": "Custom Mapping (Optional)",
         "description": "Configure custom waste type mapping",
@@ -105,6 +117,18 @@
           "suffix": "Suffix (optional)", 
           "cityname": "City Name",
           "streetname": "Street Name"
+        }
+      },
+      "omrin_credentials": {
+        "title": "Omrin Credentials (Optional)",
+        "description": "Log in with your Omrin account to get a sensor showing the number of pickups this year per waste type. Leave empty to skip.",
+        "data": {
+          "email": "Email address",
+          "password": "Password"
+        },
+        "data_description": {
+          "email": "Your Omrin account email address (optional)",
+          "password": "Your Omrin account password (optional)"
         }
       },
       "mapping": {
