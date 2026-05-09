@@ -12,7 +12,7 @@ from .const import (
     CONF_DATE_OBJECT, CONF_BUILT_IN_ICONS, CONF_BUILT_IN_ICONS_NEW, CONF_DISABLE_ICONS,
     CONF_TRANSLATE_DAYS, CONF_DAY_OF_WEEK, CONF_DAY_OF_WEEK_ONLY, CONF_ALWAYS_SHOW_DAY,
     CONF_STREET_NAME, CONF_CITY_NAME, CONF_ADDRESS_ID, CONF_CUSTOMER_ID, CONF_UPDATE_INTERVAL,
-    CONF_CUSTOM_MAPPING, DEFAULT_CONFIG, XIMMIO_COLLECTOR_IDS
+    CONF_CUSTOM_MAPPING, DEFAULT_CONFIG, XIMMIO_COLLECTOR_IDS, CONF_EMAIL, CONF_PASSWORD
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -40,6 +40,7 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def __init__(self):
         super().__init__()
         self._custom_mapping = {}
+        self._omrin_credentials = {}
     
 
     async def async_step_import(self, import_config):
@@ -242,9 +243,33 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if user_input is not None:
             self._address_input = {CONF_WASTE_COLLECTOR: self._collector, **user_input}
+            if self._collector == "Omrin":
+                return await self.async_step_omrin_credentials()
             return await self.async_step_mapping()
         return self.async_show_form(
             step_id="address",
+            data_schema=vol.Schema(schema_dict),
+            errors=errors,
+        )
+
+    async def async_step_omrin_credentials(self, user_input=None):
+        """Optional credentials step for Omrin users (enables diftar data)."""
+        errors = {}
+        if user_input is not None:
+            self._omrin_credentials = user_input
+            return await self.async_step_mapping()
+
+        schema_dict = {
+            vol.Optional(CONF_EMAIL, default=""): selector.TextSelector(
+                selector.TextSelectorConfig(type=selector.TextSelectorType.EMAIL)
+            ),
+            vol.Optional(CONF_PASSWORD, default=""): selector.TextSelector(
+                selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD)
+            ),
+        }
+
+        return self.async_show_form(
+            step_id="omrin_credentials",
             data_schema=vol.Schema(schema_dict),
             errors=errors,
         )
@@ -348,6 +373,10 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 data = {**self._address_input, **user_input}
                 # Add custom mapping to data
                 data[CONF_CUSTOM_MAPPING] = custom_mapping
+                # Add Omrin credentials if provided
+                omrin_creds = getattr(self, '_omrin_credentials', {})
+                if omrin_creds:
+                    data.update(omrin_creds)
                 # Generate unique ID for this configuration entry
                 data[CONF_ID] = str(uuid.uuid4())
                 return self.async_create_entry(
@@ -481,6 +510,7 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
         self._collector = None
         self._address_input = {}
         self._custom_mapping = {}
+        self._omrin_credentials = {}
 
     @property
     def config_entry(self):
@@ -531,9 +561,35 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
 
         if user_input is not None:
             self._address_input = {CONF_WASTE_COLLECTOR: self._collector, **user_input}
+            if self._collector == "Omrin":
+                return await self.async_step_omrin_credentials()
             return await self.async_step_mapping()
 
         return self.async_show_form(step_id="address", data_schema=vol.Schema(schema_dict))
+
+    async def async_step_omrin_credentials(self, user_input=None):
+        """Optional credentials step for Omrin users."""
+        errors = {}
+        current = {**self.config_entry.data, **self.config_entry.options}
+
+        if user_input is not None:
+            self._omrin_credentials = user_input
+            return await self.async_step_mapping()
+
+        schema_dict = {
+            vol.Optional(CONF_EMAIL, default=current.get(CONF_EMAIL, "")): selector.TextSelector(
+                selector.TextSelectorConfig(type=selector.TextSelectorType.EMAIL)
+            ),
+            vol.Optional(CONF_PASSWORD, default=current.get(CONF_PASSWORD, "")): selector.TextSelector(
+                selector.TextSelectorConfig(type=selector.TextSelectorType.PASSWORD)
+            ),
+        }
+
+        return self.async_show_form(
+            step_id="omrin_credentials",
+            data_schema=vol.Schema(schema_dict),
+            errors=errors,
+        )
 
     async def async_step_mapping(self, user_input=None):
         """Handle the custom mapping step for options flow."""
@@ -665,6 +721,10 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
                 data = {**self._address_input, **user_input}
                 # Add custom mapping to data
                 data[CONF_CUSTOM_MAPPING] = custom_mapping
+                # Add Omrin credentials if provided
+                omrin_creds = getattr(self, '_omrin_credentials', {})
+                if omrin_creds:
+                    data.update(omrin_creds)
                 
                 # Check if custom mapping changed and clean up old entities if needed
                 old_mapping = self.config_entry.options.get(CONF_CUSTOM_MAPPING, self.config_entry.data.get(CONF_CUSTOM_MAPPING, {}))

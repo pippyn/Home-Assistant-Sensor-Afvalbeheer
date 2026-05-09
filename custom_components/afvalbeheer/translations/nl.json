@@ -19,6 +19,18 @@
           "streetname": "Straatnaam"
         }
       },
+      "omrin_credentials": {
+        "title": "Omrin Inloggegevens (Optioneel)",
+        "description": "Log in met je Omrin-account om een sensor te krijgen met het aantal ophalingen dit jaar per afvaltype. Je kunt dit overslaan door de velden leeg te laten.",
+        "data": {
+          "email": "E-mailadres",
+          "password": "Wachtwoord"
+        },
+        "data_description": {
+          "email": "Het e-mailadres van je Omrin-account (optioneel)",
+          "password": "Het wachtwoord van je Omrin-account (optioneel)"
+        }
+      },
       "mapping": {
         "title": "Aangepaste Mapping (Optioneel)",
         "description": "Configureer aangepaste afvaltype mapping",
@@ -105,6 +117,18 @@
           "suffix": "Toevoeging (optioneel)", 
           "cityname": "Plaatsnaam",
           "streetname": "Straatnaam"
+        }
+      },
+      "omrin_credentials": {
+        "title": "Omrin Inloggegevens (Optioneel)",
+        "description": "Log in met je Omrin-account om een sensor te krijgen met het aantal ophalingen dit jaar per afvaltype. Je kunt dit overslaan door de velden leeg te laten.",
+        "data": {
+          "email": "E-mailadres",
+          "password": "Wachtwoord"
+        },
+        "data_description": {
+          "email": "Het e-mailadres van je Omrin-account (optioneel)",
+          "password": "Het wachtwoord van je Omrin-account (optioneel)"
         }
       },
       "mapping": {
