@@ -12,7 +12,7 @@ import urllib3.util.connection as _urllib3_connection
 from ..base import WasteCollector
 from ...models import WasteCollection
 from ...const import (
-    WASTE_TYPE_PAPER_PMD, WASTE_TYPE_BRANCHES, WASTE_TYPE_BULKLITTER,
+    WASTE_TYPE_PMD_GREY, WASTE_TYPE_PAPER_PMD, WASTE_TYPE_BRANCHES, WASTE_TYPE_BULKLITTER,
     WASTE_TYPE_GLASS, WASTE_TYPE_GREENGREY, WASTE_TYPE_GREEN, WASTE_TYPE_KCA,
     WASTE_TYPE_GREY_BAGS, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER,
     WASTE_TYPE_TEXTILE, WASTE_TYPE_TREE, OPZET_COLLECTOR_URLS
@@ -52,18 +52,21 @@ class OpzetCollector(WasteCollector):
         'glas': WASTE_TYPE_GLASS,
         'duobak': WASTE_TYPE_GREENGREY,
         'groente': WASTE_TYPE_GREEN,
+        'etensresten': WASTE_TYPE_GREEN,
         'gft': WASTE_TYPE_GREEN,
         'groene container': WASTE_TYPE_GREEN,
         'chemisch': WASTE_TYPE_KCA,
         'kca': WASTE_TYPE_KCA,
         'tariefzak restafval': WASTE_TYPE_GREY_BAGS,
         'restafvalzakken': WASTE_TYPE_GREY_BAGS,
+        'rest+pmd': WASTE_TYPE_PMD_GREY,
         'rest': WASTE_TYPE_GREY,
         'grijze container': WASTE_TYPE_GREY,
         'plastic': WASTE_TYPE_PACKAGES,
         'papier': WASTE_TYPE_PAPER,
         'textiel': WASTE_TYPE_TEXTILE,
         'kerstb': WASTE_TYPE_TREE,
+        'plastic': WASTE_TYPE_PACKAGES,
         'pmd': WASTE_TYPE_PACKAGES,
         'pbd': WASTE_TYPE_PACKAGES,
     }
