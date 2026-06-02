@@ -42,6 +42,8 @@ class OmrinCollector(WasteCollector):
         self.base_url = "https://api.omrinafvalapp.nl"
         self.device_id = str(uuid.uuid4())
         self.token = None
+        self.refresh_token = None
+        self.token_expires_at = None
         self.email = email or None
         self.password = password or None
         self.diftar_data = {}  # Dict of {waste_type: {"dates": [...], "count": int}}
@@ -65,9 +67,9 @@ class OmrinCollector(WasteCollector):
             'HouseNumber': int(self.street_number) if self.street_number else 0,
             'HouseNumberExtension': self.suffix or '',
             'DeviceId': self.device_id,
-            'Platform': 'iOS',
+            'Platform': 'HomeAssistant',
             'AppVersion': '4.0.3.273',
-            'OsVersion': 'iPhone15,3 26.2.1'
+            'OsVersion': '1.0'
         }
         
         if self.has_credentials:
@@ -86,19 +88,72 @@ class OmrinCollector(WasteCollector):
 
         if data.get('success') and data.get('data'):
             self.token = data['data'].get('accessToken')
+            self.refresh_token = data['data'].get('refreshToken')
+            expires_at_str = data['data'].get('expiresAt')
+            if expires_at_str:
+                try:
+                    self.token_expires_at = datetime.fromisoformat(expires_at_str.replace('Z', '+00:00')).replace(tzinfo=None)
+                except (ValueError, TypeError):
+                    _LOGGER.warning("Failed to parse token expiration time: %s", expires_at_str)
             return self.token
         else:
             raise Exception(f"Login failed: {data.get('errors', 'Unknown error')}")
 
-    def __graphql_query(self, query: str) -> Dict:
-        """Execute a GraphQL query"""
+    def __refresh_token_request(self) -> str:
+        """Refresh the access token using the refresh token"""
+        if not self.token or not self.refresh_token:
+            raise ValueError("Cannot refresh: missing token or refresh token")
+        
+        _LOGGER.debug("Refreshing access token")
+        
+        refresh_data = {
+            'token': self.token,
+            'refreshToken': self.refresh_token
+        }
+        
+        response = self.session.post(
+            f"{self.base_url}/api/Auth/RefreshToken",
+            json=refresh_data
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get('success') and data.get('data'):
+            self.token = data['data'].get('accessToken')
+            self.refresh_token = data['data'].get('refreshToken')  # Refresh token rotates
+            expires_at_str = data['data'].get('expiresAt')
+            if expires_at_str:
+                try:
+                    self.token_expires_at = datetime.fromisoformat(expires_at_str.replace('Z', '+00:00')).replace(tzinfo=None)
+                except (ValueError, TypeError):
+                    _LOGGER.warning("Failed to parse token expiration time: %s", expires_at_str)
+            return self.token
+        else:
+            raise Exception(f"Token refresh failed: {data.get('errors', 'Unknown error')}")
+
+    def __ensure_valid_token(self) -> str:
+        """Check if token needs refreshing and refresh if necessary"""
         if not self.token:
             raise ValueError("Not logged in")
+        
+        # Refresh if token expires in less than 1 minute (to be safe)
+        if self.token_expires_at:
+            time_until_expiry = self.token_expires_at - datetime.now()
+            if time_until_expiry.total_seconds() < 60:
+                _LOGGER.debug("Token expiring soon, refreshing")
+                return self.__refresh_token_request()
+        
+        return self.token
+
+    def __graphql_query(self, query: str) -> Dict:
+        """Execute a GraphQL query"""
+        # Ensure token is valid before making the request
+        token = self.__ensure_valid_token()
 
         headers = {
             'Content-Type': 'application/json',
             'User-Agent': 'GraphQL.Client/6.1.0.0',
-            'Authorization': f'Bearer {self.token}'
+            'Authorization': f'Bearer {token}'
         }
 
         response = self.session.post(
