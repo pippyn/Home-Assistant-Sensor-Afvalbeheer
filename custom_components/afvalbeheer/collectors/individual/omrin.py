@@ -44,6 +44,8 @@ class OmrinCollector(WasteCollector):
         self.token = None
         self.refresh_token = None
         self.token_expires_at = None
+        self._auth_loaded = False
+        self._auth_changed = False
         self.email = email or None
         self.password = password or None
         self.diftar_data = {}  # Dict of {waste_type: {"dates": [...], "count": int}}
@@ -89,6 +91,7 @@ class OmrinCollector(WasteCollector):
         if data.get('success') and data.get('data'):
             self.token = data['data'].get('accessToken')
             self.refresh_token = data['data'].get('refreshToken')
+            self._auth_changed = True
             expires_at_str = data['data'].get('expiresAt')
             if expires_at_str:
                 try:
@@ -121,6 +124,7 @@ class OmrinCollector(WasteCollector):
         if data.get('success') and data.get('data'):
             self.token = data['data'].get('accessToken')
             self.refresh_token = data['data'].get('refreshToken')  # Refresh token rotates
+            self._auth_changed = True
             expires_at_str = data['data'].get('expiresAt')
             if expires_at_str:
                 try:
@@ -144,6 +148,41 @@ class OmrinCollector(WasteCollector):
                 return self.__refresh_token_request()
         
         return self.token
+
+    async def __load_auth_data(self):
+        """Load persisted Omrin auth data once per collector instance."""
+        if self._auth_loaded:
+            return
+
+        data = await self.async_load_auth_data()
+        self._auth_loaded = True
+
+        if not data:
+            return
+
+        self.device_id = data.get('device_id') or self.device_id
+        self.token = data.get('token')
+        self.refresh_token = data.get('refresh_token')
+        expires_at = data.get('token_expires_at')
+
+        if expires_at:
+            try:
+                self.token_expires_at = datetime.fromisoformat(expires_at)
+            except (ValueError, TypeError):
+                _LOGGER.warning("Failed to parse stored token expiration time: %s", expires_at)
+
+    async def __save_auth_data(self):
+        """Persist Omrin auth data when tokens are created or rotated."""
+        if not self._auth_changed:
+            return
+
+        await self.async_save_auth_data({
+            'device_id': self.device_id,
+            'token': self.token,
+            'refresh_token': self.refresh_token,
+            'token_expires_at': self.token_expires_at.isoformat() if self.token_expires_at else None,
+        })
+        self._auth_changed = False
 
     def __graphql_query(self, query: str) -> Dict:
         """Execute a GraphQL query"""
@@ -295,10 +334,14 @@ class OmrinCollector(WasteCollector):
         _LOGGER.debug("Updating Waste collection dates using Omrin API")
 
         try:
+            await self.__load_auth_data()
+
             if not self.token:
                 await self.hass.async_add_executor_job(self.__login)
+                await self.__save_auth_data()
 
             response = await self.hass.async_add_executor_job(self.__fetch_calendar)
+            await self.__save_auth_data()
 
             if not response:
                 _LOGGER.error('No Waste data found!')
@@ -340,6 +383,7 @@ class OmrinCollector(WasteCollector):
                 try:
                     diftar_response = await self.hass.async_add_executor_job(self.__fetch_diftar)
                     self.__parse_diftar_data(diftar_response)
+                    await self.__save_auth_data()
                 except Exception as exc:
                     _LOGGER.warning('Failed to fetch diftar data: %r', exc)
 
