@@ -135,6 +135,13 @@ class OmrinCollector(WasteCollector):
         else:
             raise Exception(f"Token refresh failed: {data.get('errors', 'Unknown error')}")
 
+    def __clear_auth_data(self):
+        """Clear stale Omrin auth data before logging in again."""
+        self.token = None
+        self.refresh_token = None
+        self.token_expires_at = None
+        self._auth_changed = True
+
     def __ensure_valid_token(self) -> str:
         """Check if token needs refreshing and refresh if necessary"""
         if not self.token:
@@ -145,7 +152,14 @@ class OmrinCollector(WasteCollector):
             time_until_expiry = self.token_expires_at - datetime.now()
             if time_until_expiry.total_seconds() < 60:
                 _LOGGER.debug("Token expiring soon, refreshing")
-                return self.__refresh_token_request()
+                try:
+                    return self.__refresh_token_request()
+                except requests.exceptions.HTTPError as exc:
+                    if exc.response is None or exc.response.status_code != 401:
+                        raise
+                    _LOGGER.debug("Stored Omrin refresh token was rejected, logging in again")
+                    self.__clear_auth_data()
+                    return self.__login()
         
         return self.token
 
@@ -184,7 +198,7 @@ class OmrinCollector(WasteCollector):
         })
         self._auth_changed = False
 
-    def __graphql_query(self, query: str) -> Dict:
+    def __graphql_query(self, query: str, retry=True) -> Dict:
         """Execute a GraphQL query"""
         # Ensure token is valid before making the request
         token = self.__ensure_valid_token()
@@ -200,6 +214,13 @@ class OmrinCollector(WasteCollector):
             headers=headers,
             json={'query': query}
         )
+
+        if response.status_code == 401 and retry:
+            _LOGGER.debug("Stored Omrin access token was rejected, logging in again")
+            self.__clear_auth_data()
+            self.__login()
+            return self.__graphql_query(query, retry=False)
+
         response.raise_for_status()
         result = response.json()
 
