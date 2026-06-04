@@ -159,7 +159,7 @@ class OmrinCollector(WasteCollector):
         
         # Refresh if token expires in less than 1 minute (to be safe)
         if self.token_expires_at:
-            time_until_expiry = self.token_expires_at - datetime.now().replace(tzinfo=timezone.utc)
+            time_until_expiry = self.token_expires_at - datetime.now()
             if time_until_expiry.total_seconds() < 60:
                 _LOGGER.debug("Token expiring soon, refreshing")
                 try:
@@ -193,6 +193,8 @@ class OmrinCollector(WasteCollector):
         if expires_at:
             try:
                 self.token_expires_at = datetime.fromisoformat(expires_at)
+                if self.token_expires_at.tzinfo:
+                    self.token_expires_at = self.token_expires_at.astimezone(timezone.utc).replace(tzinfo=None)
             except (ValueError, TypeError):
                 _LOGGER.warning("Failed to parse stored token expiration time: %s", expires_at)
 
