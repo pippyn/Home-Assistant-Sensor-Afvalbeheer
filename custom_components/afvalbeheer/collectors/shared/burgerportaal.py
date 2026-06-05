@@ -52,6 +52,8 @@ class BurgerportaalCollector(WasteCollector):
         self.refresh_token = ''
         self.id_token = ''
         self.address_id = ''
+        self._auth_loaded = False
+        self._auth_changed = False
 
     def __fetch_refresh_token(self):
         _LOGGER.debug("Fetching refresh token from Burgerportaal")
@@ -61,6 +63,7 @@ class BurgerportaalCollector(WasteCollector):
             return
         self.refresh_token = response['refreshToken']
         self.id_token = response['idToken']
+        self._auth_changed = True
 
     def __fetch_id_token(self):
         _LOGGER.debug("Fetching ID token from Burgerportaal")
@@ -78,6 +81,7 @@ class BurgerportaalCollector(WasteCollector):
             _LOGGER.error('Unable to fetch ID token!')
             return
         self.id_token = response['id_token']
+        self._auth_changed = True
 
     def __fetch_address_id(self):
         _LOGGER.debug("Fetching address ID from Burgerportaal")
@@ -101,6 +105,34 @@ class BurgerportaalCollector(WasteCollector):
 
         if not self.address_id:
             self.address_id = response[-1]['addressId']
+        self._auth_changed = True
+
+    async def __load_auth_data(self):
+        """Load persisted Burgerportaal auth and address data once."""
+        if self._auth_loaded:
+            return
+
+        data = await self.async_load_auth_data()
+        self._auth_loaded = True
+
+        if not data:
+            return
+
+        self.refresh_token = data.get('refresh_token') or ''
+        self.id_token = data.get('id_token') or ''
+        self.address_id = data.get('address_id') or ''
+
+    async def __save_auth_data(self):
+        """Persist Burgerportaal auth and address data when it changes."""
+        if not self._auth_changed:
+            return
+
+        await self.async_save_auth_data({
+            'refresh_token': self.refresh_token,
+            'id_token': self.id_token,
+            'address_id': self.address_id,
+        })
+        self._auth_changed = False
 
     def __get_data(self):
         _LOGGER.debug("Fetching data from Burgerportaal")
@@ -116,13 +148,18 @@ class BurgerportaalCollector(WasteCollector):
         _LOGGER.debug("Updating Waste collection dates using Burgerportaal API")
 
         try:
+            await self.__load_auth_data()
+
             if not self.refresh_token:
                 await self.hass.async_add_executor_job(self.__fetch_refresh_token)
+                await self.__save_auth_data()
             else:
                 await self.hass.async_add_executor_job(self.__fetch_id_token)
+                await self.__save_auth_data()
 
             if not self.address_id:
                 await self.hass.async_add_executor_job(self.__fetch_address_id)
+                await self.__save_auth_data()
 
             response = await self.hass.async_add_executor_job(self.__get_data)
 

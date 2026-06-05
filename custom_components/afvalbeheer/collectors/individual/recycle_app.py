@@ -58,6 +58,8 @@ class RecycleApp(WasteCollector):
         self.accessToken = ''
         self.postcode_id = ''
         self.street_id = ''
+        self._auth_loaded = False
+        self._auth_changed = False
 
     def __get_headers(self):
         _LOGGER.debug("Getting headers for RecycleApp")
@@ -76,6 +78,7 @@ class RecycleApp(WasteCollector):
             _LOGGER.error('Invalid response from server for accessToken')
             return
         self.accessToken = response.json()['accessToken']
+        self._auth_changed = True
 
     def __get_location_ids(self):
         _LOGGER.debug("Fetching location IDs from RecycleApp")
@@ -87,6 +90,7 @@ class RecycleApp(WasteCollector):
             _LOGGER.error('Invalid response from server for postcode_id')
             return
         self.postcode_id = response.json()['items'][0]['id']
+        self._auth_changed = True
         response = requests.get("{}streets?q={}&zipcodes={}".format(self.main_url, self.street_name, self.postcode_id), headers=self.__get_headers())
         if response.status_code != 200:
             _LOGGER.error('Invalid response from server for street_id')
@@ -96,6 +100,34 @@ class RecycleApp(WasteCollector):
                 self.street_id = item['id']
         if not self.street_id:
             self.street_id = response.json()['items'][0]['id']
+        self._auth_changed = True
+
+    async def __load_auth_data(self):
+        """Load persisted RecycleApp auth and location data once."""
+        if self._auth_loaded:
+            return
+
+        data = await self.async_load_auth_data()
+        self._auth_loaded = True
+
+        if not data:
+            return
+
+        self.accessToken = data.get('access_token') or ''
+        self.postcode_id = data.get('postcode_id') or ''
+        self.street_id = data.get('street_id') or ''
+
+    async def __save_auth_data(self):
+        """Persist RecycleApp auth and location data when it changes."""
+        if not self._auth_changed:
+            return
+
+        await self.async_save_auth_data({
+            'access_token': self.accessToken,
+            'postcode_id': self.postcode_id,
+            'street_id': self.street_id,
+        })
+        self._auth_changed = False
 
     def __get_data(self):
         _LOGGER.debug("Fetching data from RecycleApp")
@@ -115,15 +147,25 @@ class RecycleApp(WasteCollector):
         _LOGGER.debug("Updating Waste collection dates using RecycleApp API")
 
         try:
-            await self.hass.async_add_executor_job(self.__get_access_token)
+            await self.__load_auth_data()
+
+            if not self.accessToken:
+                await self.hass.async_add_executor_job(self.__get_access_token)
+                await self.__save_auth_data()
 
             if (not self.postcode_id or not self.street_id) and self.accessToken:
                 await self.hass.async_add_executor_job(self.__get_location_ids)
+                await self.__save_auth_data()
 
             if not self.postcode_id or not self.street_id or not self.accessToken:
                 return
 
             r = await self.hass.async_add_executor_job(self.__get_data)
+            if r.status_code == 401:
+                await self.hass.async_add_executor_job(self.__get_access_token)
+                await self.__save_auth_data()
+                r = await self.hass.async_add_executor_job(self.__get_data)
+
             if r.status_code != 200:
                 _LOGGER.error('Invalid response from server for collection data')
                 return

@@ -3,8 +3,8 @@ Omrin collector for waste data from Omrin API.
 """
 import logging
 import uuid
-from datetime import datetime
-from typing import Optional, Dict, List
+from datetime import datetime, timezone
+from typing import Dict
 import requests
 
 from ..base import WasteCollector
@@ -42,6 +42,10 @@ class OmrinCollector(WasteCollector):
         self.base_url = "https://api.omrinafvalapp.nl"
         self.device_id = str(uuid.uuid4())
         self.token = None
+        self.refresh_token = None
+        self.token_expires_at = None
+        self._auth_loaded = False
+        self._auth_changed = False
         self.email = email or None
         self.password = password or None
         self.diftar_data = {}  # Dict of {waste_type: {"dates": [...], "count": int}}
@@ -63,11 +67,11 @@ class OmrinCollector(WasteCollector):
         login_data = {
             'PostalCode': self.postcode,
             'HouseNumber': int(self.street_number) if self.street_number else 0,
-            'HouseNumberExtension': self.suffix or '',
+            'HouseNumberExtension': self.suffix or None,
             'DeviceId': self.device_id,
-            'Platform': 'iOS',
-            'AppVersion': '4.0.3.273',
-            'OsVersion': 'iPhone15,3 26.2.1'
+            'Platform': 'HomeAssistant',
+            'AppVersion': '4.0.0 458',
+            'OsVersion': 'HomeAssistant'
         }
         
         if self.has_credentials:
@@ -86,19 +90,145 @@ class OmrinCollector(WasteCollector):
 
         if data.get('success') and data.get('data'):
             self.token = data['data'].get('accessToken')
+            self.refresh_token = data['data'].get('refreshToken')
+            self._auth_changed = True
+            _LOGGER.debug(
+                "Omrin login returned access token: %s, refresh token: %s",
+                bool(self.token), bool(self.refresh_token)
+            )
+            expires_at_str = data['data'].get('expiresAt')
+            if expires_at_str:
+                try:
+                    self.token_expires_at = datetime.fromisoformat(expires_at_str.replace('Z', '+00:00')).replace(tzinfo=None)
+                    _LOGGER.debug("Omrin access token expires at %s", self.token_expires_at)
+                except (ValueError, TypeError):
+                    _LOGGER.warning("Failed to parse token expiration time: %s", expires_at_str)
             return self.token
         else:
             raise Exception(f"Login failed: {data.get('errors', 'Unknown error')}")
 
-    def __graphql_query(self, query: str) -> Dict:
-        """Execute a GraphQL query"""
+    def __refresh_token_request(self) -> str:
+        """Refresh the access token using the refresh token"""
+        if not self.token or not self.refresh_token:
+            raise ValueError("Cannot refresh: missing token or refresh token")
+        
+        _LOGGER.debug("Refreshing access token")
+        
+        refresh_data = {
+            'Token': self.token,
+            'RefreshToken': self.refresh_token
+        }
+        
+        response = self.session.post(
+            f"{self.base_url}/api/auth/refreshtoken",
+            json=refresh_data
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get('success') and data.get('data'):
+            self.token = data['data'].get('accessToken')
+            self.refresh_token = data['data'].get('refreshToken')  # Refresh token rotates
+            self._auth_changed = True
+            _LOGGER.debug(
+                "Omrin refresh returned access token: %s, refresh token: %s",
+                bool(self.token), bool(self.refresh_token)
+            )
+            expires_at_str = data['data'].get('expiresAt')
+            if expires_at_str:
+                try:
+                    self.token_expires_at = datetime.fromisoformat(expires_at_str.replace('Z', '+00:00')).replace(tzinfo=None)
+                    _LOGGER.debug("Refreshed Omrin access token expires at %s", self.token_expires_at)
+                except (ValueError, TypeError):
+                    _LOGGER.warning("Failed to parse token expiration time: %s", expires_at_str)
+            return self.token
+        else:
+            raise Exception(f"Token refresh failed: {data.get('errors', 'Unknown error')}")
+
+    def __clear_auth_data(self):
+        """Clear stale Omrin auth data before logging in again."""
+        self.token = None
+        self.refresh_token = None
+        self.token_expires_at = None
+        self._auth_changed = True
+
+    def __ensure_valid_token(self) -> str:
+        """Check if token needs refreshing and refresh if necessary"""
         if not self.token:
             raise ValueError("Not logged in")
+        
+        # Refresh if token expires in less than 1 minute (to be safe)
+        if self.token_expires_at:
+            time_until_expiry = self.token_expires_at - datetime.now()
+            if time_until_expiry.total_seconds() < 60:
+                _LOGGER.debug("Token expiring soon, refreshing")
+                try:
+                    return self.__refresh_token_request()
+                except requests.exceptions.HTTPError as exc:
+                    if exc.response is None or exc.response.status_code != 401:
+                        raise
+                    _LOGGER.debug("Stored Omrin refresh token was rejected, logging in again")
+                    self.__clear_auth_data()
+                    return self.__login()
+        
+        return self.token
+
+    async def __load_auth_data(self):
+        """Load persisted Omrin auth data once per collector instance."""
+        if self._auth_loaded:
+            return
+
+        data = await self.async_load_auth_data()
+        self._auth_loaded = True
+
+        if not data:
+            _LOGGER.debug("No stored Omrin auth data found")
+            return
+
+        self.device_id = data.get('device_id') or self.device_id
+        self.token = data.get('token')
+        self.refresh_token = data.get('refresh_token')
+        expires_at = data.get('token_expires_at')
+
+        if expires_at:
+            try:
+                self.token_expires_at = datetime.fromisoformat(expires_at)
+                if self.token_expires_at.tzinfo:
+                    self.token_expires_at = self.token_expires_at.astimezone(timezone.utc).replace(tzinfo=None)
+            except (ValueError, TypeError):
+                _LOGGER.warning("Failed to parse stored token expiration time: %s", expires_at)
+
+        _LOGGER.debug(
+            "Loaded stored Omrin auth data: access token: %s, refresh token: %s, expires at: %s",
+            bool(self.token), bool(self.refresh_token), self.token_expires_at
+        )
+
+    async def __save_auth_data(self):
+        """Persist Omrin auth data when tokens are created or rotated."""
+        if not self._auth_changed:
+            return
+
+        await self.async_save_auth_data({
+            'device_id': self.device_id,
+            'token': self.token,
+            'refresh_token': self.refresh_token,
+            'token_expires_at': self.token_expires_at.isoformat() if self.token_expires_at else None,
+        })
+        self._auth_changed = False
+        _LOGGER.debug(
+            "Saved Omrin auth data: access token: %s, refresh token: %s, expires at: %s",
+            bool(self.token), bool(self.refresh_token), self.token_expires_at
+        )
+
+    def __graphql_query(self, query: str, retry=True) -> Dict:
+        """Execute a GraphQL query"""
+        # Ensure token is valid before making the request
+        token = self.__ensure_valid_token()
 
         headers = {
             'Content-Type': 'application/json',
             'User-Agent': 'GraphQL.Client/6.1.0.0',
-            'Authorization': f'Bearer {self.token}'
+            'Authorization': f'Bearer {token}'
         }
 
         response = self.session.post(
@@ -106,6 +236,13 @@ class OmrinCollector(WasteCollector):
             headers=headers,
             json={'query': query}
         )
+
+        if response.status_code == 401 and retry:
+            _LOGGER.debug("Stored Omrin access token was rejected, logging in again")
+            self.__clear_auth_data()
+            self.__login()
+            return self.__graphql_query(query, retry=False)
+
         response.raise_for_status()
         result = response.json()
 
@@ -240,10 +377,15 @@ class OmrinCollector(WasteCollector):
         _LOGGER.debug("Updating Waste collection dates using Omrin API")
 
         try:
+            await self.__load_auth_data()
+
             if not self.token:
+                _LOGGER.debug("No Omrin access token available, logging in")
                 await self.hass.async_add_executor_job(self.__login)
+                await self.__save_auth_data()
 
             response = await self.hass.async_add_executor_job(self.__fetch_calendar)
+            await self.__save_auth_data()
 
             if not response:
                 _LOGGER.error('No Waste data found!')
@@ -285,6 +427,7 @@ class OmrinCollector(WasteCollector):
                 try:
                     diftar_response = await self.hass.async_add_executor_job(self.__fetch_diftar)
                     self.__parse_diftar_data(diftar_response)
+                    await self.__save_auth_data()
                 except Exception as exc:
                     _LOGGER.warning('Failed to fetch diftar data: %r', exc)
 
