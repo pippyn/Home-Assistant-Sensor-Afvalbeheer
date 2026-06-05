@@ -7,7 +7,7 @@ import requests
 
 from ..base import WasteCollector
 from ...models import WasteCollection
-from ...const import WASTE_TYPE_PLASTIC, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_TREE
+from ...const import WASTE_TYPE_PLASTIC, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_TREE, WASTE_TYPE_PAPER
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,7 +21,8 @@ class DeAfvalAppCollector(WasteCollector):
         'zak_blauw': WASTE_TYPE_GREY,
         'pbp': WASTE_TYPE_PACKAGES,
         'rest': WASTE_TYPE_GREY,
-        'kerstboom': WASTE_TYPE_TREE
+        'kerstboom': WASTE_TYPE_TREE,
+        'papier': WASTE_TYPE_PAPER
     }
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
