@@ -16,9 +16,10 @@ from .recycle_app import RecycleApp
 from .reinis import ReinisCollector
 from .rova import ROVACollector
 from .straatbeeld import StraatbeeldCollector
+from .ilva import ILVACollector
 
 __all__ = [
     "AfvalAlertCollector", "AfvalwijzerCollector", "AmsterdamCollector", "CirculusCollector", "CleanprofsCollector",
     "DeAfvalAppCollector", "LimburgNetCollector", "IradoCollector", "MontferlandNetCollector", "OmrinCollector",
-    "RD4Collector", "RecycleApp", "ReinisCollector", "ROVACollector", "StraatbeeldCollector"
+    "RD4Collector", "RecycleApp", "ReinisCollector", "ROVACollector", "StraatbeeldCollector", "ILVACollector"
 ]
