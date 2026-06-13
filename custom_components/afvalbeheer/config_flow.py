@@ -18,7 +18,7 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 WASTE_COLLECTORS = [
-    "ACV", "Afval3xBeter", "Afvalstoffendienstkalender", "AfvalAlert",
+    "ILVA", "ACV", "Afval3xBeter", "Afvalstoffendienstkalender", "AfvalAlert",
     "Almere", "AlphenAanDenRijn", "Amsterdam", "AreaReiniging", "Assen", "Avalex", "Avri", "BAR",
     "Berkelland", "Blink", "Circulus", "Cleanprofs", "Cranendonck",
     "Cyclus", "DAR", "DeAfvalApp", "DeFryskeMarren", "DenHaag", "Drimmelen", "GAD",
@@ -229,7 +229,7 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         collector = getattr(self, "_collector", "")
         collector_lower = collector.lower()
         show_city = collector_lower == "limburg.net"
-        show_street = collector_lower in ["limburg.net", "recycleapp"]
+        show_street = collector_lower in ["limburg.net", "recycleapp", "ilva"]
 
         schema_dict = {
             vol.Required(CONF_POSTCODE): str,
@@ -544,7 +544,7 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
         collector = self._collector
         collector_lower = collector.lower()
         show_city = collector_lower == "limburg.net"
-        show_street = collector_lower in ["limburg.net", "recycleapp"]
+        show_street = collector_lower in ["limburg.net", "recycleapp", "ilva"]
 
         # Combine current data and options to get all current values
         current = {**self.config_entry.data, **self.config_entry.options}

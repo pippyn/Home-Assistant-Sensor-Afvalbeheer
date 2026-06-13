@@ -11,7 +11,7 @@ from .collectors import (
     XimmioCollector, BurgerportaalCollector, OpzetCollector, KlikogroepCollector,
     AfvalAlertCollector, AfvalwijzerCollector, AmsterdamCollector, CirculusCollector, CleanprofsCollector,
     DeAfvalAppCollector, LimburgNetCollector, IradoCollector, MontferlandNetCollector, OmrinCollector,
-    RD4Collector, RecycleApp, ReinisCollector, ROVACollector, StraatbeeldCollector
+    RD4Collector, RecycleApp, ReinisCollector, ROVACollector, StraatbeeldCollector, ILVACollector
 )
 
 
@@ -67,6 +67,7 @@ class WasteData(object):
             **{key: (BurgerportaalCollector, common_args) for key in BURGERPORTAAL_COLLECTOR_IDS.keys()},
             **{key: (OpzetCollector, common_args) for key in OPZET_COLLECTOR_URLS.keys()},
             **{key: (KlikogroepCollector, common_args) for key in KLIKOGROEP_COLLECTOR_IDS.keys()},
+            "ilva": (ILVACollector, common_args + [self.street_name, self.city_name]),
         }
 
         collector_class, args = collector_mapping.get(self.waste_collector, (None, None))
