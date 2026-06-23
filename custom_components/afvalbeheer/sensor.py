@@ -263,6 +263,10 @@ class WasteTypeSensor(BaseSensor):
         if collection:
             self._attrs[ATTR_SORT_DATE] = int(collection.date.strftime("%Y%m%d"))
             self._attrs[ATTR_DAYS_UNTIL] = self._days_until
+        else:
+            self._attrs.pop(ATTR_SORT_DATE, None)
+            self._attrs.pop(ATTR_DAYS_UNTIL, None)
+
         _LOGGER.debug("Attributes set for %s: %s", self._name, self._attrs)
 
     def _set_picture(self, collection):
