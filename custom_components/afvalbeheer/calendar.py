@@ -102,13 +102,16 @@ class AfvalbeheerCalendar(CalendarEntity):
         Returns:
             The next CalendarEvent if available, otherwise None.
         """
-        if self.WasteData.collections:
-            waste_item = self.WasteData.collections.get_sorted()[0]
-            return CalendarEvent(
-                summary=waste_item.waste_type,
-                start=waste_item.date.date(),
-                end=(waste_item.date + timedelta(days=1)).date(),
-            )
+        collections = self.WasteData.collections.get_first_upcoming(self.config[CONF_RESOURCES])
+        if not collections:
+            return None
+
+        waste_item = collections[0]
+        return CalendarEvent(
+            summary=", ".join(sorted({item.waste_type for item in collections})),
+            start=waste_item.date.date(),
+            end=(waste_item.date + timedelta(days=1)).date(),
+        )
 
     async def async_get_events(
         self, hass: HomeAssistant, start_date: datetime, end_date: datetime
