@@ -347,12 +347,14 @@ class WasteUpcomingSensor(BaseSensor):
         if not collections:
             self._hidden = True
             self._state = NO_DATE_STRING['nl'] if self.dutch_days else NO_DATE_STRING['en']
-            return
+            self.upcoming_day = None
+            self.upcoming_waste_types = None
         else:
             self._hidden = False
             self.upcoming_day = self._format_date(collections[0].date)
             self.upcoming_waste_types = ", ".join(sorted([x.waste_type for x in collections]))
             self._state = f"{self.upcoming_day}: {self.upcoming_waste_types}"
+
         self._set_attr()
 
     def _set_attr(self):
