@@ -54,7 +54,6 @@
                     "upcomingsensor": "Upcoming Sensors",
                     "dateonly": "Date Only",
                     "dateobject": "Date as Timestamp",
-                    "dutch": "Dutch Language",
                     "dayofweek": "Show Day of Week",
                     "dayofweekonly": "Day Names Only",
                     "alwaysshowday": "Always Show Day Names",
@@ -64,7 +63,7 @@
                     "updateinterval": "Update Interval (hours)",
                     "addressid": "Address ID",
                     "customerid": "Customer ID",
-                    "language": "Language"
+                    "language": "Sensor text language"
                 },
                 "data_description": {
                     "resources": "Select the waste types you want to track",
@@ -74,7 +73,6 @@
                     "upcomingsensor": "Create additional sensors for today, tomorrow, and next upcoming collection",
                     "dateonly": "Show only date without day names (overrides other day settings)",
                     "dateobject": "Use timestamp objects instead of formatted text (for automations)",
-                    "dutch": "Show day and month names in Dutch instead of English",
                     "dayofweek": "Include day of week in sensor values (e.g., 'Monday, 01-01-2024')",
                     "dayofweekonly": "Show only day names for nearby dates (today, tomorrow, day names)",
                     "alwaysshowday": "Always show day names, even for dates more than a week away",
@@ -156,7 +154,6 @@
                     "upcomingsensor": "Upcoming Sensors",
                     "dateonly": "Date Only",
                     "dateobject": "Date as Timestamp",
-                    "dutch": "Dutch Language",
                     "dayofweek": "Show Day of Week",
                     "dayofweekonly": "Day Names Only",
                     "alwaysshowday": "Always Show Day Names",
@@ -166,7 +163,7 @@
                     "updateinterval": "Update Interval (hours)",
                     "addressid": "Address ID",
                     "customerid": "Customer ID",
-                    "language": "Language"
+                    "language": "Sensor text language"
                 },
                 "data_description": {
                     "resources": "Select the waste types you want to track",
@@ -176,7 +173,6 @@
                     "upcomingsensor": "Create additional sensors for today, tomorrow, and next upcoming collection",
                     "dateonly": "Show only date without day names (overrides other day settings)",
                     "dateobject": "Use timestamp objects instead of formatted text (for automations)",
-                    "dutch": "Show day and month names in Dutch instead of English",
                     "dayofweek": "Include day of week in sensor values (e.g., 'Monday, 01-01-2024')",
                     "dayofweekonly": "Show only day names for nearby dates (today, tomorrow, day names)",
                     "alwaysshowday": "Always show day names, even for dates more than a week away",
@@ -256,8 +252,8 @@
             "available_waste_type_slugs": "Waste type slugs used by API: {slugs}",
             "collector_not_found": "Waste collector \"{collector}\" not found!",
             "deprecated_collector": "Update your config to use {new_collector}! You are still using {old_collector} as a waste collector, which is deprecated. Check your automations and Lovelace config, as the sensor names may also be changed!",
-            "city_required": "Config invalid! Cityname is required for {collector}",
-            "street_required": "Config invalid! Streetname is required for {collector}"
+            "city_required": "Config invalid! City name is required for {collector}",
+            "street_required": "Config invalid! Street name is required for {collector}"
         }
     }
 }

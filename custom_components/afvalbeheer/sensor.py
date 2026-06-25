@@ -1,15 +1,13 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from homeassistant.config_entries import ConfigEntry
-
-from homeassistant.const import CONF_RESOURCES
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
-from homeassistant.helpers.restore_state import RestoreEntity
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.restore_state import RestoreEntity
 
-from .const import *
 from .API import get_wastedata_from_config
+from .const import *
 from .translation import async_prepare_translations, resolve_language, text, translate_date_text
 
 _LOGGER = logging.getLogger(__name__)

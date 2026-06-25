@@ -54,7 +54,6 @@
                     "upcomingsensor": "Komende sensoren",
                     "dateonly": "Alleen datum",
                     "dateobject": "Datum als tijdstempel",
-                    "dutch": "Nederlandse taal",
                     "dayofweek": "Toon dag van de week",
                     "dayofweekonly": "Alleen dagnamen",
                     "alwaysshowday": "Altijd dagnamen tonen",
@@ -64,7 +63,7 @@
                     "updateinterval": "Update-interval (uren)",
                     "addressid": "Adres ID",
                     "customerid": "Klant ID",
-                    "language": "Taal"
+                    "language": "Taal voor sensortekst"
                 },
                 "data_description": {
                     "resources": "Selecteer de afvaltypes die u wilt volgen",
@@ -74,7 +73,6 @@
                     "upcomingsensor": "Maak extra sensoren voor vandaag, morgen en volgende komende ophaaldag",
                     "dateonly": "Toon alleen datum zonder dagnamen (overschrijft andere daginstellingen)",
                     "dateobject": "Gebruik tijdstempel objecten in plaats van opgemaakte tekst (voor automatiseringen)",
-                    "dutch": "Toon dag- en maandnamen in het Nederlands in plaats van Engels",
                     "dayofweek": "Inclusief dag van de week in sensorwaarden (bijv. 'Maandag, 01-01-2024')",
                     "dayofweekonly": "Toon alleen dagnamen voor nabije datums (vandaag, morgen, dagnamen)",
                     "alwaysshowday": "Altijd dagnamen tonen, zelfs voor datums meer dan een week weg",
@@ -156,7 +154,6 @@
                     "upcomingsensor": "Komende sensoren",
                     "dateonly": "Alleen datum",
                     "dateobject": "Datum als tijdstempel",
-                    "dutch": "Nederlandse taal",
                     "dayofweek": "Toon dag van de week",
                     "dayofweekonly": "Alleen dagnamen",
                     "alwaysshowday": "Altijd dagnamen tonen",
@@ -166,7 +163,7 @@
                     "updateinterval": "Update-interval (uren)",
                     "addressid": "Adres ID",
                     "customerid": "Klant ID",
-                    "language": "Taal"
+                    "language": "Taal voor sensortekst"
                 },
                 "data_description": {
                     "resources": "Selecteer de afvaltypes die u wilt volgen",
@@ -176,7 +173,6 @@
                     "upcomingsensor": "Maak extra sensoren voor vandaag, morgen en volgende komende ophaaldag",
                     "dateonly": "Toon alleen datum zonder dagnamen (overschrijft andere daginstellingen)",
                     "dateobject": "Gebruik tijdstempel objecten in plaats van opgemaakte tekst (voor automatiseringen)",
-                    "dutch": "Toon dag- en maandnamen in het Nederlands in plaats van Engels",
                     "dayofweek": "Inclusief dag van de week in sensorwaarden (bijv. 'Maandag, 01-01-2024')",
                     "dayofweekonly": "Toon alleen dagnamen voor nabije datums (vandaag, morgen, dagnamen)",
                     "alwaysshowday": "Altijd dagnamen tonen, zelfs voor datums meer dan een week weg",
