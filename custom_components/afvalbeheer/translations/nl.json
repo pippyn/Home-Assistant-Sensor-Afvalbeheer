@@ -1,198 +1,263 @@
 {
-  "config": {
-    "step": {
-      "user": {
-        "title": "Afvalbeheer Installatie",
-        "description": "Selecteer uw afvalinzamelaar",
-        "data": {
-          "wastecollector": "Afvalinzamelaar"
-        }
-      },
-      "address": {
-        "title": "Adresgegevens", 
-        "description": "Voer uw adresgegevens in",
-        "data": {
-          "postcode": "Postcode",
-          "streetnumber": "Huisnummer", 
-          "suffix": "Toevoeging (optioneel)",
-          "cityname": "Plaatsnaam",
-          "streetname": "Straatnaam"
-        }
-      },
-      "omrin_credentials": {
-        "title": "Omrin Inloggegevens (Optioneel)",
-        "description": "Log in met je Omrin-account om een sensor te krijgen met het aantal ophalingen dit jaar per afvaltype. Je kunt dit overslaan door de velden leeg te laten.",
-        "data": {
-          "email": "E-mailadres",
-          "password": "Wachtwoord"
+    "config": {
+        "step": {
+            "user": {
+                "title": "Afvalbeheer Installatie",
+                "description": "Selecteer uw afvalinzamelaar",
+                "data": {
+                    "wastecollector": "Afvalinzamelaar"
+                }
+            },
+            "address": {
+                "title": "Adresgegevens",
+                "description": "Voer uw adresgegevens in",
+                "data": {
+                    "postcode": "Postcode",
+                    "streetnumber": "Huisnummer",
+                    "suffix": "Toevoeging (optioneel)",
+                    "cityname": "Plaatsnaam",
+                    "streetname": "Straatnaam"
+                }
+            },
+            "omrin_credentials": {
+                "title": "Omrin Inloggegevens (Optioneel)",
+                "description": "Log in met je Omrin-account om een sensor te krijgen met het aantal ophalingen dit jaar per afvaltype. Je kunt dit overslaan door de velden leeg te laten.",
+                "data": {
+                    "email": "E-mailadres",
+                    "password": "Wachtwoord"
+                },
+                "data_description": {
+                    "email": "Het e-mailadres van je Omrin-account (optioneel)",
+                    "password": "Het wachtwoord van je Omrin-account (optioneel)"
+                }
+            },
+            "mapping": {
+                "title": "Aangepaste Mapping (Optioneel)",
+                "description": "Configureer aangepaste afvaltype mapping",
+                "data": {
+                    "use_custom_mapping": "Gebruik Aangepaste Mapping",
+                    "custommapping": "Aangepaste Afvaltype Mapping"
+                },
+                "data_description": {
+                    "use_custom_mapping": "Schakel aangepaste mapping in om afvaltypes van de API te hernoemen",
+                    "custommapping": "Aangepaste afvaltype mappings in JSON formaat"
+                }
+            },
+            "resources": {
+                "title": "Configuratie",
+                "description": "Selecteer afvaltypes en configureer opties",
+                "data": {
+                    "resources": "Afvaltypes",
+                    "name": "Aangepaste naam",
+                    "wastecollectornameprefix": "Gebruik naam voorvoegsel",
+                    "dateformat": "Datumformaat",
+                    "upcomingsensor": "Komende sensoren",
+                    "dateonly": "Alleen datum",
+                    "dateobject": "Datum als tijdstempel",
+                    "dutch": "Nederlandse taal",
+                    "dayofweek": "Toon dag van de week",
+                    "dayofweekonly": "Alleen dagnamen",
+                    "alwaysshowday": "Altijd dagnamen tonen",
+                    "builtinicons": "Klassieke pictogrammen",
+                    "builtiniconsnew": "Moderne pictogrammen",
+                    "disableicons": "Pictogrammen uitschakelen",
+                    "updateinterval": "Update-interval (uren)",
+                    "addressid": "Adres ID",
+                    "customerid": "Klant ID",
+                    "language": "Taal"
+                },
+                "data_description": {
+                    "resources": "Selecteer de afvaltypes die u wilt volgen",
+                    "name": "Aangepaste naam voor deze integratie-instantie (optioneel)",
+                    "wastecollectornameprefix": "Voeg afvalinzamelaarnaam toe als voorvoegsel aan sensornamen",
+                    "dateformat": "Datumformaat voor sensorwaarden (Python strftime formaat)",
+                    "upcomingsensor": "Maak extra sensoren voor vandaag, morgen en volgende komende ophaaldag",
+                    "dateonly": "Toon alleen datum zonder dagnamen (overschrijft andere daginstellingen)",
+                    "dateobject": "Gebruik tijdstempel objecten in plaats van opgemaakte tekst (voor automatiseringen)",
+                    "dutch": "Toon dag- en maandnamen in het Nederlands in plaats van Engels",
+                    "dayofweek": "Inclusief dag van de week in sensorwaarden (bijv. 'Maandag, 01-01-2024')",
+                    "dayofweekonly": "Toon alleen dagnamen voor nabije datums (vandaag, morgen, dagnamen)",
+                    "alwaysshowday": "Altijd dagnamen tonen, zelfs voor datums meer dan een week weg",
+                    "builtinicons": "Gebruik ingebouwde pictogrammen voor afvaltypes (klassieke pictogrammenset)",
+                    "builtiniconsnew": "Gebruik ingebouwde pictogrammen voor afvaltypes (moderne pictogrammenset)",
+                    "disableicons": "Schakel alle pictogrammen uit voor afvaltype sensoren",
+                    "updateinterval": "Hoe vaak controleren voor bijgewerkte afvalophaaldgegevens (0 = gebruik standaard interval)",
+                    "addressid": "Adres ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
+                    "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
+                    "language": "Taal voor tekst die door de integratie wordt beheerd, zoals datums, hulpsensornamen en meldingen"
+                }
+            }
         },
-        "data_description": {
-          "email": "Het e-mailadres van je Omrin-account (optioneel)",
-          "password": "Het wachtwoord van je Omrin-account (optioneel)"
-        }
-      },
-      "mapping": {
-        "title": "Aangepaste Mapping (Optioneel)",
-        "description": "Configureer aangepaste afvaltype mapping",
-        "data": {
-          "use_custom_mapping": "Gebruik Aangepaste Mapping",
-          "custommapping": "Aangepaste Afvaltype Mapping"
+        "error": {
+            "import_error": "Fout bij importeren van API module",
+            "connection_error": "Verbindingsfout opgetreden",
+            "invalid_collector": "Ongeldige inzamelaargegevens",
+            "no_resources": "Geen afvaltypes gevonden",
+            "unknown_error": "Onbekende fout opgetreden",
+            "invalid_custom_mapping": "Ongeldig JSON formaat in aangepaste mapping",
+            "already_configured": "Deze configuratie bestaat al"
         },
-        "data_description": {
-          "use_custom_mapping": "Schakel aangepaste mapping in om afvaltypes van de API te hernoemen",
-          "custommapping": "Aangepaste afvaltype mappings in JSON formaat"
+        "abort": {
+            "already_configured": "Deze afvalinzamelaar configuratie bestaat al"
         }
-      },
-      "resources": {
-        "title": "Configuratie",
-        "description": "Selecteer afvaltypes en configureer opties",
-        "data": {
-          "resources": "Afvaltypes",
-          "name": "Aangepaste naam",
-          "wastecollectornameprefix": "Gebruik naam voorvoegsel", 
-          "dateformat": "Datumformaat",
-          "upcomingsensor": "Komende sensoren",
-          "dateonly": "Alleen datum",
-          "dateobject": "Datum als tijdstempel",
-          "dutch": "Nederlandse taal",
-          "dayofweek": "Toon dag van de week",
-          "dayofweekonly": "Alleen dagnamen",
-          "alwaysshowday": "Altijd dagnamen tonen",
-          "builtinicons": "Klassieke pictogrammen",
-          "builtiniconsnew": "Moderne pictogrammen", 
-          "disableicons": "Pictogrammen uitschakelen",
-          "updateinterval": "Update-interval (uren)",
-          "addressid": "Adres ID",
-          "customerid": "Klant ID"
-        },
-        "data_description": {
-          "resources": "Selecteer de afvaltypes die u wilt volgen",
-          "name": "Aangepaste naam voor deze integratie-instantie (optioneel)",
-          "wastecollectornameprefix": "Voeg afvalinzamelaarnaam toe als voorvoegsel aan sensornamen",
-          "dateformat": "Datumformaat voor sensorwaarden (Python strftime formaat)",
-          "upcomingsensor": "Maak extra sensoren voor vandaag, morgen en volgende komende ophaaldag",
-          "dateonly": "Toon alleen datum zonder dagnamen (overschrijft andere daginstellingen)",
-          "dateobject": "Gebruik tijdstempel objecten in plaats van opgemaakte tekst (voor automatiseringen)",
-          "dutch": "Toon dag- en maandnamen in het Nederlands in plaats van Engels",
-          "dayofweek": "Inclusief dag van de week in sensorwaarden (bijv. 'Maandag, 01-01-2024')",
-          "dayofweekonly": "Toon alleen dagnamen voor nabije datums (vandaag, morgen, dagnamen)",
-          "alwaysshowday": "Altijd dagnamen tonen, zelfs voor datums meer dan een week weg",
-          "builtinicons": "Gebruik ingebouwde pictogrammen voor afvaltypes (klassieke pictogrammenset)",
-          "builtiniconsnew": "Gebruik ingebouwde pictogrammen voor afvaltypes (moderne pictogrammenset)",
-          "disableicons": "Schakel alle pictogrammen uit voor afvaltype sensoren",
-          "updateinterval": "Hoe vaak controleren voor bijgewerkte afvalophaaldgegevens (0 = gebruik standaard interval)",
-          "addressid": "Adres ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
-          "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)"
-        }
-      }
     },
-    "error": {
-      "import_error": "Fout bij importeren van API module",
-      "connection_error": "Verbindingsfout opgetreden", 
-      "invalid_collector": "Ongeldige inzamelaargegevens",
-      "no_resources": "Geen afvaltypes gevonden",
-      "unknown_error": "Onbekende fout opgetreden",
-      "invalid_custom_mapping": "Ongeldig JSON formaat in aangepaste mapping",
-      "already_configured": "Deze configuratie bestaat al"
+    "options": {
+        "step": {
+            "init": {
+                "title": "Afvalinzamelaar bijwerken",
+                "description": "Wijzig uw afvalinzamelaar",
+                "data": {
+                    "wastecollector": "Afvalinzamelaar"
+                }
+            },
+            "address": {
+                "title": "Adres bijwerken",
+                "description": "Werk uw adresgegevens bij",
+                "data": {
+                    "postcode": "Postcode",
+                    "streetnumber": "Huisnummer",
+                    "suffix": "Toevoeging (optioneel)",
+                    "cityname": "Plaatsnaam",
+                    "streetname": "Straatnaam"
+                }
+            },
+            "omrin_credentials": {
+                "title": "Omrin Inloggegevens (Optioneel)",
+                "description": "Log in met je Omrin-account om een sensor te krijgen met het aantal ophalingen dit jaar per afvaltype. Je kunt dit overslaan door de velden leeg te laten.",
+                "data": {
+                    "email": "E-mailadres",
+                    "password": "Wachtwoord"
+                },
+                "data_description": {
+                    "email": "Het e-mailadres van je Omrin-account (optioneel)",
+                    "password": "Het wachtwoord van je Omrin-account (optioneel)"
+                }
+            },
+            "mapping": {
+                "title": "Aangepaste Mapping Bijwerken (Optioneel)",
+                "description": "Werk aangepaste afvaltype mapping bij",
+                "data": {
+                    "use_custom_mapping": "Gebruik Aangepaste Mapping",
+                    "custommapping": "Aangepaste Afvaltype Mapping"
+                },
+                "data_description": {
+                    "use_custom_mapping": "Schakel aangepaste mapping in om afvaltypes van de API te hernoemen",
+                    "custommapping": "Aangepaste afvaltype mappings in JSON formaat"
+                }
+            },
+            "resources": {
+                "title": "Configuratie bijwerken",
+                "description": "Werk afvaltypes en opties bij",
+                "data": {
+                    "resources": "Afvaltypes",
+                    "name": "Aangepaste naam",
+                    "wastecollectornameprefix": "Gebruik naam voorvoegsel",
+                    "dateformat": "Datumformaat",
+                    "upcomingsensor": "Komende sensoren",
+                    "dateonly": "Alleen datum",
+                    "dateobject": "Datum als tijdstempel",
+                    "dutch": "Nederlandse taal",
+                    "dayofweek": "Toon dag van de week",
+                    "dayofweekonly": "Alleen dagnamen",
+                    "alwaysshowday": "Altijd dagnamen tonen",
+                    "builtinicons": "Klassieke pictogrammen",
+                    "builtiniconsnew": "Moderne pictogrammen",
+                    "disableicons": "Pictogrammen uitschakelen",
+                    "updateinterval": "Update-interval (uren)",
+                    "addressid": "Adres ID",
+                    "customerid": "Klant ID",
+                    "language": "Taal"
+                },
+                "data_description": {
+                    "resources": "Selecteer de afvaltypes die u wilt volgen",
+                    "name": "Aangepaste naam voor deze integratie-instantie (optioneel)",
+                    "wastecollectornameprefix": "Voeg afvalinzamelaarnaam toe als voorvoegsel aan sensornamen",
+                    "dateformat": "Datumformaat voor sensorwaarden (Python strftime formaat)",
+                    "upcomingsensor": "Maak extra sensoren voor vandaag, morgen en volgende komende ophaaldag",
+                    "dateonly": "Toon alleen datum zonder dagnamen (overschrijft andere daginstellingen)",
+                    "dateobject": "Gebruik tijdstempel objecten in plaats van opgemaakte tekst (voor automatiseringen)",
+                    "dutch": "Toon dag- en maandnamen in het Nederlands in plaats van Engels",
+                    "dayofweek": "Inclusief dag van de week in sensorwaarden (bijv. 'Maandag, 01-01-2024')",
+                    "dayofweekonly": "Toon alleen dagnamen voor nabije datums (vandaag, morgen, dagnamen)",
+                    "alwaysshowday": "Altijd dagnamen tonen, zelfs voor datums meer dan een week weg",
+                    "builtinicons": "Gebruik ingebouwde pictogrammen voor afvaltypes (klassieke pictogrammenset)",
+                    "builtiniconsnew": "Gebruik ingebouwde pictogrammen voor afvaltypes (moderne pictogrammenset)",
+                    "disableicons": "Schakel alle pictogrammen uit voor afvaltype sensoren",
+                    "updateinterval": "Hoe vaak controleren voor bijgewerkte afvalophaaldgegevens (0 = gebruik standaard interval)",
+                    "addressid": "Adres ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
+                    "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
+                    "language": "Taal voor tekst die door de integratie wordt beheerd, zoals datums, hulpsensornamen en meldingen"
+                }
+            }
+        },
+        "error": {
+            "import_error": "Fout bij importeren van API module",
+            "connection_error": "Verbindingsfout opgetreden",
+            "invalid_collector": "Ongeldige inzamelaargegevens",
+            "no_resources": "Geen afvaltypes gevonden",
+            "unknown_error": "Onbekende fout opgetreden",
+            "invalid_custom_mapping": "Ongeldig JSON formaat in aangepaste mapping"
+        }
     },
-    "abort": {
-      "already_configured": "Deze afvalinzamelaar configuratie bestaat al"
+    "runtime": {
+        "today": "Vandaag",
+        "tomorrow": "Morgen",
+        "none": "Geen",
+        "first_upcoming": "eerstvolgende",
+        "days": {
+            "Monday": "Maandag",
+            "Tuesday": "Dinsdag",
+            "Wednesday": "Woensdag",
+            "Thursday": "Donderdag",
+            "Friday": "Vrijdag",
+            "Saturday": "Zaterdag",
+            "Sunday": "Zondag"
+        },
+        "days_short": {
+            "Mon": "Maa",
+            "Tue": "Din",
+            "Wed": "Woe",
+            "Thu": "Don",
+            "Fri": "Vri",
+            "Sat": "Zat",
+            "Sun": "Zon"
+        },
+        "months": {
+            "January": "januari",
+            "February": "februari",
+            "March": "maart",
+            "April": "april",
+            "May": "mei",
+            "June": "juni",
+            "July": "juli",
+            "August": "augustus",
+            "September": "september",
+            "October": "oktober",
+            "November": "november",
+            "December": "december"
+        },
+        "months_short": {
+            "Jan": "jan",
+            "Feb": "feb",
+            "Mar": "mrt",
+            "Apr": "apr",
+            "May": "mei",
+            "Jun": "jun",
+            "Jul": "jul",
+            "Aug": "aug",
+            "Sept": "sep",
+            "Sep": "sep",
+            "Oct": "okt",
+            "Nov": "nov",
+            "Dec": "dec"
+        },
+        "notifications": {
+            "available_waste_types": "Beschikbare afvaltypes: {types}",
+            "available_waste_type_slugs": "Afvaltype slugs gebruikt door API: {slugs}",
+            "collector_not_found": "Afvalinzamelaar \"{collector}\" niet gevonden!",
+            "deprecated_collector": "Werk je configuratie bij naar {new_collector}! Je gebruikt nog {old_collector} als afvalinzamelaar, deze is verouderd. Controleer ook je automatiseringen en Lovelace-configuratie, omdat sensornamen mogelijk gewijzigd zijn!",
+            "city_required": "Configuratie ongeldig! Plaatsnaam is vereist voor {collector}",
+            "street_required": "Configuratie ongeldig! Straatnaam is vereist voor {collector}"
+        }
     }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Afvalinzamelaar bijwerken",
-        "description": "Wijzig uw afvalinzamelaar",
-        "data": {
-          "wastecollector": "Afvalinzamelaar"
-        }
-      },
-      "address": {
-        "title": "Adres bijwerken",
-        "description": "Werk uw adresgegevens bij", 
-        "data": {
-          "postcode": "Postcode",
-          "streetnumber": "Huisnummer",
-          "suffix": "Toevoeging (optioneel)", 
-          "cityname": "Plaatsnaam",
-          "streetname": "Straatnaam"
-        }
-      },
-      "omrin_credentials": {
-        "title": "Omrin Inloggegevens (Optioneel)",
-        "description": "Log in met je Omrin-account om een sensor te krijgen met het aantal ophalingen dit jaar per afvaltype. Je kunt dit overslaan door de velden leeg te laten.",
-        "data": {
-          "email": "E-mailadres",
-          "password": "Wachtwoord"
-        },
-        "data_description": {
-          "email": "Het e-mailadres van je Omrin-account (optioneel)",
-          "password": "Het wachtwoord van je Omrin-account (optioneel)"
-        }
-      },
-      "mapping": {
-        "title": "Aangepaste Mapping Bijwerken (Optioneel)",
-        "description": "Werk aangepaste afvaltype mapping bij",
-        "data": {
-          "use_custom_mapping": "Gebruik Aangepaste Mapping",
-          "custommapping": "Aangepaste Afvaltype Mapping"
-        },
-        "data_description": {
-          "use_custom_mapping": "Schakel aangepaste mapping in om afvaltypes van de API te hernoemen",
-          "custommapping": "Aangepaste afvaltype mappings in JSON formaat"
-        }
-      },
-      "resources": {
-        "title": "Configuratie bijwerken",
-        "description": "Werk afvaltypes en opties bij",
-        "data": {
-          "resources": "Afvaltypes",
-          "name": "Aangepaste naam",
-          "wastecollectornameprefix": "Gebruik naam voorvoegsel",
-          "dateformat": "Datumformaat", 
-          "upcomingsensor": "Komende sensoren",
-          "dateonly": "Alleen datum",
-          "dateobject": "Datum als tijdstempel",
-          "dutch": "Nederlandse taal",
-          "dayofweek": "Toon dag van de week",
-          "dayofweekonly": "Alleen dagnamen",
-          "alwaysshowday": "Altijd dagnamen tonen",
-          "builtinicons": "Klassieke pictogrammen",
-          "builtiniconsnew": "Moderne pictogrammen",
-          "disableicons": "Pictogrammen uitschakelen",
-          "updateinterval": "Update-interval (uren)",
-          "addressid": "Adres ID", 
-          "customerid": "Klant ID"
-        },
-        "data_description": {
-          "resources": "Selecteer de afvaltypes die u wilt volgen",
-          "name": "Aangepaste naam voor deze integratie-instantie (optioneel)",
-          "wastecollectornameprefix": "Voeg afvalinzamelaarnaam toe als voorvoegsel aan sensornamen",
-          "dateformat": "Datumformaat voor sensorwaarden (Python strftime formaat)",
-          "upcomingsensor": "Maak extra sensoren voor vandaag, morgen en volgende komende ophaaldag",
-          "dateonly": "Toon alleen datum zonder dagnamen (overschrijft andere daginstellingen)",
-          "dateobject": "Gebruik tijdstempel objecten in plaats van opgemaakte tekst (voor automatiseringen)",
-          "dutch": "Toon dag- en maandnamen in het Nederlands in plaats van Engels",
-          "dayofweek": "Inclusief dag van de week in sensorwaarden (bijv. 'Maandag, 01-01-2024')",
-          "dayofweekonly": "Toon alleen dagnamen voor nabije datums (vandaag, morgen, dagnamen)",
-          "alwaysshowday": "Altijd dagnamen tonen, zelfs voor datums meer dan een week weg",
-          "builtinicons": "Gebruik ingebouwde pictogrammen voor afvaltypes (klassieke pictogrammenset)",
-          "builtiniconsnew": "Gebruik ingebouwde pictogrammen voor afvaltypes (moderne pictogrammenset)",
-          "disableicons": "Schakel alle pictogrammen uit voor afvaltype sensoren",
-          "updateinterval": "Hoe vaak controleren voor bijgewerkte afvalophaaldgegevens (0 = gebruik standaard interval)",
-          "addressid": "Adres ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
-          "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)"
-        }
-      }
-    },
-    "error": {
-      "import_error": "Fout bij importeren van API module",
-      "connection_error": "Verbindingsfout opgetreden",
-      "invalid_collector": "Ongeldige inzamelaargegevens", 
-      "no_resources": "Geen afvaltypes gevonden",
-      "unknown_error": "Onbekende fout opgetreden",
-      "invalid_custom_mapping": "Ongeldig JSON formaat in aangepaste mapping"
-    }
-  }
 }
