@@ -106,7 +106,7 @@ class WasteData(object):
                 f'Waste type slugs used by API: {", ".join(self.collector.collections.get_available_waste_type_slugs())}',
                 f'Afvalwijzer {self.waste_collector}',
                 f'{NOTIFICATION_ID}_availablewastetypeslugs_{self.waste_collector}')
-            self.print_waste_type = False
+            self.print_waste_type_slugs = False
 
     @property
     def collections(self):
