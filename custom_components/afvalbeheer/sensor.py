@@ -185,9 +185,10 @@ class BaseSensor(RestoreEntity, SensorEntity):
                 if self.day_of_week_only:
                     formatted = collection_date.strftime("%A")
                 else:
-                    if "%A" not in self.date_format:
-                        self.date_format = "%A, " + self.date_format
-                    formatted = collection_date.strftime(self.date_format)
+                    date_format = self.date_format
+                    if "%A" not in date_format:
+                        date_format = "%A, " + date_format
+                    formatted = collection_date.strftime(date_format)
             else:
                 formatted = collection_date.strftime(self.date_format)
         elif date_diff == 1:
