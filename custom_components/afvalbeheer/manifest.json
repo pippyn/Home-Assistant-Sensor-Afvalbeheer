@@ -1,13 +1,13 @@
 {
-  "domain": "afvalbeheer",
+  "domain": "afvalbeheerFor",
   "name": "Afvalbeheer",
-  "documentation": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer",
+  "documentation": "https://github.com/ItWorksDenBoey/Home-Assistant-Sensor-Afvalbeheer.git",
   "dependencies": [],
-  "codeowners": ["@pippyn"],
+  "codeowners": ["@ItWorksDenBoey"],
   "requirements": [
     "rsa",
     "pycryptodome"
   ],
-  "version": "6.5.16",
+  "version": "6.5.17",
   "config_flow": true
 }
