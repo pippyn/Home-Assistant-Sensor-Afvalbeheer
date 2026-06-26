@@ -10,7 +10,8 @@ from .const import (
     DOMAIN, CONF_ID, CONF_WASTE_COLLECTOR, CONF_POSTCODE, CONF_STREET_NUMBER, CONF_SUFFIX,
     CONF_RESOURCES, CONF_NAME_PREFIX, CONF_DATE_FORMAT, CONF_UPCOMING, CONF_DATE_ONLY,
     CONF_DATE_OBJECT, CONF_BUILT_IN_ICONS, CONF_BUILT_IN_ICONS_NEW, CONF_DISABLE_ICONS,
-    CONF_TRANSLATE_DAYS, CONF_DAY_OF_WEEK, CONF_DAY_OF_WEEK_ONLY, CONF_ALWAYS_SHOW_DAY,
+    CONF_TRANSLATE_DAYS, CONF_LANGUAGE, LANGUAGE_NL, LANGUAGE_EN, LANGUAGE_FR, LANGUAGE_EL,
+    CONF_DAY_OF_WEEK, CONF_DAY_OF_WEEK_ONLY, CONF_ALWAYS_SHOW_DAY,
     CONF_STREET_NAME, CONF_CITY_NAME, CONF_ADDRESS_ID, CONF_CUSTOMER_ID, CONF_UPDATE_INTERVAL,
     CONF_CUSTOM_MAPPING, DEFAULT_CONFIG, XIMMIO_COLLECTOR_IDS, CONF_EMAIL, CONF_PASSWORD
 )
@@ -30,6 +31,21 @@ WASTE_COLLECTORS = [
     "TwenteMilieu", "Uithoorn", "Venlo","Venray", "Voorschoten", "Waalre", "Waardlanden", "Westland",
     "Woerden", "ZRD"
 ]
+
+LANGUAGE_OPTIONS = [
+    {"value": LANGUAGE_NL, "label": "Nederlands"},
+    {"value": LANGUAGE_EN, "label": "English"},
+    {"value": LANGUAGE_FR, "label": "Français"},
+    {"value": LANGUAGE_EL, "label": "Ελληνικά"},
+]
+
+
+def _default_language(config):
+    language = config.get(CONF_LANGUAGE)
+    if language:
+        return language
+
+    return LANGUAGE_NL if config.get(CONF_TRANSLATE_DAYS, DEFAULT_CONFIG[CONF_TRANSLATE_DAYS]) else LANGUAGE_EN
 
 
 class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -135,6 +151,7 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         config_data[CONF_BUILT_IN_ICONS_NEW] = import_config.get(CONF_BUILT_IN_ICONS_NEW, DEFAULT_CONFIG[CONF_BUILT_IN_ICONS_NEW])
         config_data[CONF_DISABLE_ICONS] = import_config.get(CONF_DISABLE_ICONS, DEFAULT_CONFIG[CONF_DISABLE_ICONS])
         config_data[CONF_TRANSLATE_DAYS] = import_config.get(CONF_TRANSLATE_DAYS, DEFAULT_CONFIG[CONF_TRANSLATE_DAYS])
+        config_data[CONF_LANGUAGE] = import_config.get(CONF_LANGUAGE, _default_language(config_data))
         config_data[CONF_DAY_OF_WEEK] = import_config.get(CONF_DAY_OF_WEEK, DEFAULT_CONFIG[CONF_DAY_OF_WEEK])
         config_data[CONF_DAY_OF_WEEK_ONLY] = import_config.get(CONF_DAY_OF_WEEK_ONLY, DEFAULT_CONFIG[CONF_DAY_OF_WEEK_ONLY])
         config_data[CONF_ALWAYS_SHOW_DAY] = import_config.get(CONF_ALWAYS_SHOW_DAY, DEFAULT_CONFIG[CONF_ALWAYS_SHOW_DAY])
@@ -407,7 +424,12 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             vol.Optional(CONF_UPCOMING, default=DEFAULT_CONFIG[CONF_UPCOMING]): selector.BooleanSelector(),
             vol.Optional(CONF_DATE_ONLY, default=DEFAULT_CONFIG[CONF_DATE_ONLY]): selector.BooleanSelector(),
             vol.Optional(CONF_DATE_OBJECT, default=DEFAULT_CONFIG[CONF_DATE_OBJECT]): selector.BooleanSelector(),
-            vol.Optional(CONF_TRANSLATE_DAYS, default=DEFAULT_CONFIG[CONF_TRANSLATE_DAYS]): selector.BooleanSelector(),
+            vol.Optional(CONF_LANGUAGE, default=DEFAULT_CONFIG[CONF_LANGUAGE]): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=LANGUAGE_OPTIONS,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
             vol.Optional(CONF_DAY_OF_WEEK, default=DEFAULT_CONFIG[CONF_DAY_OF_WEEK]): selector.BooleanSelector(),
             vol.Optional(CONF_DAY_OF_WEEK_ONLY, default=DEFAULT_CONFIG[CONF_DAY_OF_WEEK_ONLY]): selector.BooleanSelector(),
             vol.Optional(CONF_ALWAYS_SHOW_DAY, default=DEFAULT_CONFIG[CONF_ALWAYS_SHOW_DAY]): selector.BooleanSelector(),
@@ -752,7 +774,12 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
             vol.Optional(CONF_UPCOMING, default=current.get(CONF_UPCOMING, DEFAULT_CONFIG[CONF_UPCOMING])): selector.BooleanSelector(),
             vol.Optional(CONF_DATE_ONLY, default=current.get(CONF_DATE_ONLY, DEFAULT_CONFIG[CONF_DATE_ONLY])): selector.BooleanSelector(),
             vol.Optional(CONF_DATE_OBJECT, default=current.get(CONF_DATE_OBJECT, DEFAULT_CONFIG[CONF_DATE_OBJECT])): selector.BooleanSelector(),
-            vol.Optional(CONF_TRANSLATE_DAYS, default=current.get(CONF_TRANSLATE_DAYS, DEFAULT_CONFIG[CONF_TRANSLATE_DAYS])): selector.BooleanSelector(),
+            vol.Optional(CONF_LANGUAGE, default=_default_language(current)): selector.SelectSelector(
+                selector.SelectSelectorConfig(
+                    options=LANGUAGE_OPTIONS,
+                    mode=selector.SelectSelectorMode.DROPDOWN,
+                )
+            ),
             vol.Optional(CONF_DAY_OF_WEEK, default=current.get(CONF_DAY_OF_WEEK, DEFAULT_CONFIG[CONF_DAY_OF_WEEK])): selector.BooleanSelector(),
             vol.Optional(CONF_DAY_OF_WEEK_ONLY, default=current.get(CONF_DAY_OF_WEEK_ONLY, DEFAULT_CONFIG[CONF_DAY_OF_WEEK_ONLY])): selector.BooleanSelector(),
             vol.Optional(CONF_ALWAYS_SHOW_DAY, default=current.get(CONF_ALWAYS_SHOW_DAY, DEFAULT_CONFIG[CONF_ALWAYS_SHOW_DAY])): selector.BooleanSelector(),

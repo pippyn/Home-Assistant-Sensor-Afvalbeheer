@@ -6,6 +6,7 @@ from homeassistant.util import dt as dt_util
 from homeassistant.components import persistent_notification
 
 from .const import *
+from .translation import resolve_language, text
 from .models import WasteCollectionRepository
 from .collectors import (
     XimmioCollector, BurgerportaalCollector, OpzetCollector, KlikogroepCollector,
@@ -23,7 +24,7 @@ class WasteData(object):
     Manages waste data and schedules updates.
     """
 
-    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, custom_mapping, address_id, print_waste_type, print_waste_type_slugs, update_interval, customer_id, email=None, password=None):
+    def __init__(self, hass, waste_collector, city_name, postcode, street_name, street_number, suffix, custom_mapping, address_id, print_waste_type, print_waste_type_slugs, update_interval, customer_id, email=None, password=None, language=None):
         self.hass = hass
         self.waste_collector = waste_collector
         self.city_name = city_name
@@ -40,6 +41,7 @@ class WasteData(object):
         self.email = email
         self.password = password
         self.custom_mapping = custom_mapping
+        self.language = language or LANGUAGE_NL
         self.__select_collector()
 
     def __select_collector(self):
@@ -76,7 +78,7 @@ class WasteData(object):
         else:
             persistent_notification.create(
                 self.hass,
-                f'Waste collector "{self.waste_collector}" not found!',
+                text(self.language, "notifications.collector_not_found", collector=self.waste_collector),
                 f'Afvalwijzer {self.waste_collector}',
                 f'{NOTIFICATION_ID}_collectornotfound_{self.waste_collector}'
             )
@@ -96,14 +98,14 @@ class WasteData(object):
         if self.print_waste_type:
             persistent_notification.create(
                 self.hass,
-                f'Available waste types: {", ".join(self.collector.collections.get_available_waste_types())}',
+                text(self.language, "notifications.available_waste_types", types=", ".join(self.collector.collections.get_available_waste_types())),
                 f'Afvalwijzer {self.waste_collector}',
                 f'{NOTIFICATION_ID}_availablewastetypes_{self.waste_collector}')
             self.print_waste_type = False
         if self.print_waste_type_slugs:
             persistent_notification.create(
                 self.hass,
-                f'Waste type slugs used by API: {", ".join(self.collector.collections.get_available_waste_type_slugs())}',
+                text(self.language, "notifications.available_waste_type_slugs", slugs=", ".join(self.collector.collections.get_available_waste_type_slugs())),
                 f'Afvalwijzer {self.waste_collector}',
                 f'{NOTIFICATION_ID}_availablewastetypeslugs_{self.waste_collector}')
             self.print_waste_type_slugs = False
@@ -130,12 +132,18 @@ def get_wastedata_from_config(hass, config):
     email = config.get(CONF_EMAIL)
     password = config.get(CONF_PASSWORD)
     custom_mapping = config.get(CONF_CUSTOM_MAPPING)
+    language = resolve_language(config)
     config["id"] = _format_id(waste_collector, postcode, street_number)
 
     if waste_collector in DEPRECATED_AND_NEW_WASTECOLLECTORS:
         persistent_notification.create(
             hass,
-            f"Update your config to use {DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector]}! You are still using {waste_collector} as a waste collector, which is deprecated. Check your automations and lovelace config, as the sensor names may also be changed!",
+            text(
+                language,
+                "notifications.deprecated_collector",
+                new_collector=DEPRECATED_AND_NEW_WASTECOLLECTORS[waste_collector],
+                old_collector=waste_collector,
+            ),
             f"Afvalbeheer {waste_collector}",
             f"{NOTIFICATION_ID}_update_config_{waste_collector}",
         )
@@ -144,7 +152,7 @@ def get_wastedata_from_config(hass, config):
     if waste_collector in ["limburg.net"] and not city_name:
         persistent_notification.create(
             hass,
-            f"Config invalid! Cityname is required for {waste_collector}",
+            text(language, "notifications.city_required", collector=waste_collector),
             f"Afvalbeheer {waste_collector}",
             f"{NOTIFICATION_ID}_invalid_config_{waste_collector}",
         )
@@ -153,7 +161,7 @@ def get_wastedata_from_config(hass, config):
     if waste_collector in ["limburg.net", "recycleapp"] and not street_name:
         persistent_notification.create(
             hass,
-            f"Config invalid! Streetname is required for {waste_collector}",
+            text(language, "notifications.street_required", collector=waste_collector),
             f"Afvalbeheer {waste_collector}",
             f"{NOTIFICATION_ID}_invalid_config_{waste_collector}",
         )
@@ -175,6 +183,7 @@ def get_wastedata_from_config(hass, config):
         customer_id,
         email,
         password,
+        language,
     )
 
 

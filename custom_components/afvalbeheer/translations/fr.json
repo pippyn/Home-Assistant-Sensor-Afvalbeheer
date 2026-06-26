@@ -1,174 +1,259 @@
 {
-  "config": {
-    "step": {
-      "user": {
-        "title": "Configuration Afvalbeheer",
-        "description": "Sélectionnez votre collecteur de déchets",
-        "data": {
-          "wastecollector": "Collecteur de Déchets"
-        }
-      },
-      "address": {
-        "title": "Informations d'Adresse", 
-        "description": "Saisissez les détails de votre adresse",
-        "data": {
-          "postcode": "Code Postal",
-          "streetnumber": "Numéro de Rue", 
-          "suffix": "Suffixe (optionnel)",
-          "cityname": "Nom de la Ville",
-          "streetname": "Nom de la Rue"
-        }
-      },
-      "mapping": {
-        "title": "Mappage Personnalisé (Optionnel)",
-        "description": "Configurer le mappage personnalisé des types de déchets",
-        "data": {
-          "use_custom_mapping": "Utiliser Mappage Personnalisé",
-          "custommapping": "Mappage Personnalisé des Types de Déchets"
+    "config": {
+        "step": {
+            "user": {
+                "title": "Configuration Afvalbeheer",
+                "description": "Sélectionnez votre collecteur de déchets",
+                "data": {
+                    "wastecollector": "Collecteur de Déchets"
+                }
+            },
+            "address": {
+                "title": "Informations d'Adresse",
+                "description": "Saisissez les détails de votre adresse",
+                "data": {
+                    "postcode": "Code Postal",
+                    "streetnumber": "Numéro de Rue",
+                    "suffix": "Suffixe (optionnel)",
+                    "cityname": "Nom de la Ville",
+                    "streetname": "Nom de la Rue"
+                }
+            },
+            "omrin_credentials": {
+                "title": "Identifiants Omrin (facultatif)",
+                "description": "Connectez-vous avec votre compte Omrin pour obtenir un capteur indiquant le nombre de collectes cette année par type de déchet. Laissez les champs vides pour ignorer cette étape.",
+                "data": {
+                    "email": "Adresse e-mail",
+                    "password": "Mot de passe"
+                },
+                "data_description": {
+                    "email": "Adresse e-mail de votre compte Omrin (facultatif)",
+                    "password": "Mot de passe de votre compte Omrin (facultatif)"
+                }
+            },
+            "mapping": {
+                "title": "Mappage Personnalisé (Optionnel)",
+                "description": "Configurer le mappage personnalisé des types de déchets",
+                "data": {
+                    "use_custom_mapping": "Utiliser Mappage Personnalisé",
+                    "custommapping": "Mappage Personnalisé des Types de Déchets"
+                },
+                "data_description": {
+                    "use_custom_mapping": "Activer le mappage personnalisé pour renommer les types de déchets de l'API",
+                    "custommapping": "Mappages personnalisés des types de déchets au format JSON"
+                }
+            },
+            "resources": {
+                "title": "Configuration",
+                "description": "Sélectionnez les types de déchets et configurez les options",
+                "data": {
+                    "resources": "Types de Déchets",
+                    "name": "Nom Personnalisé",
+                    "wastecollectornameprefix": "Utiliser Préfixe de Nom",
+                    "dateformat": "Format de Date",
+                    "upcomingsensor": "Capteurs à Venir",
+                    "dateonly": "Date Uniquement",
+                    "dateobject": "Date comme Timestamp",
+                    "dayofweek": "Afficher Jour de la Semaine",
+                    "dayofweekonly": "Noms des Jours Uniquement",
+                    "alwaysshowday": "Toujours Afficher les Noms des Jours",
+                    "builtinicons": "Icônes Classiques",
+                    "builtiniconsnew": "Icônes Modernes",
+                    "disableicons": "Désactiver les Icônes",
+                    "updateinterval": "Intervalle de Mise à Jour (heures)",
+                    "addressid": "ID d'Adresse",
+                    "customerid": "ID Client",
+                    "language": "Langue du texte des capteurs"
+                },
+                "data_description": {
+                    "resources": "Sélectionnez les types de déchets que vous souhaitez suivre",
+                    "name": "Nom personnalisé pour cette instance d'intégration (optionnel)",
+                    "wastecollectornameprefix": "Ajouter le nom du collecteur de déchets comme préfixe aux noms de capteurs",
+                    "dateformat": "Format de date pour les valeurs des capteurs (format Python strftime)",
+                    "upcomingsensor": "Créer des capteurs supplémentaires pour aujourd'hui, demain et la prochaine collecte",
+                    "dateonly": "Afficher seulement la date sans les noms des jours (remplace les autres paramètres de jour)",
+                    "dateobject": "Utiliser des objets timestamp au lieu de texte formaté (pour les automatisations)",
+                    "dayofweek": "Inclure le jour de la semaine dans les valeurs des capteurs (ex. 'Lundi, 01-01-2024')",
+                    "dayofweekonly": "Afficher seulement les noms des jours pour les dates proches (aujourd'hui, demain, noms des jours)",
+                    "alwaysshowday": "Toujours afficher les noms des jours, même pour les dates à plus d'une semaine",
+                    "builtinicons": "Utiliser les icônes intégrées pour les types de déchets (jeu d'icônes classique)",
+                    "builtiniconsnew": "Utiliser les icônes intégrées pour les types de déchets (jeu d'icônes moderne)",
+                    "disableicons": "Désactiver toutes les icônes pour les capteurs de types de déchets",
+                    "updateinterval": "Fréquence de vérification des données de collecte de déchets mises à jour (0 = utiliser l'intervalle par défaut)",
+                    "addressid": "ID d'adresse pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
+                    "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
+                    "language": "Langue utilisée par les textes gérés par l'intégration, comme les dates, les noms de capteurs auxiliaires et les notifications"
+                }
+            }
         },
-        "data_description": {
-          "use_custom_mapping": "Activer le mappage personnalisé pour renommer les types de déchets de l'API",
-          "custommapping": "Mappages personnalisés des types de déchets au format JSON"
-        }
-      },
-      "resources": {
-        "title": "Configuration",
-        "description": "Sélectionnez les types de déchets et configurez les options",
-        "data": {
-          "resources": "Types de Déchets",
-          "name": "Nom Personnalisé",
-          "wastecollectornameprefix": "Utiliser Préfixe de Nom", 
-          "dateformat": "Format de Date",
-          "upcomingsensor": "Capteurs à Venir",
-          "dateonly": "Date Uniquement",
-          "dateobject": "Date comme Timestamp",
-          "dutch": "Langue Néerlandaise",
-          "dayofweek": "Afficher Jour de la Semaine",
-          "dayofweekonly": "Noms des Jours Uniquement",
-          "alwaysshowday": "Toujours Afficher les Noms des Jours",
-          "builtinicons": "Icônes Classiques",
-          "builtiniconsnew": "Icônes Modernes", 
-          "disableicons": "Désactiver les Icônes",
-          "updateinterval": "Intervalle de Mise à Jour (heures)",
-          "addressid": "ID d'Adresse",
-          "customerid": "ID Client"
+        "error": {
+            "import_error": "Échec de l'importation du module API",
+            "connection_error": "Erreur de connexion survenue",
+            "invalid_collector": "Données de collecteur invalides",
+            "no_resources": "Aucun type de déchet trouvé",
+            "unknown_error": "Erreur inconnue survenue",
+            "invalid_custom_mapping": "Format JSON invalide dans le mappage personnalisé",
+            "already_configured": "Cette configuration existe déjà"
         },
-        "data_description": {
-          "resources": "Sélectionnez les types de déchets que vous souhaitez suivre",
-          "name": "Nom personnalisé pour cette instance d'intégration (optionnel)",
-          "wastecollectornameprefix": "Ajouter le nom du collecteur de déchets comme préfixe aux noms de capteurs",
-          "dateformat": "Format de date pour les valeurs des capteurs (format Python strftime)",
-          "upcomingsensor": "Créer des capteurs supplémentaires pour aujourd'hui, demain et la prochaine collecte",
-          "dateonly": "Afficher seulement la date sans les noms des jours (remplace les autres paramètres de jour)",
-          "dateobject": "Utiliser des objets timestamp au lieu de texte formaté (pour les automatisations)",
-          "dutch": "Afficher les noms des jours et des mois en néerlandais au lieu de l'anglais",
-          "dayofweek": "Inclure le jour de la semaine dans les valeurs des capteurs (ex. 'Lundi, 01-01-2024')",
-          "dayofweekonly": "Afficher seulement les noms des jours pour les dates proches (aujourd'hui, demain, noms des jours)",
-          "alwaysshowday": "Toujours afficher les noms des jours, même pour les dates à plus d'une semaine",
-          "builtinicons": "Utiliser les icônes intégrées pour les types de déchets (jeu d'icônes classique)",
-          "builtiniconsnew": "Utiliser les icônes intégrées pour les types de déchets (jeu d'icônes moderne)",
-          "disableicons": "Désactiver toutes les icônes pour les capteurs de types de déchets",
-          "updateinterval": "Fréquence de vérification des données de collecte de déchets mises à jour (0 = utiliser l'intervalle par défaut)",
-          "addressid": "ID d'adresse pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
-          "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)"
+        "abort": {
+            "already_configured": "Cette configuration de collecteur de déchets existe déjà"
         }
-      }
     },
-    "error": {
-      "import_error": "Échec de l'importation du module API",
-      "connection_error": "Erreur de connexion survenue", 
-      "invalid_collector": "Données de collecteur invalides",
-      "no_resources": "Aucun type de déchet trouvé",
-      "unknown_error": "Erreur inconnue survenue",
-      "invalid_custom_mapping": "Format JSON invalide dans le mappage personnalisé",
-      "already_configured": "Cette configuration existe déjà"
+    "options": {
+        "step": {
+            "init": {
+                "title": "Mettre à Jour le Collecteur de Déchets",
+                "description": "Changer votre collecteur de déchets",
+                "data": {
+                    "wastecollector": "Collecteur de Déchets"
+                }
+            },
+            "address": {
+                "title": "Mettre à Jour l'Adresse",
+                "description": "Mettre à jour les détails de votre adresse",
+                "data": {
+                    "postcode": "Code Postal",
+                    "streetnumber": "Numéro de Rue",
+                    "suffix": "Suffixe (optionnel)",
+                    "cityname": "Nom de la Ville",
+                    "streetname": "Nom de la Rue"
+                }
+            },
+            "omrin_credentials": {
+                "title": "Identifiants Omrin (facultatif)",
+                "description": "Connectez-vous avec votre compte Omrin pour obtenir un capteur indiquant le nombre de collectes cette année par type de déchet. Laissez les champs vides pour ignorer cette étape.",
+                "data": {
+                    "email": "Adresse e-mail",
+                    "password": "Mot de passe"
+                },
+                "data_description": {
+                    "email": "Adresse e-mail de votre compte Omrin (facultatif)",
+                    "password": "Mot de passe de votre compte Omrin (facultatif)"
+                }
+            },
+            "mapping": {
+                "title": "Mettre à Jour le Mappage Personnalisé (Optionnel)",
+                "description": "Mettre à jour le mappage personnalisé des types de déchets",
+                "data": {
+                    "use_custom_mapping": "Utiliser Mappage Personnalisé",
+                    "custommapping": "Mappage Personnalisé des Types de Déchets"
+                },
+                "data_description": {
+                    "use_custom_mapping": "Activer le mappage personnalisé pour renommer les types de déchets de l'API",
+                    "custommapping": "Mappages personnalisés des types de déchets au format JSON"
+                }
+            },
+            "resources": {
+                "title": "Mettre à Jour la Configuration",
+                "description": "Mettre à jour les types de déchets et les options",
+                "data": {
+                    "resources": "Types de Déchets",
+                    "name": "Nom Personnalisé",
+                    "wastecollectornameprefix": "Utiliser Préfixe de Nom",
+                    "dateformat": "Format de Date",
+                    "upcomingsensor": "Capteurs à Venir",
+                    "dateonly": "Date Uniquement",
+                    "dateobject": "Date comme Timestamp",
+                    "dayofweek": "Afficher Jour de la Semaine",
+                    "dayofweekonly": "Noms des Jours Uniquement",
+                    "alwaysshowday": "Toujours Afficher les Noms des Jours",
+                    "builtinicons": "Icônes Classiques",
+                    "builtiniconsnew": "Icônes Modernes",
+                    "disableicons": "Désactiver les Icônes",
+                    "updateinterval": "Intervalle de Mise à Jour (heures)",
+                    "addressid": "ID d'Adresse",
+                    "customerid": "ID Client",
+                    "language": "Langue du texte des capteurs"
+                },
+                "data_description": {
+                    "resources": "Sélectionnez les types de déchets que vous souhaitez suivre",
+                    "name": "Nom personnalisé pour cette instance d'intégration (optionnel)",
+                    "wastecollectornameprefix": "Ajouter le nom du collecteur de déchets comme préfixe aux noms de capteurs",
+                    "dateformat": "Format de date pour les valeurs des capteurs (format Python strftime)",
+                    "upcomingsensor": "Créer des capteurs supplémentaires pour aujourd'hui, demain et la prochaine collecte",
+                    "dateonly": "Afficher seulement la date sans les noms des jours (remplace les autres paramètres de jour)",
+                    "dateobject": "Utiliser des objets timestamp au lieu de texte formaté (pour les automatisations)",
+                    "dayofweek": "Inclure le jour de la semaine dans les valeurs des capteurs (ex. 'Lundi, 01-01-2024')",
+                    "dayofweekonly": "Afficher seulement les noms des jours pour les dates proches (aujourd'hui, demain, noms des jours)",
+                    "alwaysshowday": "Toujours afficher les noms des jours, même pour les dates à plus d'une semaine",
+                    "builtinicons": "Utiliser les icônes intégrées pour les types de déchets (jeu d'icônes classique)",
+                    "builtiniconsnew": "Utiliser les icônes intégrées pour les types de déchets (jeu d'icônes moderne)",
+                    "disableicons": "Désactiver toutes les icônes pour les capteurs de types de déchets",
+                    "updateinterval": "Fréquence de vérification des données de collecte de déchets mises à jour (0 = utiliser l'intervalle par défaut)",
+                    "addressid": "ID d'adresse pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
+                    "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
+                    "language": "Langue utilisée par les textes gérés par l'intégration, comme les dates, les noms de capteurs auxiliaires et les notifications"
+                }
+            }
+        },
+        "error": {
+            "import_error": "Échec de l'importation du module API",
+            "connection_error": "Erreur de connexion survenue",
+            "invalid_collector": "Données de collecteur invalides",
+            "no_resources": "Aucun type de déchet trouvé",
+            "unknown_error": "Erreur inconnue survenue",
+            "invalid_custom_mapping": "Format JSON invalide dans le mappage personnalisé"
+        }
     },
-    "abort": {
-      "already_configured": "Cette configuration de collecteur de déchets existe déjà"
+    "runtime": {
+        "today": "Aujourd'hui",
+        "tomorrow": "Demain",
+        "none": "Aucun",
+        "first_upcoming": "prochaine collecte",
+        "days": {
+            "Monday": "Lundi",
+            "Tuesday": "Mardi",
+            "Wednesday": "Mercredi",
+            "Thursday": "Jeudi",
+            "Friday": "Vendredi",
+            "Saturday": "Samedi",
+            "Sunday": "Dimanche"
+        },
+        "days_short": {
+            "Mon": "Lun",
+            "Tue": "Mar",
+            "Wed": "Mer",
+            "Thu": "Jeu",
+            "Fri": "Ven",
+            "Sat": "Sam",
+            "Sun": "Dim"
+        },
+        "months": {
+            "January": "janvier",
+            "February": "février",
+            "March": "mars",
+            "April": "avril",
+            "May": "mai",
+            "June": "juin",
+            "July": "juillet",
+            "August": "août",
+            "September": "septembre",
+            "October": "octobre",
+            "November": "novembre",
+            "December": "décembre"
+        },
+        "months_short": {
+            "Jan": "janv",
+            "Feb": "févr",
+            "Mar": "mars",
+            "Apr": "avr",
+            "May": "mai",
+            "Jun": "juin",
+            "Jul": "juil",
+            "Aug": "août",
+            "Sept": "sept",
+            "Sep": "sept",
+            "Oct": "oct",
+            "Nov": "nov",
+            "Dec": "déc"
+        },
+        "notifications": {
+            "available_waste_types": "Types de déchets disponibles : {types}",
+            "available_waste_type_slugs": "Slugs de types de déchets utilisés par l'API : {slugs}",
+            "collector_not_found": "Collecteur de déchets \"{collector}\" introuvable !",
+            "deprecated_collector": "Mettez à jour votre configuration pour utiliser {new_collector} ! Vous utilisez encore {old_collector} comme collecteur de déchets, ce qui est obsolète. Vérifiez aussi vos automatisations et votre configuration Lovelace, car les noms des capteurs peuvent aussi avoir changé !",
+            "city_required": "Configuration invalide ! Le nom de la ville est requis pour {collector}",
+            "street_required": "Configuration invalide ! Le nom de la rue est requis pour {collector}"
+        }
     }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Mettre à Jour le Collecteur de Déchets",
-        "description": "Changer votre collecteur de déchets",
-        "data": {
-          "wastecollector": "Collecteur de Déchets"
-        }
-      },
-      "address": {
-        "title": "Mettre à Jour l'Adresse",
-        "description": "Mettre à jour les détails de votre adresse", 
-        "data": {
-          "postcode": "Code Postal",
-          "streetnumber": "Numéro de Rue",
-          "suffix": "Suffixe (optionnel)", 
-          "cityname": "Nom de la Ville",
-          "streetname": "Nom de la Rue"
-        }
-      },
-      "mapping": {
-        "title": "Mettre à Jour le Mappage Personnalisé (Optionnel)",
-        "description": "Mettre à jour le mappage personnalisé des types de déchets",
-        "data": {
-          "use_custom_mapping": "Utiliser Mappage Personnalisé",
-          "custommapping": "Mappage Personnalisé des Types de Déchets"
-        },
-        "data_description": {
-          "use_custom_mapping": "Activer le mappage personnalisé pour renommer les types de déchets de l'API",
-          "custommapping": "Mappages personnalisés des types de déchets au format JSON"
-        }
-      },
-      "resources": {
-        "title": "Mettre à Jour la Configuration",
-        "description": "Mettre à jour les types de déchets et les options",
-        "data": {
-          "resources": "Types de Déchets",
-          "name": "Nom Personnalisé",
-          "wastecollectornameprefix": "Utiliser Préfixe de Nom",
-          "dateformat": "Format de Date", 
-          "upcomingsensor": "Capteurs à Venir",
-          "dateonly": "Date Uniquement",
-          "dateobject": "Date comme Timestamp",
-          "dutch": "Langue Néerlandaise",
-          "dayofweek": "Afficher Jour de la Semaine",
-          "dayofweekonly": "Noms des Jours Uniquement",
-          "alwaysshowday": "Toujours Afficher les Noms des Jours",
-          "builtinicons": "Icônes Classiques",
-          "builtiniconsnew": "Icônes Modernes",
-          "disableicons": "Désactiver les Icônes",
-          "updateinterval": "Intervalle de Mise à Jour (heures)",
-          "addressid": "ID d'Adresse", 
-          "customerid": "ID Client"
-        },
-        "data_description": {
-          "resources": "Sélectionnez les types de déchets que vous souhaitez suivre",
-          "name": "Nom personnalisé pour cette instance d'intégration (optionnel)",
-          "wastecollectornameprefix": "Ajouter le nom du collecteur de déchets comme préfixe aux noms de capteurs",
-          "dateformat": "Format de date pour les valeurs des capteurs (format Python strftime)",
-          "upcomingsensor": "Créer des capteurs supplémentaires pour aujourd'hui, demain et la prochaine collecte",
-          "dateonly": "Afficher seulement la date sans les noms des jours (remplace les autres paramètres de jour)",
-          "dateobject": "Utiliser des objets timestamp au lieu de texte formaté (pour les automatisations)",
-          "dutch": "Afficher les noms des jours et des mois en néerlandais au lieu de l'anglais",
-          "dayofweek": "Inclure le jour de la semaine dans les valeurs des capteurs (ex. 'Lundi, 01-01-2024')",
-          "dayofweekonly": "Afficher seulement les noms des jours pour les dates proches (aujourd'hui, demain, noms des jours)",
-          "alwaysshowday": "Toujours afficher les noms des jours, même pour les dates à plus d'une semaine",
-          "builtinicons": "Utiliser les icônes intégrées pour les types de déchets (jeu d'icônes classique)",
-          "builtiniconsnew": "Utiliser les icônes intégrées pour les types de déchets (jeu d'icônes moderne)",
-          "disableicons": "Désactiver toutes les icônes pour les capteurs de types de déchets",
-          "updateinterval": "Fréquence de vérification des données de collecte de déchets mises à jour (0 = utiliser l'intervalle par défaut)",
-          "addressid": "ID d'adresse pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
-          "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)"
-        }
-      }
-    },
-    "error": {
-      "import_error": "Échec de l'importation du module API",
-      "connection_error": "Erreur de connexion survenue",
-      "invalid_collector": "Données de collecteur invalides", 
-      "no_resources": "Aucun type de déchet trouvé",
-      "unknown_error": "Erreur inconnue survenue",
-      "invalid_custom_mapping": "Format JSON invalide dans le mappage personnalisé"
-    }
-  }
 }
