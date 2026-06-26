@@ -9,8 +9,8 @@ from .const import *
 from .translation import resolve_language, text
 from .models import WasteCollectionRepository
 from .collectors import (
-    XimmioCollector, BurgerportaalCollector, OpzetCollector, KlikogroepCollector,
-    AfvalAlertCollector, AfvalwijzerCollector, AmsterdamCollector, CirculusCollector, CleanprofsCollector,
+    XimmioCollector, BurgerportaalCollector, OpzetCollector, KlikogroepCollector, AfvalAlertCollector,
+    AfvalhulpCollector, AfvalwijzerCollector, AmsterdamCollector, CirculusCollector, CleanprofsCollector,
     DeAfvalAppCollector, LimburgNetCollector, IradoCollector, MontferlandNetCollector, OmrinCollector,
     RD4Collector, RecycleApp, ReinisCollector, ROVACollector, StraatbeeldCollector
 )
@@ -53,6 +53,7 @@ class WasteData(object):
             "mijnafvalwijzer": (AfvalwijzerCollector, common_args),
             # "afvalstoffendienstkalender": (AfvalwijzerCollector, common_args),
             "afvalalert": (AfvalAlertCollector, common_args),
+            "afvalhulp": (AfvalhulpCollector, common_args),
             "amsterdam": (AmsterdamCollector, common_args),
             "deafvalapp": (DeAfvalAppCollector, common_args),
             "circulus": (CirculusCollector, common_args),
