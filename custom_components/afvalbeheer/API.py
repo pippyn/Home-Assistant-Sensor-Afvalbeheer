@@ -90,11 +90,13 @@ class WasteData(object):
 
     async def async_update(self, *_):
         _LOGGER.debug("Performing async update")
-        await self.collector.update()
-        if self.update_interval is not None and self.update_interval != 0:
-            await self.schedule_update(timedelta(hours=self.update_interval))
-        else:
-            await self.schedule_update(SCHEDULE_UPDATE_INTERVAL)
+        try:
+            await self.collector.update()
+        finally:
+            if self.update_interval is not None and self.update_interval != 0:
+                await self.schedule_update(timedelta(hours=self.update_interval))
+            else:
+                await self.schedule_update(SCHEDULE_UPDATE_INTERVAL)
         if self.print_waste_type:
             persistent_notification.create(
                 self.hass,
