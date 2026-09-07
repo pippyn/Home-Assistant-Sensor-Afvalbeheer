@@ -49,7 +49,11 @@ class CirculusCollector(WasteCollector):
                 session_cookie = item[1]
 
         if session_cookie:
-            authenticityToken = re.search('__AT=(.*)&___TS=', session_cookie).group(1)
+            authenticityToken_match = re.search('__AT=(.*)&___TS=', session_cookie)
+            if not authenticityToken_match:
+                _LOGGER.error("Unable to parse authenticity token from Session Cookie")
+                return
+            authenticityToken = authenticityToken_match.group(1)
             data = {
                 'authenticityToken': authenticityToken,
                 'zipCode': self.postcode,
