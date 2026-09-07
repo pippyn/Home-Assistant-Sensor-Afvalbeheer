@@ -43,15 +43,17 @@ class LimburgNetCollector(WasteCollector):
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping, street_name, city_name):
         super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
         self.city_name = city_name
-        self.street_name = street_name.replace(" ", "+")
+        self.street_name = street_name
         self.main_url = "https://limburg.net/api-proxy/public"
         self.city_id = None
         self.street_id = None
 
     def __fetch_address(self):
         _LOGGER.debug("Fetching address from Limburg.net")
-        response = requests.get('{}/afval-kalender/gemeenten/search?query={}'.format(
-            self.main_url, self.city_name)).json()
+        response = requests.get(
+            '{}/afval-kalender/gemeenten/search'.format(self.main_url),
+            params={'query': self.city_name}
+        ).json()
 
         if not response[0]['nisCode']:
             _LOGGER.error('City not found!')
@@ -59,8 +61,10 @@ class LimburgNetCollector(WasteCollector):
 
         self.city_id = response[0]["nisCode"]
 
-        response = requests.get('{}/afval-kalender/gemeente/{}/straten/search?query={}'.format(
-            self.main_url, self.city_id, self.street_name)).json()
+        response = requests.get(
+            '{}/afval-kalender/gemeente/{}/straten/search'.format(self.main_url, self.city_id),
+            params={'query': self.street_name}
+        ).json()
 
         if not response[0]['nummer']:
             _LOGGER.error('Street not found!')
