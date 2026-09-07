@@ -77,8 +77,9 @@ class BurgerportaalCollector(WasteCollector):
         }
 
         response = requests.post("https://securetoken.googleapis.com/v1/token?key={}".format(self.apikey), headers=headers, data=data).json()
-        if not response:
-            _LOGGER.error('Unable to fetch ID token!')
+        if not response or 'id_token' not in response:
+            _LOGGER.warning('Stored refresh token was rejected, obtaining new credentials')
+            self.__fetch_refresh_token()
             return
         self.id_token = response['id_token']
         self._auth_changed = True
