@@ -53,7 +53,7 @@ class LimburgNetCollector(WasteCollector):
         response = requests.get('{}/afval-kalender/gemeenten/search?query={}'.format(
             self.main_url, self.city_name)).json()
 
-        if not response[0]['nisCode']:
+        if not response or not response[0].get('nisCode'):
             _LOGGER.error('City not found!')
             return
 
@@ -62,7 +62,7 @@ class LimburgNetCollector(WasteCollector):
         response = requests.get('{}/afval-kalender/gemeente/{}/straten/search?query={}'.format(
             self.main_url, self.city_id, self.street_name)).json()
 
-        if not response[0]['nummer']:
+        if not response or not response[0].get('nummer'):
             _LOGGER.error('Street not found!')
             return
 
