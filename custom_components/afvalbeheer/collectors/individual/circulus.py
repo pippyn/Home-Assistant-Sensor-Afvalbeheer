@@ -101,6 +101,9 @@ class CirculusCollector(WasteCollector):
 
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
+            if r is None:
+                _LOGGER.error('No response received from Circulus API!')
+                return
             response = r.json()
 
             if not response or 'customData' not in response or not response['customData']['response']['garbage']:
