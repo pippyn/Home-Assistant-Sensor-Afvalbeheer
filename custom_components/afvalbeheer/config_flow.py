@@ -498,7 +498,7 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 _LOGGER.warning("Data object missing collections attribute for %s", address[CONF_WASTE_COLLECTOR])
                 return {"error": "invalid_data", "resources": []}
             
-            await data.async_update()
+            await data.collector.update()
             resources = data.collections.get_available_waste_types()
             if not resources:
                 _LOGGER.warning("No waste types found for %s at %s %s", 
