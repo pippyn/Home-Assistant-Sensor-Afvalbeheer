@@ -41,6 +41,7 @@ This integration works with the following waste collectors:
   - DeAfvalApp
   - DenHaag
   - Drimmelen
+  - FrisseKliko
   - GAD
   - Groningen
   - Hellendoorn

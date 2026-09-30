@@ -200,6 +200,7 @@ DEPRECATED_AND_NEW_WASTECOLLECTORS = {
     'circulus-berkel':  'circulus',
     'alkmaar':          'hvc',
     'ôffalkalinder':    'offalkalinder',
+    'frisse kliko':     'frissekliko',
 }
 
 WASTE_TYPE_BRANCHES = 'Takken'

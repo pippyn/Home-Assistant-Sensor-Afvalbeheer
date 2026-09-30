@@ -11,7 +11,7 @@ from .models import WasteCollectionRepository
 from .collectors import (
     XimmioCollector, BurgerportaalCollector, OpzetCollector, KlikogroepCollector,
     AfvalAlertCollector, AfvalwijzerCollector, AmsterdamCollector, CirculusCollector, CleanprofsCollector,
-    DeAfvalAppCollector, LimburgNetCollector, IradoCollector, MontferlandNetCollector, OmrinCollector,
+    DeAfvalAppCollector, FrisseKlikoCollector, LimburgNetCollector, IradoCollector, MontferlandNetCollector, OmrinCollector,
     RD4Collector, RecycleApp, ReinisCollector, ROVACollector, StraatbeeldCollector
 )
 
@@ -64,6 +64,7 @@ class WasteData(object):
             "reinis": (ReinisCollector, common_args),
             "rd4": (RD4Collector, common_args),
             "cleanprofs": (CleanprofsCollector, common_args),
+            "frissekliko": (FrisseKlikoCollector, common_args + [self.street_name]),
             "rova": (ROVACollector, common_args),
             "drimmelen": (StraatbeeldCollector, common_args),
             **{key: (BurgerportaalCollector, common_args) for key in BURGERPORTAAL_COLLECTOR_IDS.keys()},

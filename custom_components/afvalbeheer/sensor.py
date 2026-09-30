@@ -433,7 +433,7 @@ def _format_unique_id(name, name_prefix, waste_collector, sensor_type, entry_id,
     """
     parts = [sensor_type]
 
-    if str(waste_collector).lower() == "cleanprofs" or name_prefix:
+    if str(waste_collector).lower() in ["cleanprofs", "frissekliko"] or name_prefix:
         parts.insert(0, str(waste_collector))
     if name:
         parts.insert(1, name)
