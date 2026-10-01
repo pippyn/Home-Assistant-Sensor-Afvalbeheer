@@ -58,7 +58,11 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     _LOGGER.debug("Schedule update: %s", schedule_update)
 
     config_data = discovery_info["config"] if discovery_info and "config" in discovery_info else config
-    _LOGGER.debug("Configuration data: %s", config_data)
+    _LOGGER.debug(
+        "Resolved config for waste collector: %s, resources: %s",
+        config_data.get(CONF_WASTE_COLLECTOR),
+        config_data.get(CONF_RESOURCES),
+    )
 
     await async_prepare_translations(hass, resolve_language(config_data))
 
@@ -131,7 +135,6 @@ class BaseSensor(RestoreEntity, SensorEntity):
         self._entity_picture = None
         self._attr_unique_id = None
         self._config = config
-        _LOGGER.debug("BaseSensor initialized with configuration: %s", config)
 
     @property
     def state(self):
