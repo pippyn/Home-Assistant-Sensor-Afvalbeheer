@@ -111,6 +111,8 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             from .API import get_wastedata_from_config
             data = get_wastedata_from_config(self.hass, temp_config)
             if data and hasattr(data, 'collections'):
+                # Fetch collector data once (no scheduling) before reading resources
+                await data.collector.update()
                 # Get available resources from API
                 available_resources = data.collections.get_available_waste_types()
                 if available_resources:
