@@ -37,10 +37,13 @@ class BurgerportaalCollector(WasteCollector):
     """
     WASTE_TYPE_MAPPING = {
         'gft': WASTE_TYPE_GREEN,
+        'gft+e': WASTE_TYPE_GREEN,
+        'gfte': WASTE_TYPE_GREEN,
         'opk': WASTE_TYPE_PAPER,
         'pmdrest': WASTE_TYPE_PMD_GREY,
         'rest': WASTE_TYPE_GREY,
         'pmd': WASTE_TYPE_PACKAGES,
+        'pbd': WASTE_TYPE_PACKAGES,
         'papier': WASTE_TYPE_PAPER
     }
 
@@ -77,8 +80,9 @@ class BurgerportaalCollector(WasteCollector):
         }
 
         response = requests.post("https://securetoken.googleapis.com/v1/token?key={}".format(self.apikey), headers=headers, data=data).json()
-        if not response:
-            _LOGGER.error('Unable to fetch ID token!')
+        if not response or 'id_token' not in response:
+            _LOGGER.warning('Stored refresh token was rejected, obtaining new credentials')
+            self.__fetch_refresh_token()
             return
         self.id_token = response['id_token']
         self._auth_changed = True
@@ -94,17 +98,22 @@ class BurgerportaalCollector(WasteCollector):
                 self.company_code, self.postcode, self.street_number
             ),
             headers=headers
-        ).json()
-        if not response:
+        )
+        if response.status_code == 204 or not response.text:
             _LOGGER.error('Unable to fetch address!')
             return
 
-        for address in response:
+        addresses = response.json()
+        if not addresses:
+            _LOGGER.error('Unable to fetch address!')
+            return
+
+        for address in addresses:
             if 'addition' in address and address['addition'] == self.suffix.upper():
                 self.address_id = address['addressId']
 
         if not self.address_id:
-            self.address_id = response[-1]['addressId']
+            self.address_id = addresses[-1]['addressId']
         self._auth_changed = True
 
     async def __load_auth_data(self):
@@ -141,8 +150,10 @@ class BurgerportaalCollector(WasteCollector):
         }
 
         response = requests.get("https://europe-west3-burgerportaal-production.cloudfunctions.net/exposed/organisations/{}/address/{}/calendar".format(
-            self.company_code, self.address_id), headers=headers).json()
-        return response
+            self.company_code, self.address_id), headers=headers)
+        if response.status_code == 204 or not response.text:
+            return []
+        return response.json()
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Burgerportaal API")

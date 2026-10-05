@@ -202,7 +202,7 @@ class RecycleApp(WasteCollector):
                     continue
 
                 collection = WasteCollection.create(
-                    date=datetime.strptime(item['timestamp'], '%Y-%m-%dT%H:%M:%S.000Z'),
+                    date=datetime.fromisoformat(item['timestamp'].replace('Z', '+00:00')).replace(tzinfo=None),
                     waste_type=waste_type,
                     waste_type_slug=item['fraction']['name']['nl']
                 )

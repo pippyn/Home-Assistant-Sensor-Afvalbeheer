@@ -10,7 +10,7 @@ from .const import (
     DOMAIN, CONF_ID, CONF_WASTE_COLLECTOR, CONF_POSTCODE, CONF_STREET_NUMBER, CONF_SUFFIX,
     CONF_RESOURCES, CONF_NAME_PREFIX, CONF_DATE_FORMAT, CONF_UPCOMING, CONF_DATE_ONLY,
     CONF_DATE_OBJECT, CONF_BUILT_IN_ICONS, CONF_BUILT_IN_ICONS_NEW, CONF_DISABLE_ICONS,
-    CONF_TRANSLATE_DAYS, CONF_LANGUAGE, LANGUAGE_NL, LANGUAGE_EN, LANGUAGE_FR, LANGUAGE_EL,
+    CONF_TRANSLATE_DAYS, CONF_LANGUAGE, LANGUAGE_NL, LANGUAGE_EN, LANGUAGE_FR, LANGUAGE_EL, LANGUAGE_DE,
     CONF_DAY_OF_WEEK, CONF_DAY_OF_WEEK_ONLY, CONF_ALWAYS_SHOW_DAY,
     CONF_STREET_NAME, CONF_CITY_NAME, CONF_ADDRESS_ID, CONF_CUSTOMER_ID, CONF_UPDATE_INTERVAL,
     CONF_CUSTOM_MAPPING, DEFAULT_CONFIG, XIMMIO_COLLECTOR_IDS, CONF_EMAIL, CONF_PASSWORD
@@ -21,8 +21,8 @@ _LOGGER = logging.getLogger(__name__)
 WASTE_COLLECTORS = [
     "ACV", "Afval3xBeter", "Afvalstoffendienstkalender", "AfvalAlert",
     "Almere", "AlphenAanDenRijn", "Amsterdam", "AreaReiniging", "Assen", "Avalex", "Avri", "BAR",
-    "Berkelland", "Blink", "Circulus", "Cleanprofs", "Cranendonck",
-    "Cyclus", "DAR", "DeAfvalApp", "DeFryskeMarren", "DenHaag", "Drimmelen", "GAD",
+    "Berkelland", "Blink", "Breda", "Circulus", "Cleanprofs", "Cranendonck",
+    "Cyclus", "DAR", "DeAfvalApp", "DeFryskeMarren", "DenHaag", "Drimmelen", "FrisseKliko", "GAD",
     "Groningen", "Hellendoorn", "HVC", "Irado", "Limburg.NET", "Lingewaard", "Maassluis", "Meerlanden",
     "Middelburg-Vlissingen", "MijnAfvalwijzer", "Mijnafvalzaken", "Montferland",
     "Montfoort", "Nijkerk", "Offalkalinder", "Omrin", "Oostzaan", "OudeIJsselstreek", "PeelEnMaas", "PreZero",
@@ -37,6 +37,7 @@ LANGUAGE_OPTIONS = [
     {"value": LANGUAGE_EN, "label": "English"},
     {"value": LANGUAGE_FR, "label": "Français"},
     {"value": LANGUAGE_EL, "label": "Ελληνικά"},
+    {"value": LANGUAGE_DE, "label": "Deutsch"},
 ]
 
 
@@ -111,6 +112,8 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             from .API import get_wastedata_from_config
             data = get_wastedata_from_config(self.hass, temp_config)
             if data and hasattr(data, 'collections'):
+                # Fetch collector data once (no scheduling) before reading resources
+                await data.collector.update()
                 # Get available resources from API
                 available_resources = data.collections.get_available_waste_types()
                 if available_resources:
@@ -498,7 +501,7 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 _LOGGER.warning("Data object missing collections attribute for %s", address[CONF_WASTE_COLLECTOR])
                 return {"error": "invalid_data", "resources": []}
             
-            await data.async_update()
+            await data.collector.update()
             resources = data.collections.get_available_waste_types()
             if not resources:
                 _LOGGER.warning("No waste types found for %s at %s %s", 

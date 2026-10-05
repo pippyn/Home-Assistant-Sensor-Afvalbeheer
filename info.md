@@ -31,6 +31,7 @@ This integration works with the following waste collectors:
   - BAR
   - Berkelland
   - Blink
+  - Breda
   - Circulus
   - Cleanprofs
   - Cranendonck
@@ -41,6 +42,7 @@ This integration works with the following waste collectors:
   - DeAfvalApp
   - DenHaag
   - Drimmelen
+  - FrisseKliko
   - GAD
   - Groningen
   - Hellendoorn

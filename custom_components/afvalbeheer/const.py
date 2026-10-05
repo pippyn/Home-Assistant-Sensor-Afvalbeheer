@@ -32,8 +32,9 @@ LANGUAGE_NL = 'nl'
 LANGUAGE_EN = 'en'
 LANGUAGE_FR = 'fr'
 LANGUAGE_EL = 'el'
+LANGUAGE_DE = 'de'
 
-SUPPORTED_LANGUAGES = [LANGUAGE_NL, LANGUAGE_EN, LANGUAGE_FR, LANGUAGE_EL]
+SUPPORTED_LANGUAGES = [LANGUAGE_NL, LANGUAGE_EN, LANGUAGE_FR, LANGUAGE_EL, LANGUAGE_DE]
 CONF_DAY_OF_WEEK = 'dayofweek'
 CONF_DAY_OF_WEEK_ONLY = 'dayofweekonly'
 CONF_ALWAYS_SHOW_DAY = 'alwaysshowday'
@@ -168,6 +169,7 @@ BURGERPORTAAL_COLLECTOR_IDS = {
     # 'amsterdam':        '138204213565341829',
     'assen':            '138204213565303512',
     'bar':              '138204213564933497',
+    'breda':            '452048812597352613',
     'groningen':        '452048812597326549',
     # 'maassluis':        '138204213564933097',
     'nijkerk':          '138204213565304094',
@@ -200,6 +202,7 @@ DEPRECATED_AND_NEW_WASTECOLLECTORS = {
     'circulus-berkel':  'circulus',
     'alkmaar':          'hvc',
     'ôffalkalinder':    'offalkalinder',
+    'frisse kliko':     'frissekliko',
 }
 
 WASTE_TYPE_BRANCHES = 'Takken'
