@@ -1,0 +1,259 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Afvalbeheer Einrichtung",
+                "description": "Wählen Sie Ihren Abfallentsorger",
+                "data": {
+                    "wastecollector": "Abfallentsorger"
+                }
+            },
+            "address": {
+                "title": "Adressangaben",
+                "description": "Geben Sie Ihre Adressdaten ein",
+                "data": {
+                    "postcode": "Postleitzahl",
+                    "streetnumber": "Hausnummer",
+                    "suffix": "Zusatz (optional)",
+                    "cityname": "Stadt/Gemeinde",
+                    "streetname": "Straßenname"
+                }
+            },
+            "omrin_credentials": {
+                "title": "Omrin-Zugangsdaten (optional)",
+                "description": "Melden Sie sich mit Ihrem Omrin-Konto an, um einen Sensor zu erhalten, der die Anzahl der Leerungen in diesem Jahr pro Abfallart anzeigt. Leer lassen, um dies zu überspringen.",
+                "data": {
+                    "email": "E-Mail-Adresse",
+                    "password": "Passwort"
+                },
+                "data_description": {
+                    "email": "Ihre Omrin-Konto-E-Mail-Adresse (optional)",
+                    "password": "Ihr Omrin-Konto-Passwort (optional)"
+                }
+            },
+            "mapping": {
+                "title": "Benutzerdefinierte Zuordnung (optional)",
+                "description": "Benutzerdefinierte Zuordnung der Abfallarten konfigurieren",
+                "data": {
+                    "use_custom_mapping": "Benutzerdefinierte Zuordnung verwenden",
+                    "custommapping": "Benutzerdefinierte Zuordnung der Abfallarten"
+                },
+                "data_description": {
+                    "use_custom_mapping": "Benutzerdefinierte Zuordnung aktivieren, um Abfallarten aus der API umzubenennen",
+                    "custommapping": "Benutzerdefinierte Zuordnung der Abfallarten im JSON-Format"
+                }
+            },
+            "resources": {
+                "title": "Konfiguration",
+                "description": "Abfallarten auswählen und Optionen konfigurieren",
+                "data": {
+                    "resources": "Abfallarten",
+                    "name": "Benutzerdefinierter Name",
+                    "wastecollectornameprefix": "Namenspräfix verwenden",
+                    "dateformat": "Datumsformat",
+                    "upcomingsensor": "Anstehende Sensoren",
+                    "dateonly": "Nur Datum",
+                    "dateobject": "Datum als Zeitstempel",
+                    "dayofweek": "Wochentag anzeigen",
+                    "dayofweekonly": "Nur Wochentagsnamen",
+                    "alwaysshowday": "Wochentagsnamen immer anzeigen",
+                    "builtinicons": "Klassische Symbole",
+                    "builtiniconsnew": "Moderne Symbole",
+                    "disableicons": "Symbole deaktivieren",
+                    "updateinterval": "Aktualisierungsintervall (Stunden)",
+                    "addressid": "Adress-ID",
+                    "customerid": "Kunden-ID",
+                    "language": "Sprache für Sensortext"
+                },
+                "data_description": {
+                    "resources": "Wählen Sie die Abfallarten aus, die Sie verfolgen möchten",
+                    "name": "Benutzerdefinierter Name für diese Integrationsinstanz (optional)",
+                    "wastecollectornameprefix": "Name des Abfallentsorgers als Präfix zu Sensornamen hinzufügen",
+                    "dateformat": "Datumsformat für Sensorwerte (Python-strftime-Format)",
+                    "upcomingsensor": "Zusätzliche Sensoren für heute, morgen und die nächste anstehende Abholung erstellen",
+                    "dateonly": "Nur Datum ohne Wochentagsnamen anzeigen (überschreibt andere Wochentag-Einstellungen)",
+                    "dateobject": "Zeitstempel-Objekte anstelle von formatiertem Text verwenden (für Automatisierungen)",
+                    "dayofweek": "Wochentag in Sensorwerten einschließen (z. B. „Montag, 01.01.2024“)",
+                    "dayofweekonly": "Für nahegelegene Termine nur Wochentagsnamen anzeigen (heute, morgen, Wochentagsnamen)",
+                    "alwaysshowday": "Wochentagsnamen immer anzeigen, auch für Termine, die mehr als eine Woche entfernt sind",
+                    "builtinicons": "Integrierte Symbole für Abfallarten verwenden (klassischer Symbolsatz)",
+                    "builtiniconsnew": "Integrierte Symbole für Abfallarten verwenden (moderner Symbolsatz)",
+                    "disableicons": "Alle Symbole für Abfallart-Sensoren deaktivieren",
+                    "updateinterval": "Wie oft nach aktualisierten Abfallabholdaten gesucht werden soll (0 = Standardintervall verwenden)",
+                    "addressid": "Adress-ID für Ximmio-basierte Entsorger (falls von Ihrem Abfallentsorger benötigt)",
+                    "customerid": "Kunden-ID für Ximmio-basierte Entsorger (falls von Ihrem Abfallentsorger benötigt)",
+                    "language": "Sprache, die für vom Integration gesteuerte Texte wie Datumsangaben, Hilfssensor-Namen und Benachrichtigungen verwendet wird"
+                }
+            }
+        },
+        "error": {
+            "import_error": "API-Modul konnte nicht importiert werden",
+            "connection_error": "Verbindungsfehler aufgetreten",
+            "invalid_collector": "Ungültige Entsorgerdaten",
+            "no_resources": "Keine Abfallarten gefunden",
+            "unknown_error": "Unbekannter Fehler aufgetreten",
+            "invalid_custom_mapping": "Ungültiges JSON-Format in der benutzerdefinierten Zuordnung",
+            "already_configured": "Diese Konfiguration existiert bereits"
+        },
+        "abort": {
+            "already_configured": "Diese Abfallentsorger-Konfiguration existiert bereits"
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "title": "Abfallentsorger aktualisieren",
+                "description": "Ändern Sie Ihren Abfallentsorger",
+                "data": {
+                    "wastecollector": "Abfallentsorger"
+                }
+            },
+            "address": {
+                "title": "Adresse aktualisieren",
+                "description": "Aktualisieren Sie Ihre Adressdaten",
+                "data": {
+                    "postcode": "Postleitzahl",
+                    "streetnumber": "Hausnummer",
+                    "suffix": "Zusatz (optional)",
+                    "cityname": "Stadt/Gemeinde",
+                    "streetname": "Straßenname"
+                }
+            },
+            "omrin_credentials": {
+                "title": "Omrin-Zugangsdaten (optional)",
+                "description": "Melden Sie sich mit Ihrem Omrin-Konto an, um einen Sensor zu erhalten, der die Anzahl der Leerungen in diesem Jahr pro Abfallart anzeigt. Leer lassen, um dies zu überspringen.",
+                "data": {
+                    "email": "E-Mail-Adresse",
+                    "password": "Passwort"
+                },
+                "data_description": {
+                    "email": "Ihre Omrin-Konto-E-Mail-Adresse (optional)",
+                    "password": "Ihr Omrin-Konto-Passwort (optional)"
+                }
+            },
+            "mapping": {
+                "title": "Benutzerdefinierte Zuordnung aktualisieren (optional)",
+                "description": "Benutzerdefinierte Zuordnung der Abfallarten aktualisieren",
+                "data": {
+                    "use_custom_mapping": "Benutzerdefinierte Zuordnung verwenden",
+                    "custommapping": "Benutzerdefinierte Zuordnung der Abfallarten"
+                },
+                "data_description": {
+                    "use_custom_mapping": "Benutzerdefinierte Zuordnung aktivieren, um Abfallarten aus der API umzubenennen",
+                    "custommapping": "Benutzerdefinierte Zuordnung der Abfallarten im JSON-Format"
+                }
+            },
+            "resources": {
+                "title": "Konfiguration aktualisieren",
+                "description": "Abfallarten und Optionen aktualisieren",
+                "data": {
+                    "resources": "Abfallarten",
+                    "name": "Benutzerdefinierter Name",
+                    "wastecollectornameprefix": "Namenspräfix verwenden",
+                    "dateformat": "Datumsformat",
+                    "upcomingsensor": "Anstehende Sensoren",
+                    "dateonly": "Nur Datum",
+                    "dateobject": "Datum als Zeitstempel",
+                    "dayofweek": "Wochentag anzeigen",
+                    "dayofweekonly": "Nur Wochentagsnamen",
+                    "alwaysshowday": "Wochentagsnamen immer anzeigen",
+                    "builtinicons": "Klassische Symbole",
+                    "builtiniconsnew": "Moderne Symbole",
+                    "disableicons": "Symbole deaktivieren",
+                    "updateinterval": "Aktualisierungsintervall (Stunden)",
+                    "addressid": "Adress-ID",
+                    "customerid": "Kunden-ID",
+                    "language": "Sprache für Sensortext"
+                },
+                "data_description": {
+                    "resources": "Wählen Sie die Abfallarten aus, die Sie verfolgen möchten",
+                    "name": "Benutzerdefinierter Name für diese Integrationsinstanz (optional)",
+                    "wastecollectornameprefix": "Name des Abfallentsorgers als Präfix zu Sensornamen hinzufügen",
+                    "dateformat": "Datumsformat für Sensorwerte (Python-strftime-Format)",
+                    "upcomingsensor": "Zusätzliche Sensoren für heute, morgen und die nächste anstehende Abholung erstellen",
+                    "dateonly": "Nur Datum ohne Wochentagsnamen anzeigen (überschreibt andere Wochentag-Einstellungen)",
+                    "dateobject": "Zeitstempel-Objekte anstelle von formatiertem Text verwenden (für Automatisierungen)",
+                    "dayofweek": "Wochentag in Sensorwerten einschließen (z. B. „Montag, 01.01.2024“)",
+                    "dayofweekonly": "Für nahegelegene Termine nur Wochentagsnamen anzeigen (heute, morgen, Wochentagsnamen)",
+                    "alwaysshowday": "Wochentagsnamen immer anzeigen, auch für Termine, die mehr als eine Woche entfernt sind",
+                    "builtinicons": "Integrierte Symbole für Abfallarten verwenden (klassischer Symbolsatz)",
+                    "builtiniconsnew": "Integrierte Symbole für Abfallarten verwenden (moderner Symbolsatz)",
+                    "disableicons": "Alle Symbole für Abfallart-Sensoren deaktivieren",
+                    "updateinterval": "Wie oft nach aktualisierten Abfallabholdaten gesucht werden soll (0 = Standardintervall verwenden)",
+                    "addressid": "Adress-ID für Ximmio-basierte Entsorger (falls von Ihrem Abfallentsorger benötigt)",
+                    "customerid": "Kunden-ID für Ximmio-basierte Entsorger (falls von Ihrem Abfallentsorger benötigt)",
+                    "language": "Sprache, die für vom Integration gesteuerte Texte wie Datumsangaben, Hilfssensor-Namen und Benachrichtigungen verwendet wird"
+                }
+            }
+        },
+        "error": {
+            "import_error": "API-Modul konnte nicht importiert werden",
+            "connection_error": "Verbindungsfehler aufgetreten",
+            "invalid_collector": "Ungültige Entsorgerdaten",
+            "no_resources": "Keine Abfallarten gefunden",
+            "unknown_error": "Unbekannter Fehler aufgetreten",
+            "invalid_custom_mapping": "Ungültiges JSON-Format in der benutzerdefinierten Zuordnung"
+        }
+    },
+    "runtime": {
+        "today": "Heute",
+        "tomorrow": "Morgen",
+        "none": "Keine",
+        "first_upcoming": "nächste Abholung",
+        "days": {
+            "Monday": "Montag",
+            "Tuesday": "Dienstag",
+            "Wednesday": "Mittwoch",
+            "Thursday": "Donnerstag",
+            "Friday": "Freitag",
+            "Saturday": "Samstag",
+            "Sunday": "Sonntag"
+        },
+        "days_short": {
+            "Mon": "Mo",
+            "Tue": "Di",
+            "Wed": "Mi",
+            "Thu": "Do",
+            "Fri": "Fr",
+            "Sat": "Sa",
+            "Sun": "So"
+        },
+        "months": {
+            "January": "Januar",
+            "February": "Februar",
+            "March": "März",
+            "April": "April",
+            "May": "Mai",
+            "June": "Juni",
+            "July": "Juli",
+            "August": "August",
+            "September": "September",
+            "October": "Oktober",
+            "November": "November",
+            "December": "Dezember"
+        },
+        "months_short": {
+            "Jan": "Jan",
+            "Feb": "Feb",
+            "Mar": "Mär",
+            "Apr": "Apr",
+            "May": "Mai",
+            "Jun": "Jun",
+            "Jul": "Jul",
+            "Aug": "Aug",
+            "Sept": "Sept",
+            "Sep": "Sep",
+            "Oct": "Okt",
+            "Nov": "Nov",
+            "Dec": "Dez"
+        },
+        "notifications": {
+            "available_waste_types": "Verfügbare Abfallarten: {types}",
+            "available_waste_type_slugs": "Von der API verwendete Abfallart-Kürzel: {slugs}",
+            "collector_not_found": "Abfallentsorger \"{collector}\" nicht gefunden!",
+            "deprecated_collector": "Aktualisieren Sie Ihre Konfiguration auf {new_collector}! Sie verwenden noch {old_collector} als Abfallentsorger, was veraltet ist. Überprüfen Sie auch Ihre Automatisierungen und die Lovelace-Konfiguration, da sich die Sensornamen ebenfalls geändert haben könnten!",
+            "city_required": "Konfiguration ungültig! Für {collector} ist ein Stadtname erforderlich",
+            "street_required": "Konfiguration ungültig! Für {collector} ist ein Straßenname erforderlich"
+        }
+    }
+}
