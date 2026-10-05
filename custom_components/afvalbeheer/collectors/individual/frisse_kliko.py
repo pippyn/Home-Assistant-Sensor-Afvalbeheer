@@ -1,5 +1,5 @@
 """
-Frisse Kliko collector for waste and bin cleaning data from Frisse Kliko API.
+Frisse Kliko collector for bin cleaning data from Frisse Kliko API.
 """
 import base64
 from datetime import datetime, timezone
@@ -44,7 +44,7 @@ def _extract_jwt_expiry(token: str) -> Optional[datetime]:
 
 class FrisseKlikoCollector(WasteCollector):
     """
-    Collector for Frisse Kliko waste and container cleaning data.
+    Collector for Frisse Kliko container cleaning data.
     """
     WASTE_TYPE_MAPPING = {
         'pmd': WASTE_TYPE_PACKAGES,
@@ -226,51 +226,34 @@ class FrisseKlikoCollector(WasteCollector):
         return self.__login()
 
     def _parse_collections(self, customer: Dict[str, Any]) -> None:
-        """Parse customer waste calendar pickups and cleaning dates into collections repository."""
+        """Parse customer bin cleaning dates into collections repository."""
         self.collections.remove_all()
 
-        # 1. Parse regular waste calendar pickups
-        raw_pickups = customer.get("waste_calendar_pickups")
-        pickups = []
-        if isinstance(raw_pickups, str):
+        clean_dates = []
+        raw_next_clean_date = customer.get("next_clean_date")
+        if raw_next_clean_date:
+            if isinstance(raw_next_clean_date, list):
+                clean_dates.extend(raw_next_clean_date)
+            else:
+                clean_dates.append(raw_next_clean_date)
+
+        raw_clean_dates = customer.get("clean_dates") or customer.get("cleaning_dates")
+        if raw_clean_dates:
+            if isinstance(raw_clean_dates, list):
+                clean_dates.extend(raw_clean_dates)
+            else:
+                clean_dates.append(raw_clean_dates)
+
+        clean_containers = customer.get("clean_containers") or []
+        if isinstance(clean_containers, str):
             try:
-                pickups = json.loads(raw_pickups)
-            except json.JSONDecodeError as exc:
-                _LOGGER.warning("Could not parse waste_calendar_pickups JSON string: %r", exc)
-        elif isinstance(raw_pickups, list):
-            pickups = raw_pickups
+                clean_containers = json.loads(clean_containers)
+            except json.JSONDecodeError:
+                clean_containers = [c.strip() for c in clean_containers.split(",") if c.strip()]
 
-        for entry in pickups:
-            if not isinstance(entry, dict):
-                continue
-            fraction = entry.get("fraction")
-            dates = entry.get("dates")
-            if not fraction or not isinstance(dates, list):
-                continue
-
-            waste_type = self.map_waste_type(fraction)
-            if not waste_type:
-                continue
-
-            for date_str in dates:
-                try:
-                    clean_date_str = str(date_str).split("T")[0]
-                    date = datetime.strptime(clean_date_str, "%Y-%m-%d").replace(tzinfo=None)
-                    collection = WasteCollection.create(
-                        date=date,
-                        waste_type=waste_type,
-                        waste_type_slug=fraction,
-                    )
-                    if collection not in self.collections:
-                        self.collections.add(collection)
-                except (ValueError, TypeError) as exc:
-                    _LOGGER.warning("Error parsing collection date '%s' for fraction '%s': %r", date_str, fraction, exc)
-
-        # 2. Parse next bin cleaning date
-        next_clean_date = customer.get("next_clean_date")
-        if next_clean_date:
+        for clean_date_entry in clean_dates:
             try:
-                clean_date_str = str(next_clean_date).split("T")[0]
+                clean_date_str = str(clean_date_entry).split("T")[0]
                 clean_date = datetime.strptime(clean_date_str, "%Y-%m-%d").replace(tzinfo=None)
 
                 # General bin cleaning collection
@@ -283,11 +266,13 @@ class FrisseKlikoCollector(WasteCollector):
                     self.collections.add(clean_collection)
 
                 # Specific container cleaning collections
-                clean_containers = customer.get("clean_containers") or []
                 if isinstance(clean_containers, list):
                     for container in clean_containers:
-                        mapped_container = self.map_waste_type(container)
-                        slug = f"reiniging_{str(container).lower().replace('/', '_')}"
+                        if not container:
+                            continue
+                        container_str = str(container).strip()
+                        mapped_container = self.map_waste_type(container_str) or container_str.capitalize()
+                        slug = f"reiniging_{container_str.lower().replace('/', '_')}"
                         container_collection = WasteCollection.create(
                             date=clean_date,
                             waste_type=f"Reiniging {mapped_container}",
@@ -296,11 +281,11 @@ class FrisseKlikoCollector(WasteCollector):
                         if container_collection not in self.collections:
                             self.collections.add(container_collection)
             except (ValueError, TypeError) as exc:
-                _LOGGER.warning("Error parsing next_clean_date '%s': %r", next_clean_date, exc)
+                _LOGGER.warning("Error parsing cleaning date '%s': %r", clean_date_entry, exc)
 
     async def update(self):
-        """Update waste collection dates using Frisse Kliko API."""
-        _LOGGER.debug("Updating waste collection dates using Frisse Kliko API")
+        """Update cleaning dates using Frisse Kliko API."""
+        _LOGGER.debug("Updating cleaning dates using Frisse Kliko API")
 
         try:
             await self.async_load_and_init_auth()
