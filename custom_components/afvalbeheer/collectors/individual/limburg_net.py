@@ -55,7 +55,7 @@ class LimburgNetCollector(WasteCollector):
             params={'query': self.city_name}
         ).json()
 
-        if not response[0]['nisCode']:
+        if not response or not response[0].get('nisCode'):
             _LOGGER.error('City not found!')
             return
 
@@ -66,7 +66,7 @@ class LimburgNetCollector(WasteCollector):
             params={'query': self.street_name}
         ).json()
 
-        if not response[0]['nummer']:
+        if not response or not response[0].get('nummer'):
             _LOGGER.error('Street not found!')
             return
 
