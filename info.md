@@ -31,6 +31,7 @@ This integration works with the following waste collectors:
   - BAR
   - Berkelland
   - Blink
+  - Breda
   - Circulus
   - Cleanprofs
   - Cranendonck

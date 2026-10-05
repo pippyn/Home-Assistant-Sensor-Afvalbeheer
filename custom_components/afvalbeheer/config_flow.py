@@ -21,7 +21,7 @@ _LOGGER = logging.getLogger(__name__)
 WASTE_COLLECTORS = [
     "ACV", "Afval3xBeter", "Afvalstoffendienstkalender", "AfvalAlert",
     "Almere", "AlphenAanDenRijn", "Amsterdam", "AreaReiniging", "Assen", "Avalex", "Avri", "BAR",
-    "Berkelland", "Blink", "Circulus", "Cleanprofs", "Cranendonck",
+    "Berkelland", "Blink", "Breda", "Circulus", "Cleanprofs", "Cranendonck",
     "Cyclus", "DAR", "DeAfvalApp", "DeFryskeMarren", "DenHaag", "Drimmelen", "FrisseKliko", "GAD",
     "Groningen", "Hellendoorn", "HVC", "Irado", "Limburg.NET", "Lingewaard", "Maassluis", "Meerlanden",
     "Middelburg-Vlissingen", "MijnAfvalwijzer", "Mijnafvalzaken", "Montferland",
