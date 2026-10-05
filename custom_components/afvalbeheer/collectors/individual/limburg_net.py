@@ -79,9 +79,11 @@ class LimburgNetCollector(WasteCollector):
                 today = (today.replace(day=1) + timedelta(days=32)).replace(day=1)
             year = today.year
             month = today.month
-            get_url = '{}/kalender/{}/{}-{}?straatNummer={}&huisNummer={}&toevoeging={}'.format(
-                    self.main_url, self.city_id, year, month, self.street_id, self.street_number, self.suffix)
-            month_json = requests.get(get_url).json()
+            get_url = '{}/kalender/{}/{}-{}'.format(self.main_url, self.city_id, year, month)
+            month_json = requests.get(
+                get_url,
+                params={'straatNummer': self.street_id, 'huisNummer': self.street_number, 'toevoeging': self.suffix}
+            ).json()
             data = data + month_json['events']
 
         return data
