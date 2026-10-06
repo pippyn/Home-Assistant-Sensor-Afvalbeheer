@@ -182,7 +182,10 @@
         }
 
         if (fraction) {
-          const target = this.shadowRoot ? (this.shadowRoot.querySelector(".icon") || this.shadowRoot.querySelector("img")) : null;
+          // With an entity_picture, state-badge renders the image as a background on the host itself
+          const host = this.style && this.style.backgroundImage ? this : null;
+          const inner = this.shadowRoot ? (this.shadowRoot.querySelector(".icon") || this.shadowRoot.querySelector("img")) : null;
+          const target = host || inner;
           if (target) {
             const isDark = isDarkTheme(this);
             let chosenSvg = null;
