@@ -265,8 +265,6 @@ class FrisseKlikoCollector(WasteCollector):
         """Parse customer bin cleaning dates into collections repository."""
         self.collections.remove_all()
 
-        general_clean_dates = set()
-
         # 1. Parse per-bin next cleaning dates from planning endpoint if available
         next_by_bin = planning.get("next_by_bin") if isinstance(planning, dict) else None
         if isinstance(next_by_bin, dict) and next_by_bin:
@@ -276,7 +274,6 @@ class FrisseKlikoCollector(WasteCollector):
                 try:
                     clean_date_str = str(date_val).split("T")[0]
                     clean_date = datetime.strptime(clean_date_str, "%Y-%m-%d").replace(tzinfo=None)
-                    general_clean_dates.add(clean_date)
 
                     container_str = str(container_key).strip()
                     mapped_container = self.map_waste_type(container_str) or container_str.capitalize()
@@ -332,7 +329,6 @@ class FrisseKlikoCollector(WasteCollector):
                 try:
                     clean_date_str = str(clean_date_entry).split("T")[0]
                     clean_date = datetime.strptime(clean_date_str, "%Y-%m-%d").replace(tzinfo=None)
-                    general_clean_dates.add(clean_date)
 
                     if isinstance(clean_containers, list):
                         for container in clean_containers:
@@ -354,32 +350,6 @@ class FrisseKlikoCollector(WasteCollector):
                                 self.collections.add(container_collection)
                 except (ValueError, TypeError) as exc:
                     _LOGGER.warning("Error parsing cleaning date '%s': %r", clean_date_entry, exc)
-
-        # 3. Add general bin cleaning collection ("Reiniging") for all known cleaning dates
-        raw_overall_next = (
-            planning.get("next_clean_date") if isinstance(planning, dict) else None
-        ) or customer.get("next_clean_date")
-        if raw_overall_next:
-            try:
-                if isinstance(raw_overall_next, list):
-                    for d_str in raw_overall_next:
-                        clean_date = datetime.strptime(str(d_str).split("T")[0], "%Y-%m-%d").replace(tzinfo=None)
-                        general_clean_dates.add(clean_date)
-                else:
-                    clean_date = datetime.strptime(str(raw_overall_next).split("T")[0], "%Y-%m-%d").replace(tzinfo=None)
-                    general_clean_dates.add(clean_date)
-            except (ValueError, TypeError) as exc:
-                _LOGGER.warning("Error parsing overall next_clean_date '%s': %r", raw_overall_next, exc)
-
-        reiniging_type = self.map_waste_type("reiniging")
-        for date in sorted(general_clean_dates):
-            clean_collection = WasteCollection.create(
-                date=date,
-                waste_type=reiniging_type,
-                waste_type_slug="reiniging",
-            )
-            if clean_collection not in self.collections:
-                self.collections.add(clean_collection)
 
     async def update(self):
         """Update cleaning dates using Frisse Kliko API."""
