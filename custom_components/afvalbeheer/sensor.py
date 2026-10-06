@@ -257,8 +257,7 @@ class WasteTypeSensor(BaseSensor):
     def icon(self):
         """Return the icon for the sensor."""
         if self.built_in_icons and not self.built_in_icons_new and not self.disable_icons:
-            waste_type_lower = self.waste_type.lower().strip()
-            key = waste_type_lower.replace(" ", "-").replace("_", "-")
+            key, waste_type_lower = _fraction_icon_keys(self.waste_type)
             return FRACTION_ICONS.get(key) or FRACTION_ICONS.get(waste_type_lower) or super().icon
         return super().icon
 
@@ -326,8 +325,7 @@ class WasteTypeSensor(BaseSensor):
         """Get the appropriate entity picture for the waste type."""
         if not self.built_in_icons_new or self.disable_icons:
             return None
-        waste_type_lower = self.waste_type.lower().strip()
-        key = waste_type_lower.replace(" ", "-").replace("_", "-")
+        key, waste_type_lower = _fraction_icon_keys(self.waste_type)
         return FRACTION_ICONS_NEW.get(key) or FRACTION_ICONS_NEW.get(waste_type_lower)
 
 
@@ -471,6 +469,20 @@ def _format_sensor(name, name_prefix, waste_collector, sensor_type):
     if name and name.strip().lower() != str(waste_collector).strip().lower():
         prefix = name.strip() + " "
     return prefix + sensor_type
+
+
+def _fraction_icon_keys(waste_type):
+    """
+    Return the lookup keys for the fraction icons of a waste type.
+
+    The 'Reiniging' prefix (used for bin cleaning by Cleanprofs and Frisse Kliko)
+    is ignored, so the icon of the underlying fraction is used.
+    """
+    waste_type_lower = waste_type.lower().strip()
+    if waste_type_lower.startswith("reiniging "):
+        waste_type_lower = waste_type_lower[len("reiniging "):].strip()
+    key = waste_type_lower.replace(" ", "-").replace("_", "-")
+    return key, waste_type_lower
 
 
 def _format_unique_id(name, name_prefix, waste_collector, sensor_type, entry_id, postcode=None, street_number=None):
