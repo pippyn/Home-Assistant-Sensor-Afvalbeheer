@@ -7,6 +7,7 @@ from .amsterdam import AmsterdamCollector
 from .circulus import CirculusCollector
 from .cleanprofs import CleanprofsCollector
 from .deafvalapp import DeAfvalAppCollector
+from .demo import DemoCollector
 from .frisse_kliko import FrisseKlikoCollector
 from .limburg_net import LimburgNetCollector
 from .irado import IradoCollector
@@ -20,6 +21,6 @@ from .straatbeeld import StraatbeeldCollector
 
 __all__ = [
     "AfvalAlertCollector", "AfvalwijzerCollector", "AmsterdamCollector", "CirculusCollector", "CleanprofsCollector",
-    "DeAfvalAppCollector", "FrisseKlikoCollector", "LimburgNetCollector", "IradoCollector", "MontferlandNetCollector", "OmrinCollector",
+    "DeAfvalAppCollector", "DemoCollector", "FrisseKlikoCollector", "LimburgNetCollector", "IradoCollector", "MontferlandNetCollector", "OmrinCollector",
     "RD4Collector", "RecycleApp", "ReinisCollector", "ROVACollector", "StraatbeeldCollector"
 ]
