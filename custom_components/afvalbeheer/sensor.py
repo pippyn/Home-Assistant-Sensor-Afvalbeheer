@@ -123,6 +123,7 @@ class BaseSensor(RestoreEntity, SensorEntity):
         self.built_in_icons = config.get(CONF_BUILT_IN_ICONS)
         self.built_in_icons_new = config.get(CONF_BUILT_IN_ICONS_NEW)
         self.disable_icons = config.get(CONF_DISABLE_ICONS)
+        self.bold_icons = config.get(CONF_BOLD_ICONS)
         self.language = resolve_language(config)
         self.day_of_week = config.get(CONF_DAY_OF_WEEK)
         self.day_of_week_only = config.get(CONF_DAY_OF_WEEK_ONLY)
@@ -193,6 +194,17 @@ class BaseSensor(RestoreEntity, SensorEntity):
             self._entity_picture = state.attributes.get("entity_picture")
             _LOGGER.debug("Restored entity picture: %s", self._entity_picture)
 
+    def _classic_icon(self, icon):
+        """Return the bold variant of a classic iconset icon when bold icons are enabled."""
+        if icon and self.bold_icons:
+            return icon + "-bold"
+        return icon
+
+    @property
+    def _modern_icons(self):
+        """Return the modern icon pictures, bold when bold icons are enabled."""
+        return FRACTION_ICONS_NEW_BOLD if self.bold_icons else FRACTION_ICONS_NEW
+
     def _translate_state(self, state):
         translated = translate_date_text(self.language, state)
         _LOGGER.debug("Translated state: %s", translated)
@@ -258,7 +270,8 @@ class WasteTypeSensor(BaseSensor):
         """Return the icon for the sensor."""
         if self.built_in_icons and not self.built_in_icons_new and not self.disable_icons:
             key, waste_type_lower = _fraction_icon_keys(self.waste_type)
-            return FRACTION_ICONS.get(key) or FRACTION_ICONS.get(waste_type_lower) or super().icon
+            icon = self._classic_icon(FRACTION_ICONS.get(key) or FRACTION_ICONS.get(waste_type_lower))
+            return icon or super().icon
         return super().icon
 
     @property
@@ -326,7 +339,7 @@ class WasteTypeSensor(BaseSensor):
         if not self.built_in_icons_new or self.disable_icons:
             return None
         key, waste_type_lower = _fraction_icon_keys(self.waste_type)
-        return FRACTION_ICONS_NEW.get(key) or FRACTION_ICONS_NEW.get(waste_type_lower)
+        return self._modern_icons.get(key) or self._modern_icons.get(waste_type_lower)
 
 
 class WasteDateSensor(BaseSensor):
@@ -360,16 +373,16 @@ class WasteDateSensor(BaseSensor):
         """Return the icon for the sensor."""
         if self.built_in_icons and not self.built_in_icons_new and not self.disable_icons:
             if self.date_delta.days == 0:
-                return "afvalbeheer:today"
+                return self._classic_icon("afvalbeheer:today")
             elif self.date_delta.days == 1:
-                return "afvalbeheer:tomorrow"
+                return self._classic_icon("afvalbeheer:tomorrow")
         return super().icon
 
     def _set_picture(self):
         """Set the entity picture based on sensor type."""
         if self.built_in_icons_new and not self.disable_icons:
             key = "today" if self.date_delta.days == 0 else "tomorrow"
-            self._entity_picture = FRACTION_ICONS_NEW.get(key)
+            self._entity_picture = self._modern_icons.get(key)
         else:
             self._entity_picture = None
 
@@ -417,13 +430,13 @@ class WasteUpcomingSensor(BaseSensor):
     def icon(self):
         """Return the icon for the sensor."""
         if self.built_in_icons and not self.built_in_icons_new and not self.disable_icons:
-            return "afvalbeheer:upcoming"
+            return self._classic_icon("afvalbeheer:upcoming")
         return super().icon
 
     def _set_picture(self):
         """Set the entity picture based on sensor type."""
         if self.built_in_icons_new and not self.disable_icons:
-            self._entity_picture = FRACTION_ICONS_NEW.get("upcoming")
+            self._entity_picture = self._modern_icons.get("upcoming")
         else:
             self._entity_picture = None
 

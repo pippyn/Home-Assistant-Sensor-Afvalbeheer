@@ -10,7 +10,8 @@ from .const import (
     DOMAIN, CONF_ID, CONF_WASTE_COLLECTOR, CONF_POSTCODE, CONF_STREET_NUMBER, CONF_SUFFIX,
     CONF_RESOURCES, CONF_NAME_PREFIX, CONF_DATE_FORMAT, CONF_UPCOMING, CONF_DATE_ONLY,
     CONF_DATE_OBJECT, CONF_BUILT_IN_ICONS, CONF_BUILT_IN_ICONS_NEW, CONF_DISABLE_ICONS,
-    CONF_ICON_SET, ICON_SET_DEFAULT, ICON_SET_CLASSIC, ICON_SET_MODERN,
+    CONF_ICON_SET, CONF_BOLD_ICONS, ICON_SET_DEFAULT, ICON_SET_CLASSIC, ICON_SET_MODERN,
+    ICON_SET_CLASSIC_BOLD, ICON_SET_MODERN_BOLD,
     CONF_TRANSLATE_DAYS, CONF_LANGUAGE, LANGUAGE_NL, LANGUAGE_EN, LANGUAGE_FR, LANGUAGE_EL, LANGUAGE_DE,
     CONF_DAY_OF_WEEK, CONF_DAY_OF_WEEK_ONLY, CONF_ALWAYS_SHOW_DAY,
     CONF_STREET_NAME, CONF_CITY_NAME, CONF_ADDRESS_ID, CONF_CUSTOMER_ID, CONF_UPDATE_INTERVAL,
@@ -58,14 +59,15 @@ def _icon_set_from_config(config):
         config: Config entry data and options.
 
     Returns:
-        One of ICON_SET_DEFAULT, ICON_SET_CLASSIC or ICON_SET_MODERN.
+        One of the ICON_SET_* values.
     """
+    bold = config.get(CONF_BOLD_ICONS)
     if config.get(CONF_DISABLE_ICONS):
         return ICON_SET_DEFAULT
     if config.get(CONF_BUILT_IN_ICONS_NEW):
-        return ICON_SET_MODERN
+        return ICON_SET_MODERN_BOLD if bold else ICON_SET_MODERN
     if config.get(CONF_BUILT_IN_ICONS):
-        return ICON_SET_CLASSIC
+        return ICON_SET_CLASSIC_BOLD if bold else ICON_SET_CLASSIC
     return ICON_SET_DEFAULT
 
 
@@ -74,15 +76,16 @@ def _apply_icon_set(data):
     icon_set = data.pop(CONF_ICON_SET, None)
     if icon_set is None:
         return
-    data[CONF_BUILT_IN_ICONS] = icon_set == ICON_SET_CLASSIC
-    data[CONF_BUILT_IN_ICONS_NEW] = icon_set == ICON_SET_MODERN
+    data[CONF_BUILT_IN_ICONS] = icon_set in (ICON_SET_CLASSIC, ICON_SET_CLASSIC_BOLD)
+    data[CONF_BUILT_IN_ICONS_NEW] = icon_set in (ICON_SET_MODERN, ICON_SET_MODERN_BOLD)
+    data[CONF_BOLD_ICONS] = icon_set in (ICON_SET_CLASSIC_BOLD, ICON_SET_MODERN_BOLD)
     data[CONF_DISABLE_ICONS] = False
 
 
 def _icon_set_selector():
     return selector.SelectSelector(
         selector.SelectSelectorConfig(
-            options=[ICON_SET_DEFAULT, ICON_SET_CLASSIC, ICON_SET_MODERN],
+            options=[ICON_SET_DEFAULT, ICON_SET_CLASSIC, ICON_SET_CLASSIC_BOLD, ICON_SET_MODERN, ICON_SET_MODERN_BOLD],
             mode=selector.SelectSelectorMode.DROPDOWN,
             translation_key=CONF_ICON_SET,
         )
@@ -193,6 +196,7 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         config_data[CONF_BUILT_IN_ICONS] = import_config.get(CONF_BUILT_IN_ICONS, DEFAULT_CONFIG[CONF_BUILT_IN_ICONS])
         config_data[CONF_BUILT_IN_ICONS_NEW] = import_config.get(CONF_BUILT_IN_ICONS_NEW, DEFAULT_CONFIG[CONF_BUILT_IN_ICONS_NEW])
         config_data[CONF_DISABLE_ICONS] = import_config.get(CONF_DISABLE_ICONS, DEFAULT_CONFIG[CONF_DISABLE_ICONS])
+        config_data[CONF_BOLD_ICONS] = import_config.get(CONF_BOLD_ICONS, DEFAULT_CONFIG[CONF_BOLD_ICONS])
         config_data[CONF_TRANSLATE_DAYS] = import_config.get(CONF_TRANSLATE_DAYS, DEFAULT_CONFIG[CONF_TRANSLATE_DAYS])
         config_data[CONF_LANGUAGE] = import_config.get(CONF_LANGUAGE, _default_language(config_data))
         config_data[CONF_DAY_OF_WEEK] = import_config.get(CONF_DAY_OF_WEEK, DEFAULT_CONFIG[CONF_DAY_OF_WEEK])

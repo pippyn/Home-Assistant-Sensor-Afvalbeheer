@@ -253,7 +253,9 @@
             "options": {
                 "default": "Aucune (par défaut de Home Assistant)",
                 "classic": "Classique",
-                "modern": "Moderne"
+                "classic_bold": "Classique gras",
+                "modern": "Moderne",
+                "modern_bold": "Moderne gras"
             }
         }
     }

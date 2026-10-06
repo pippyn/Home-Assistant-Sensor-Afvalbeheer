@@ -253,7 +253,9 @@
             "options": {
                 "default": "Κανένα (προεπιλογή Home Assistant)",
                 "classic": "Κλασικό",
-                "modern": "Μοντέρνο"
+                "classic_bold": "Κλασικό έντονο",
+                "modern": "Μοντέρνο",
+                "modern_bold": "Μοντέρνο έντονο"
             }
         }
     }

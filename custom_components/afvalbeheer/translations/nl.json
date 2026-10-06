@@ -253,7 +253,9 @@
             "options": {
                 "default": "Geen (standaard Home Assistant)",
                 "classic": "Klassiek",
-                "modern": "Modern"
+                "classic_bold": "Klassiek vet",
+                "modern": "Modern",
+                "modern_bold": "Modern vet"
             }
         }
     }

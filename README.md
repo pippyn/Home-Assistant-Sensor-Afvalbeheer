@@ -189,9 +189,13 @@ Select which waste types you want sensors for. At least one is required. Availab
 
 ### Icon Options
 
-- **Built-in Icons**: Use integration's built-in icons instead of collector-provided icons
-- **New Built-in Icons**: Use newer icon set (requires Built-in Icons enabled)
-- **Disable Icons**: Disable entity pictures to use custom MDI icons
+Choose one icon set in the **Icons** dropdown:
+
+- **None (Home Assistant default)**: No built-in icons; Home Assistant's default sensor icon is used, so you can set your own MDI icons
+- **Classic** / **Classic bold**: Single-color icons that follow your theme's icon color
+- **Modern** / **Modern bold** (default for new setups): Colored icons shown as entity pictures
+
+The bold variants use thicker lines. In YAML, use `builtinicons: 1` (classic) or `builtiniconsnew: 1` (modern), and add `boldicons: 1` for the bold variant.
 
 **Built-in Icons:**
 
