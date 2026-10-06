@@ -225,63 +225,161 @@ class FrisseKlikoCollector(WasteCollector):
 
         return self.__login()
 
-    def _parse_collections(self, customer: Dict[str, Any]) -> None:
+    def __get_planning(self) -> Optional[Dict[str, Any]]:
+        """Fetch customer planning data (per-bin cleaning dates) using auth token."""
+        if not self._is_token_valid():
+            return None
+
+        headers = {
+            "Authorization": f"Bearer {self.token}",
+            "Content-Type": "application/json",
+            "User-Agent": "Home-Assistant-Sensor-Afvalbeheer",
+        }
+        url = f"{self.base_url}/api/customers/{self.customer_id}/planning"
+        try:
+            response = requests.get(url, headers=headers, timeout=30)
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 401:
+                _LOGGER.debug("Frisse Kliko token unauthorized for planning; re-authenticating")
+                customer = self.__login()
+                if customer and self.token:
+                    headers["Authorization"] = f"Bearer {self.token}"
+                    retry_response = requests.get(url, headers=headers, timeout=30)
+                    if retry_response.status_code == 200:
+                        return retry_response.json()
+            else:
+                _LOGGER.debug(
+                    "Frisse Kliko planning endpoint returned status %d for %s",
+                    response.status_code,
+                    self.customer_id,
+                )
+        except requests.exceptions.RequestException as exc:
+            _LOGGER.warning("Failed to fetch Frisse Kliko planning: %r", exc)
+
+        return None
+
+    def _parse_collections(
+        self, customer: Dict[str, Any], planning: Optional[Dict[str, Any]] = None
+    ) -> None:
         """Parse customer bin cleaning dates into collections repository."""
         self.collections.remove_all()
 
-        clean_dates = []
-        raw_next_clean_date = customer.get("next_clean_date")
-        if raw_next_clean_date:
-            if isinstance(raw_next_clean_date, list):
-                clean_dates.extend(raw_next_clean_date)
-            else:
-                clean_dates.append(raw_next_clean_date)
+        general_clean_dates = set()
 
-        raw_clean_dates = customer.get("clean_dates") or customer.get("cleaning_dates")
-        if raw_clean_dates:
-            if isinstance(raw_clean_dates, list):
-                clean_dates.extend(raw_clean_dates)
-            else:
-                clean_dates.append(raw_clean_dates)
+        # 1. Parse per-bin next cleaning dates from planning endpoint if available
+        next_by_bin = planning.get("next_by_bin") if isinstance(planning, dict) else None
+        if isinstance(next_by_bin, dict) and next_by_bin:
+            for container_key, date_val in next_by_bin.items():
+                if not container_key or not date_val:
+                    continue
+                try:
+                    clean_date_str = str(date_val).split("T")[0]
+                    clean_date = datetime.strptime(clean_date_str, "%Y-%m-%d").replace(tzinfo=None)
+                    general_clean_dates.add(clean_date)
 
-        clean_containers = customer.get("clean_containers") or []
-        if isinstance(clean_containers, str):
+                    container_str = str(container_key).strip()
+                    mapped_container = self.map_waste_type(container_str) or container_str.capitalize()
+                    slug = f"reiniging_{container_str.lower().replace('/', '_')}"
+                    waste_type = f"Reiniging {mapped_container}"
+                    if self.custom_mapping and waste_type in self.custom_mapping:
+                        waste_type = self.custom_mapping[waste_type]
+
+                    container_collection = WasteCollection.create(
+                        date=clean_date,
+                        waste_type=waste_type,
+                        waste_type_slug=slug,
+                    )
+                    if container_collection not in self.collections:
+                        self.collections.add(container_collection)
+                except (ValueError, TypeError) as exc:
+                    _LOGGER.warning(
+                        "Error parsing bin cleaning date '%s' for container '%s': %r",
+                        date_val,
+                        container_key,
+                        exc,
+                    )
+
+        # 2. Fall back to clean_dates / next_clean_date per container if next_by_bin was unavailable
+        else:
+            clean_dates = []
+            raw_next_clean_date = (
+                planning.get("next_clean_date") if isinstance(planning, dict) else None
+            ) or customer.get("next_clean_date")
+            if raw_next_clean_date:
+                if isinstance(raw_next_clean_date, list):
+                    clean_dates.extend(raw_next_clean_date)
+                else:
+                    clean_dates.append(raw_next_clean_date)
+
+            raw_clean_dates = customer.get("clean_dates") or customer.get("cleaning_dates")
+            if raw_clean_dates:
+                if isinstance(raw_clean_dates, list):
+                    clean_dates.extend(raw_clean_dates)
+                else:
+                    clean_dates.append(raw_clean_dates)
+
+            clean_containers = (
+                planning.get("clean_containers") if isinstance(planning, dict) else None
+            ) or customer.get("clean_containers") or []
+            if isinstance(clean_containers, str):
+                try:
+                    clean_containers = json.loads(clean_containers)
+                except json.JSONDecodeError:
+                    clean_containers = [c.strip() for c in clean_containers.split(",") if c.strip()]
+
+            for clean_date_entry in clean_dates:
+                try:
+                    clean_date_str = str(clean_date_entry).split("T")[0]
+                    clean_date = datetime.strptime(clean_date_str, "%Y-%m-%d").replace(tzinfo=None)
+                    general_clean_dates.add(clean_date)
+
+                    if isinstance(clean_containers, list):
+                        for container in clean_containers:
+                            if not container:
+                                continue
+                            container_str = str(container).strip()
+                            mapped_container = self.map_waste_type(container_str) or container_str.capitalize()
+                            slug = f"reiniging_{container_str.lower().replace('/', '_')}"
+                            waste_type = f"Reiniging {mapped_container}"
+                            if self.custom_mapping and waste_type in self.custom_mapping:
+                                waste_type = self.custom_mapping[waste_type]
+
+                            container_collection = WasteCollection.create(
+                                date=clean_date,
+                                waste_type=waste_type,
+                                waste_type_slug=slug,
+                            )
+                            if container_collection not in self.collections:
+                                self.collections.add(container_collection)
+                except (ValueError, TypeError) as exc:
+                    _LOGGER.warning("Error parsing cleaning date '%s': %r", clean_date_entry, exc)
+
+        # 3. Add general bin cleaning collection ("Reiniging") for all known cleaning dates
+        raw_overall_next = (
+            planning.get("next_clean_date") if isinstance(planning, dict) else None
+        ) or customer.get("next_clean_date")
+        if raw_overall_next:
             try:
-                clean_containers = json.loads(clean_containers)
-            except json.JSONDecodeError:
-                clean_containers = [c.strip() for c in clean_containers.split(",") if c.strip()]
-
-        for clean_date_entry in clean_dates:
-            try:
-                clean_date_str = str(clean_date_entry).split("T")[0]
-                clean_date = datetime.strptime(clean_date_str, "%Y-%m-%d").replace(tzinfo=None)
-
-                # General bin cleaning collection
-                clean_collection = WasteCollection.create(
-                    date=clean_date,
-                    waste_type=self.map_waste_type("reiniging"),
-                    waste_type_slug="reiniging",
-                )
-                if clean_collection not in self.collections:
-                    self.collections.add(clean_collection)
-
-                # Specific container cleaning collections
-                if isinstance(clean_containers, list):
-                    for container in clean_containers:
-                        if not container:
-                            continue
-                        container_str = str(container).strip()
-                        mapped_container = self.map_waste_type(container_str) or container_str.capitalize()
-                        slug = f"reiniging_{container_str.lower().replace('/', '_')}"
-                        container_collection = WasteCollection.create(
-                            date=clean_date,
-                            waste_type=f"Reiniging {mapped_container}",
-                            waste_type_slug=slug,
-                        )
-                        if container_collection not in self.collections:
-                            self.collections.add(container_collection)
+                if isinstance(raw_overall_next, list):
+                    for d_str in raw_overall_next:
+                        clean_date = datetime.strptime(str(d_str).split("T")[0], "%Y-%m-%d").replace(tzinfo=None)
+                        general_clean_dates.add(clean_date)
+                else:
+                    clean_date = datetime.strptime(str(raw_overall_next).split("T")[0], "%Y-%m-%d").replace(tzinfo=None)
+                    general_clean_dates.add(clean_date)
             except (ValueError, TypeError) as exc:
-                _LOGGER.warning("Error parsing cleaning date '%s': %r", clean_date_entry, exc)
+                _LOGGER.warning("Error parsing overall next_clean_date '%s': %r", raw_overall_next, exc)
+
+        reiniging_type = self.map_waste_type("reiniging")
+        for date in sorted(general_clean_dates):
+            clean_collection = WasteCollection.create(
+                date=date,
+                waste_type=reiniging_type,
+                waste_type_slug="reiniging",
+            )
+            if clean_collection not in self.collections:
+                self.collections.add(clean_collection)
 
     async def update(self):
         """Update cleaning dates using Frisse Kliko API."""
@@ -291,14 +389,16 @@ class FrisseKlikoCollector(WasteCollector):
             await self.async_load_and_init_auth()
 
             customer = await self.hass.async_add_executor_job(self.__get_customer)
-            if self._auth_changed:
-                await self.async_save_current_auth()
-
             if not customer:
                 _LOGGER.error("No waste data found for Frisse Kliko at %s %s", self.postcode, self.street_number)
                 return False
 
-            self._parse_collections(customer)
+            planning = await self.hass.async_add_executor_job(self.__get_planning)
+
+            if self._auth_changed:
+                await self.async_save_current_auth()
+
+            self._parse_collections(customer, planning)
 
             if len(self.collections) == 0:
                 _LOGGER.error("No waste collections could be parsed for Frisse Kliko")
