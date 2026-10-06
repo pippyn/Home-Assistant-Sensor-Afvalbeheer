@@ -25,6 +25,11 @@ CONF_NAME_PREFIX = 'wastecollectornameprefix'
 CONF_BUILT_IN_ICONS = 'builtinicons'
 CONF_BUILT_IN_ICONS_NEW = 'builtiniconsnew'
 CONF_DISABLE_ICONS = 'disableicons'
+CONF_ICON_SET = 'iconset'
+
+ICON_SET_DEFAULT = 'default'
+ICON_SET_CLASSIC = 'classic'
+ICON_SET_MODERN = 'modern'
 CONF_TRANSLATE_DAYS = 'dutch'
 CONF_LANGUAGE = 'language'
 

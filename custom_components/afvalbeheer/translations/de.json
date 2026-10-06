@@ -57,9 +57,7 @@
                     "dayofweek": "Wochentag anzeigen",
                     "dayofweekonly": "Nur Wochentagsnamen",
                     "alwaysshowday": "Wochentagsnamen immer anzeigen",
-                    "builtinicons": "Klassische Symbole",
-                    "builtiniconsnew": "Moderne Symbole",
-                    "disableicons": "Symbole deaktivieren",
+                    "iconset": "Symbole",
                     "updateinterval": "Aktualisierungsintervall (Stunden)",
                     "addressid": "Adress-ID",
                     "customerid": "Kunden-ID",
@@ -76,9 +74,7 @@
                     "dayofweek": "Wochentag in Sensorwerten einschließen (z. B. „Montag, 01.01.2024“)",
                     "dayofweekonly": "Für nahegelegene Termine nur Wochentagsnamen anzeigen (heute, morgen, Wochentagsnamen)",
                     "alwaysshowday": "Wochentagsnamen immer anzeigen, auch für Termine, die mehr als eine Woche entfernt sind",
-                    "builtinicons": "Integrierte Symbole für Abfallarten verwenden (klassischer Symbolsatz)",
-                    "builtiniconsnew": "Integrierte Symbole für Abfallarten verwenden (moderner Symbolsatz)",
-                    "disableicons": "Alle Symbole für Abfallart-Sensoren deaktivieren",
+                    "iconset": "Symbolsatz für die Abfallart-Sensoren",
                     "updateinterval": "Wie oft nach aktualisierten Abfallabholdaten gesucht werden soll (0 = Standardintervall verwenden)",
                     "addressid": "Adress-ID für Ximmio-basierte Entsorger (falls von Ihrem Abfallentsorger benötigt)",
                     "customerid": "Kunden-ID für Ximmio-basierte Entsorger (falls von Ihrem Abfallentsorger benötigt)",
@@ -157,9 +153,7 @@
                     "dayofweek": "Wochentag anzeigen",
                     "dayofweekonly": "Nur Wochentagsnamen",
                     "alwaysshowday": "Wochentagsnamen immer anzeigen",
-                    "builtinicons": "Klassische Symbole",
-                    "builtiniconsnew": "Moderne Symbole",
-                    "disableicons": "Symbole deaktivieren",
+                    "iconset": "Symbole",
                     "updateinterval": "Aktualisierungsintervall (Stunden)",
                     "addressid": "Adress-ID",
                     "customerid": "Kunden-ID",
@@ -176,9 +170,7 @@
                     "dayofweek": "Wochentag in Sensorwerten einschließen (z. B. „Montag, 01.01.2024“)",
                     "dayofweekonly": "Für nahegelegene Termine nur Wochentagsnamen anzeigen (heute, morgen, Wochentagsnamen)",
                     "alwaysshowday": "Wochentagsnamen immer anzeigen, auch für Termine, die mehr als eine Woche entfernt sind",
-                    "builtinicons": "Integrierte Symbole für Abfallarten verwenden (klassischer Symbolsatz)",
-                    "builtiniconsnew": "Integrierte Symbole für Abfallarten verwenden (moderner Symbolsatz)",
-                    "disableicons": "Alle Symbole für Abfallart-Sensoren deaktivieren",
+                    "iconset": "Symbolsatz für die Abfallart-Sensoren",
                     "updateinterval": "Wie oft nach aktualisierten Abfallabholdaten gesucht werden soll (0 = Standardintervall verwenden)",
                     "addressid": "Adress-ID für Ximmio-basierte Entsorger (falls von Ihrem Abfallentsorger benötigt)",
                     "customerid": "Kunden-ID für Ximmio-basierte Entsorger (falls von Ihrem Abfallentsorger benötigt)",
@@ -254,6 +246,15 @@
             "deprecated_collector": "Aktualisieren Sie Ihre Konfiguration auf {new_collector}! Sie verwenden noch {old_collector} als Abfallentsorger, was veraltet ist. Überprüfen Sie auch Ihre Automatisierungen und die Lovelace-Konfiguration, da sich die Sensornamen ebenfalls geändert haben könnten!",
             "city_required": "Konfiguration ungültig! Für {collector} ist ein Stadtname erforderlich",
             "street_required": "Konfiguration ungültig! Für {collector} ist ein Straßenname erforderlich"
+        }
+    },
+    "selector": {
+        "iconset": {
+            "options": {
+                "default": "Keine (Home Assistant Standard)",
+                "classic": "Klassisch",
+                "modern": "Modern"
+            }
         }
     }
 }

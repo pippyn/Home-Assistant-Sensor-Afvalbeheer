@@ -57,9 +57,7 @@
                     "dayofweek": "Toon dag van de week",
                     "dayofweekonly": "Alleen dagnamen",
                     "alwaysshowday": "Altijd dagnamen tonen",
-                    "builtinicons": "Klassieke pictogrammen",
-                    "builtiniconsnew": "Moderne pictogrammen",
-                    "disableicons": "Pictogrammen uitschakelen",
+                    "iconset": "Pictogrammen",
                     "updateinterval": "Update-interval (uren)",
                     "addressid": "Adres ID",
                     "customerid": "Klant ID",
@@ -76,9 +74,7 @@
                     "dayofweek": "Inclusief dag van de week in sensorwaarden (bijv. 'Maandag, 01-01-2024')",
                     "dayofweekonly": "Toon alleen dagnamen voor nabije datums (vandaag, morgen, dagnamen)",
                     "alwaysshowday": "Altijd dagnamen tonen, zelfs voor datums meer dan een week weg",
-                    "builtinicons": "Gebruik ingebouwde pictogrammen voor afvaltypes (klassieke pictogrammenset)",
-                    "builtiniconsnew": "Gebruik ingebouwde pictogrammen voor afvaltypes (moderne pictogrammenset)",
-                    "disableicons": "Schakel alle pictogrammen uit voor afvaltype sensoren",
+                    "iconset": "Pictogrammenset voor de afvaltype sensoren",
                     "updateinterval": "Hoe vaak controleren voor bijgewerkte afvalophaaldgegevens (0 = gebruik standaard interval)",
                     "addressid": "Adres ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
                     "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
@@ -157,9 +153,7 @@
                     "dayofweek": "Toon dag van de week",
                     "dayofweekonly": "Alleen dagnamen",
                     "alwaysshowday": "Altijd dagnamen tonen",
-                    "builtinicons": "Klassieke pictogrammen",
-                    "builtiniconsnew": "Moderne pictogrammen",
-                    "disableicons": "Pictogrammen uitschakelen",
+                    "iconset": "Pictogrammen",
                     "updateinterval": "Update-interval (uren)",
                     "addressid": "Adres ID",
                     "customerid": "Klant ID",
@@ -176,9 +170,7 @@
                     "dayofweek": "Inclusief dag van de week in sensorwaarden (bijv. 'Maandag, 01-01-2024')",
                     "dayofweekonly": "Toon alleen dagnamen voor nabije datums (vandaag, morgen, dagnamen)",
                     "alwaysshowday": "Altijd dagnamen tonen, zelfs voor datums meer dan een week weg",
-                    "builtinicons": "Gebruik ingebouwde pictogrammen voor afvaltypes (klassieke pictogrammenset)",
-                    "builtiniconsnew": "Gebruik ingebouwde pictogrammen voor afvaltypes (moderne pictogrammenset)",
-                    "disableicons": "Schakel alle pictogrammen uit voor afvaltype sensoren",
+                    "iconset": "Pictogrammenset voor de afvaltype sensoren",
                     "updateinterval": "Hoe vaak controleren voor bijgewerkte afvalophaaldgegevens (0 = gebruik standaard interval)",
                     "addressid": "Adres ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
                     "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
@@ -254,6 +246,15 @@
             "deprecated_collector": "Werk je configuratie bij naar {new_collector}! Je gebruikt nog {old_collector} als afvalinzamelaar, deze is verouderd. Controleer ook je automatiseringen en Lovelace-configuratie, omdat sensornamen mogelijk gewijzigd zijn!",
             "city_required": "Configuratie ongeldig! Plaatsnaam is vereist voor {collector}",
             "street_required": "Configuratie ongeldig! Straatnaam is vereist voor {collector}"
+        }
+    },
+    "selector": {
+        "iconset": {
+            "options": {
+                "default": "Geen (standaard Home Assistant)",
+                "classic": "Klassiek",
+                "modern": "Modern"
+            }
         }
     }
 }

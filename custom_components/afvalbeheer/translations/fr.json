@@ -57,9 +57,7 @@
                     "dayofweek": "Afficher Jour de la Semaine",
                     "dayofweekonly": "Noms des Jours Uniquement",
                     "alwaysshowday": "Toujours Afficher les Noms des Jours",
-                    "builtinicons": "Icônes Classiques",
-                    "builtiniconsnew": "Icônes Modernes",
-                    "disableicons": "Désactiver les Icônes",
+                    "iconset": "Icônes",
                     "updateinterval": "Intervalle de Mise à Jour (heures)",
                     "addressid": "ID d'Adresse",
                     "customerid": "ID Client",
@@ -76,9 +74,7 @@
                     "dayofweek": "Inclure le jour de la semaine dans les valeurs des capteurs (ex. 'Lundi, 01-01-2024')",
                     "dayofweekonly": "Afficher seulement les noms des jours pour les dates proches (aujourd'hui, demain, noms des jours)",
                     "alwaysshowday": "Toujours afficher les noms des jours, même pour les dates à plus d'une semaine",
-                    "builtinicons": "Utiliser les icônes intégrées pour les types de déchets (jeu d'icônes classique)",
-                    "builtiniconsnew": "Utiliser les icônes intégrées pour les types de déchets (jeu d'icônes moderne)",
-                    "disableicons": "Désactiver toutes les icônes pour les capteurs de types de déchets",
+                    "iconset": "Jeu d'icônes utilisé pour les capteurs de types de déchets",
                     "updateinterval": "Fréquence de vérification des données de collecte de déchets mises à jour (0 = utiliser l'intervalle par défaut)",
                     "addressid": "ID d'adresse pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
                     "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
@@ -157,9 +153,7 @@
                     "dayofweek": "Afficher Jour de la Semaine",
                     "dayofweekonly": "Noms des Jours Uniquement",
                     "alwaysshowday": "Toujours Afficher les Noms des Jours",
-                    "builtinicons": "Icônes Classiques",
-                    "builtiniconsnew": "Icônes Modernes",
-                    "disableicons": "Désactiver les Icônes",
+                    "iconset": "Icônes",
                     "updateinterval": "Intervalle de Mise à Jour (heures)",
                     "addressid": "ID d'Adresse",
                     "customerid": "ID Client",
@@ -176,9 +170,7 @@
                     "dayofweek": "Inclure le jour de la semaine dans les valeurs des capteurs (ex. 'Lundi, 01-01-2024')",
                     "dayofweekonly": "Afficher seulement les noms des jours pour les dates proches (aujourd'hui, demain, noms des jours)",
                     "alwaysshowday": "Toujours afficher les noms des jours, même pour les dates à plus d'une semaine",
-                    "builtinicons": "Utiliser les icônes intégrées pour les types de déchets (jeu d'icônes classique)",
-                    "builtiniconsnew": "Utiliser les icônes intégrées pour les types de déchets (jeu d'icônes moderne)",
-                    "disableicons": "Désactiver toutes les icônes pour les capteurs de types de déchets",
+                    "iconset": "Jeu d'icônes utilisé pour les capteurs de types de déchets",
                     "updateinterval": "Fréquence de vérification des données de collecte de déchets mises à jour (0 = utiliser l'intervalle par défaut)",
                     "addressid": "ID d'adresse pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
                     "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
@@ -254,6 +246,15 @@
             "deprecated_collector": "Mettez à jour votre configuration pour utiliser {new_collector} ! Vous utilisez encore {old_collector} comme collecteur de déchets, ce qui est obsolète. Vérifiez aussi vos automatisations et votre configuration Lovelace, car les noms des capteurs peuvent aussi avoir changé !",
             "city_required": "Configuration invalide ! Le nom de la ville est requis pour {collector}",
             "street_required": "Configuration invalide ! Le nom de la rue est requis pour {collector}"
+        }
+    },
+    "selector": {
+        "iconset": {
+            "options": {
+                "default": "Aucune (par défaut de Home Assistant)",
+                "classic": "Classique",
+                "modern": "Moderne"
+            }
         }
     }
 }

@@ -57,9 +57,7 @@
                     "dayofweek": "Show Day of Week",
                     "dayofweekonly": "Day Names Only",
                     "alwaysshowday": "Always Show Day Names",
-                    "builtinicons": "Classic Icons",
-                    "builtiniconsnew": "Modern Icons",
-                    "disableicons": "Disable Icons",
+                    "iconset": "Icons",
                     "updateinterval": "Update Interval (hours)",
                     "addressid": "Address ID",
                     "customerid": "Customer ID",
@@ -76,9 +74,7 @@
                     "dayofweek": "Include day of week in sensor values (e.g., 'Monday, 01-01-2024')",
                     "dayofweekonly": "Show only day names for nearby dates (today, tomorrow, day names)",
                     "alwaysshowday": "Always show day names, even for dates more than a week away",
-                    "builtinicons": "Use built-in icons for waste types (classic icon set)",
-                    "builtiniconsnew": "Use built-in icons for waste types (modern icon set)",
-                    "disableicons": "Disable all icons for waste type sensors",
+                    "iconset": "Icon set used for the waste type sensors",
                     "updateinterval": "How often to check for updated waste collection data (0 = use default interval)",
                     "addressid": "Address ID for Ximmio-based collectors (if required by your waste collector)",
                     "customerid": "Customer ID for Ximmio-based collectors (if required by your waste collector)",
@@ -157,9 +153,7 @@
                     "dayofweek": "Show Day of Week",
                     "dayofweekonly": "Day Names Only",
                     "alwaysshowday": "Always Show Day Names",
-                    "builtinicons": "Classic Icons",
-                    "builtiniconsnew": "Modern Icons",
-                    "disableicons": "Disable Icons",
+                    "iconset": "Icons",
                     "updateinterval": "Update Interval (hours)",
                     "addressid": "Address ID",
                     "customerid": "Customer ID",
@@ -176,9 +170,7 @@
                     "dayofweek": "Include day of week in sensor values (e.g., 'Monday, 01-01-2024')",
                     "dayofweekonly": "Show only day names for nearby dates (today, tomorrow, day names)",
                     "alwaysshowday": "Always show day names, even for dates more than a week away",
-                    "builtinicons": "Use built-in icons for waste types (classic icon set)",
-                    "builtiniconsnew": "Use built-in icons for waste types (modern icon set)",
-                    "disableicons": "Disable all icons for waste type sensors",
+                    "iconset": "Icon set used for the waste type sensors",
                     "updateinterval": "How often to check for updated waste collection data (0 = use default interval)",
                     "addressid": "Address ID for Ximmio-based collectors (if required by your waste collector)",
                     "customerid": "Customer ID for Ximmio-based collectors (if required by your waste collector)",
@@ -254,6 +246,15 @@
             "deprecated_collector": "Update your config to use {new_collector}! You are still using {old_collector} as a waste collector, which is deprecated. Check your automations and Lovelace config, as the sensor names may also be changed!",
             "city_required": "Config invalid! City name is required for {collector}",
             "street_required": "Config invalid! Street name is required for {collector}"
+        }
+    },
+    "selector": {
+        "iconset": {
+            "options": {
+                "default": "None (Home Assistant default)",
+                "classic": "Classic",
+                "modern": "Modern"
+            }
         }
     }
 }

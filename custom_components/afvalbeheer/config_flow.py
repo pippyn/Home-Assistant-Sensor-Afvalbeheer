@@ -10,6 +10,7 @@ from .const import (
     DOMAIN, CONF_ID, CONF_WASTE_COLLECTOR, CONF_POSTCODE, CONF_STREET_NUMBER, CONF_SUFFIX,
     CONF_RESOURCES, CONF_NAME_PREFIX, CONF_DATE_FORMAT, CONF_UPCOMING, CONF_DATE_ONLY,
     CONF_DATE_OBJECT, CONF_BUILT_IN_ICONS, CONF_BUILT_IN_ICONS_NEW, CONF_DISABLE_ICONS,
+    CONF_ICON_SET, ICON_SET_DEFAULT, ICON_SET_CLASSIC, ICON_SET_MODERN,
     CONF_TRANSLATE_DAYS, CONF_LANGUAGE, LANGUAGE_NL, LANGUAGE_EN, LANGUAGE_FR, LANGUAGE_EL, LANGUAGE_DE,
     CONF_DAY_OF_WEEK, CONF_DAY_OF_WEEK_ONLY, CONF_ALWAYS_SHOW_DAY,
     CONF_STREET_NAME, CONF_CITY_NAME, CONF_ADDRESS_ID, CONF_CUSTOMER_ID, CONF_UPDATE_INTERVAL,
@@ -47,6 +48,45 @@ def _default_language(config):
         return language
 
     return LANGUAGE_NL if config.get(CONF_TRANSLATE_DAYS, DEFAULT_CONFIG[CONF_TRANSLATE_DAYS]) else LANGUAGE_EN
+
+
+def _icon_set_from_config(config):
+    """
+    Return the icon set selection for the stored icon options.
+
+    Args:
+        config: Config entry data and options.
+
+    Returns:
+        One of ICON_SET_DEFAULT, ICON_SET_CLASSIC or ICON_SET_MODERN.
+    """
+    if config.get(CONF_DISABLE_ICONS):
+        return ICON_SET_DEFAULT
+    if config.get(CONF_BUILT_IN_ICONS_NEW):
+        return ICON_SET_MODERN
+    if config.get(CONF_BUILT_IN_ICONS):
+        return ICON_SET_CLASSIC
+    return ICON_SET_DEFAULT
+
+
+def _apply_icon_set(data):
+    """Replace the icon set selection with the icon options used by the sensors."""
+    icon_set = data.pop(CONF_ICON_SET, None)
+    if icon_set is None:
+        return
+    data[CONF_BUILT_IN_ICONS] = icon_set == ICON_SET_CLASSIC
+    data[CONF_BUILT_IN_ICONS_NEW] = icon_set == ICON_SET_MODERN
+    data[CONF_DISABLE_ICONS] = False
+
+
+def _icon_set_selector():
+    return selector.SelectSelector(
+        selector.SelectSelectorConfig(
+            options=[ICON_SET_DEFAULT, ICON_SET_CLASSIC, ICON_SET_MODERN],
+            mode=selector.SelectSelectorMode.DROPDOWN,
+            translation_key=CONF_ICON_SET,
+        )
+    )
 
 
 class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -391,6 +431,7 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             if not errors:
                 data = {**self._address_input, **user_input}
+                _apply_icon_set(data)
                 # Add custom mapping to data
                 data[CONF_CUSTOM_MAPPING] = custom_mapping
                 # Add Omrin credentials if provided
@@ -440,9 +481,7 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         
         # Icon settings
         schema_dict.update({
-            vol.Optional(CONF_BUILT_IN_ICONS, default=DEFAULT_CONFIG[CONF_BUILT_IN_ICONS]): selector.BooleanSelector(),
-            vol.Optional(CONF_BUILT_IN_ICONS_NEW, default=DEFAULT_CONFIG[CONF_BUILT_IN_ICONS_NEW]): selector.BooleanSelector(),
-            vol.Optional(CONF_DISABLE_ICONS, default=DEFAULT_CONFIG[CONF_DISABLE_ICONS]): selector.BooleanSelector(),
+            vol.Optional(CONF_ICON_SET, default=_icon_set_from_config(DEFAULT_CONFIG)): _icon_set_selector(),
         })
         
         # Advanced settings
@@ -744,6 +783,7 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None:
             if not errors:
                 data = {**self._address_input, **user_input}
+                _apply_icon_set(data)
                 # Add custom mapping to data
                 data[CONF_CUSTOM_MAPPING] = custom_mapping
                 # Add Omrin credentials if provided
@@ -790,9 +830,7 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
         
         # Icon settings
         schema_dict.update({
-            vol.Optional(CONF_BUILT_IN_ICONS, default=current.get(CONF_BUILT_IN_ICONS, DEFAULT_CONFIG[CONF_BUILT_IN_ICONS])): selector.BooleanSelector(),
-            vol.Optional(CONF_BUILT_IN_ICONS_NEW, default=current.get(CONF_BUILT_IN_ICONS_NEW, DEFAULT_CONFIG[CONF_BUILT_IN_ICONS_NEW])): selector.BooleanSelector(),
-            vol.Optional(CONF_DISABLE_ICONS, default=current.get(CONF_DISABLE_ICONS, DEFAULT_CONFIG[CONF_DISABLE_ICONS])): selector.BooleanSelector(),
+            vol.Optional(CONF_ICON_SET, default=_icon_set_from_config(current)): _icon_set_selector(),
         })
         
         # Advanced settings
