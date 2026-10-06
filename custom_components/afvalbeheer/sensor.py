@@ -112,6 +112,8 @@ class BaseSensor(RestoreEntity, SensorEntity):
         data: Data source for waste information.
         config: Configuration dictionary for the sensor.
     """
+    _attr_has_entity_name = True
+
     def __init__(self, data, config):
         self.data = data
         self.waste_collector = config.get(CONF_WASTE_COLLECTOR, "").lower()
@@ -323,10 +325,10 @@ class WasteDateSensor(BaseSensor):
         super().__init__(data, config)
         self.date_delta = date_delta
         if self.date_delta.days == 0:
-            display_day = text(self.language, "today").lower()
+            display_day = text(self.language, "today").capitalize()
             unique_day = "vandaag"
         else:
-            display_day = text(self.language, "tomorrow").lower()
+            display_day = text(self.language, "tomorrow").capitalize()
             unique_day = "morgen"
 
         self._name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, display_day)
@@ -364,7 +366,7 @@ class WasteUpcomingSensor(BaseSensor):
     """
     def __init__(self, data, config):
         super().__init__(data, config)
-        self.first_upcoming = text(self.language, "first_upcoming")
+        self.first_upcoming = text(self.language, "first_upcoming").capitalize()
         self._name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, self.first_upcoming)
         self._attr_unique_id = _format_unique_id(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, "eerstvolgende", self.entry_id, config.get(CONF_POSTCODE), config.get(CONF_STREET_NUMBER)).lower()
         self.upcoming_day = None
@@ -405,18 +407,18 @@ def _format_sensor(name, name_prefix, waste_collector, sensor_type):
 
     Args:
         name: The base name of the sensor.
-        name_prefix: Whether to include the waste collector's name as a prefix.
+        name_prefix: Kept for backwards compatibility.
         waste_collector: Name of the waste collector.
         sensor_type: Type of the sensor (e.g., waste type or date).
 
     Returns:
         Formatted sensor name as a string.
     """
-    return (
-        (waste_collector.capitalize() + " " if name_prefix else "")
-        + (name + " " if name else "")
-        + sensor_type
-    )
+    prefix = ""
+    if name and name.strip().lower() != str(waste_collector).strip().lower():
+        prefix = name.strip() + " "
+    return prefix + sensor_type
+
 
 def _format_unique_id(name, name_prefix, waste_collector, sensor_type, entry_id, postcode=None, street_number=None):
     """
@@ -438,8 +440,8 @@ def _format_unique_id(name, name_prefix, waste_collector, sensor_type, entry_id,
 
     if str(waste_collector).lower() in ["cleanprofs", "frissekliko"] or name_prefix:
         parts.insert(0, str(waste_collector))
-    if name:
-        parts.insert(1, name)
+    if name and name.strip().lower() != str(waste_collector).strip().lower():
+        parts.insert(1, name.strip())
     unique_id = "_".join(parts).replace(" ", "_").replace("-", "_").lower()
     return unique_id
 
