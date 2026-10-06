@@ -12,6 +12,7 @@ from homeassistant.const import Platform
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.typing import ConfigType
+from pathlib import Path
 from homeassistant.components import persistent_notification
 
 from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID, NOTIFICATION_ID, CONF_WASTE_COLLECTOR
@@ -22,9 +23,45 @@ __version__ = "6.5.26"
 
 _LOGGER = logging.getLogger(__name__)
 
+FRONTEND_URL = "/afvalbeheer/afvalbeheer-icons.js"
+FRONTEND_FILE = Path(__file__).parent / "frontend" / "afvalbeheer-icons.js"
+
+
+async def _async_register_frontend(hass: HomeAssistant):
+    """Register the frontend custom iconset with Home Assistant."""
+    if "afvalbeheer_frontend_registered" in hass.data:
+        return
+
+    hass.data["afvalbeheer_frontend_registered"] = True
+
+    try:
+        from homeassistant.components.frontend import add_extra_js_url
+        from homeassistant.components.http import StaticPathConfig
+
+        if FRONTEND_FILE.exists():
+            if hasattr(hass.http, "async_register_static_paths"):
+                await hass.http.async_register_static_paths([
+                    StaticPathConfig(
+                        FRONTEND_URL,
+                        str(FRONTEND_FILE),
+                        False,
+                    )
+                ])
+            elif hasattr(hass.http, "register_static_path"):
+                hass.http.register_static_path(
+                    FRONTEND_URL,
+                    str(FRONTEND_FILE),
+                    False,
+                )
+            add_extra_js_url(hass, f"{FRONTEND_URL}?v={__version__}")
+            _LOGGER.debug("Registered Afvalbeheer custom iconset at %s", FRONTEND_URL)
+    except Exception as err:
+        _LOGGER.warning("Could not register Afvalbeheer frontend icons: %s", err)
+
 
 async def async_setup(hass: HomeAssistant, config: ConfigType):
     _LOGGER.debug("Setup of Afvalbeheer component Rest API retriever")
+    await _async_register_frontend(hass)
 
     yaml_config = config.get(DOMAIN, None)
 
@@ -204,6 +241,7 @@ async def _migrate_entry_to_v3(hass, config_entry):
 
 
 async def async_setup_entry(hass, entry):
+    await _async_register_frontend(hass)
     config = {**entry.data, **entry.options}
 
     if DOMAIN not in hass.data:

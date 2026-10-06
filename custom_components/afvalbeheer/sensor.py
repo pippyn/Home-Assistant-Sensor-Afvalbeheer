@@ -189,7 +189,7 @@ class BaseSensor(RestoreEntity, SensorEntity):
 
     def _restore_entity_picture(self, state):
         """Restore the entity picture from the previous state."""
-        if not self.disable_icons:
+        if self.built_in_icons_new and not self.disable_icons:
             self._entity_picture = state.attributes.get("entity_picture")
             _LOGGER.debug("Restored entity picture: %s", self._entity_picture)
 
@@ -250,7 +250,17 @@ class WasteTypeSensor(BaseSensor):
         ).lower()
         self._days_until = None
         self._sort_date = 0
+        self._set_picture(None)
         _LOGGER.debug("WasteTypeSensor initialized: %s", self._name)
+
+    @property
+    def icon(self):
+        """Return the icon for the sensor."""
+        if self.built_in_icons and not self.built_in_icons_new and not self.disable_icons:
+            waste_type_lower = self.waste_type.lower().strip()
+            key = waste_type_lower.replace(" ", "-").replace("_", "-")
+            return FRACTION_ICONS.get(key) or FRACTION_ICONS.get(waste_type_lower) or super().icon
+        return super().icon
 
     @property
     def name(self):
@@ -263,6 +273,12 @@ class WasteTypeSensor(BaseSensor):
         if self.date_object:
             return SensorDeviceClass.TIMESTAMP
 
+    def _restore_entity_picture(self, state):
+        """Restore the entity picture, preferring the current built-in icon."""
+        if self.built_in_icons_new and not self.disable_icons:
+            self._entity_picture = self._get_entity_picture() or state.attributes.get("entity_picture")
+            _LOGGER.debug("Restored entity picture: %s", self._entity_picture)
+
     def update(self):
         """Update the state and attributes of the sensor."""
         _LOGGER.debug("Updating WasteTypeSensor: %s", self._name)
@@ -274,7 +290,7 @@ class WasteTypeSensor(BaseSensor):
         else:
             self._hidden = False
             self._set_state(collection)
-            self._set_picture(collection)
+        self._set_picture(collection)
         self._set_attr(collection)
         _LOGGER.debug("Updated state for %s: %s", self._name, self._state)
 
@@ -300,18 +316,19 @@ class WasteTypeSensor(BaseSensor):
 
     def _set_picture(self, collection):
         """Set the entity picture based on collection data."""
-        if (self.built_in_icons or self.built_in_icons_new) and not self.disable_icons:
+        if self.built_in_icons_new and not self.disable_icons:
             self._entity_picture = self._get_entity_picture()
             _LOGGER.debug("Entity picture set for %s: %s", self._name, self._entity_picture)
+        else:
+            self._entity_picture = None
 
     def _get_entity_picture(self):
         """Get the appropriate entity picture for the waste type."""
-        waste_type_lower = self.waste_type.lower()
-        if self.built_in_icons_new and waste_type_lower in FRACTION_ICONS_NEW:
-            return FRACTION_ICONS_NEW[waste_type_lower]
-        elif self.built_in_icons and waste_type_lower in FRACTION_ICONS:
-            return FRACTION_ICONS[waste_type_lower]
-        return None
+        if not self.built_in_icons_new or self.disable_icons:
+            return None
+        waste_type_lower = self.waste_type.lower().strip()
+        key = waste_type_lower.replace(" ", "-").replace("_", "-")
+        return FRACTION_ICONS_NEW.get(key) or FRACTION_ICONS_NEW.get(waste_type_lower)
 
 
 class WasteDateSensor(BaseSensor):
@@ -333,11 +350,30 @@ class WasteDateSensor(BaseSensor):
 
         self._name = _format_sensor(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, display_day)
         self._attr_unique_id = _format_unique_id(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, unique_day, self.entry_id, config.get(CONF_POSTCODE), config.get(CONF_STREET_NUMBER)).lower()
+        self._set_picture()
 
     @property
     def name(self):
         """Return the name of the sensor."""
         return self._name
+
+    @property
+    def icon(self):
+        """Return the icon for the sensor."""
+        if self.built_in_icons and not self.built_in_icons_new and not self.disable_icons:
+            if self.date_delta.days == 0:
+                return "afvalbeheer:today"
+            elif self.date_delta.days == 1:
+                return "afvalbeheer:tomorrow"
+        return super().icon
+
+    def _set_picture(self):
+        """Set the entity picture based on sensor type."""
+        if self.built_in_icons_new and not self.disable_icons:
+            key = "today" if self.date_delta.days == 0 else "tomorrow"
+            self._entity_picture = FRACTION_ICONS_NEW.get(key)
+        else:
+            self._entity_picture = None
 
     def update(self):
         """Update the state and attributes of the sensor."""
@@ -350,6 +386,7 @@ class WasteDateSensor(BaseSensor):
             self._hidden = False
             self._state = ", ".join(sorted({x.waste_type for x in collections}))
         self._set_attr()
+        self._set_picture()
 
     def _set_attr(self):
         """Set the attributes of the sensor."""
@@ -371,11 +408,26 @@ class WasteUpcomingSensor(BaseSensor):
         self._attr_unique_id = _format_unique_id(config.get(CONF_NAME), config.get(CONF_NAME_PREFIX), self.waste_collector, "eerstvolgende", self.entry_id, config.get(CONF_POSTCODE), config.get(CONF_STREET_NUMBER)).lower()
         self.upcoming_day = None
         self.upcoming_waste_types = None
+        self._set_picture()
 
     @property
     def name(self):
         """Return the name of the sensor."""
         return self._name
+
+    @property
+    def icon(self):
+        """Return the icon for the sensor."""
+        if self.built_in_icons and not self.built_in_icons_new and not self.disable_icons:
+            return "afvalbeheer:upcoming"
+        return super().icon
+
+    def _set_picture(self):
+        """Set the entity picture based on sensor type."""
+        if self.built_in_icons_new and not self.disable_icons:
+            self._entity_picture = FRACTION_ICONS_NEW.get("upcoming")
+        else:
+            self._entity_picture = None
 
     def update(self):
         """Update the state and attributes of the sensor."""
@@ -392,6 +444,7 @@ class WasteUpcomingSensor(BaseSensor):
             self._state = f"{self.upcoming_day}: {self.upcoming_waste_types}"
 
         self._set_attr()
+        self._set_picture()
 
     def _set_attr(self):
         """Set the attributes of the sensor."""
