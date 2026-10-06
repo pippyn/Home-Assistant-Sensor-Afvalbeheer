@@ -8,7 +8,7 @@
 
 Afvalbeheer provides Home Assistant sensors and a calendar entity for multiple Dutch and Belgian waste collectors using REST APIs.
 
-> **⚠️ Important Notice:** YAML configuration is deprecated as of v6.0.0. All new installations and configurations should use the Home Assistant UI (Config Flow). Existing YAML configurations will automatically be imported and should be removed form configuration.yaml after migration.
+> **⚠️ Important Notice:** YAML configuration is deprecated as of v6.0.0. All new installations and configurations should use the Home Assistant UI (Config Flow). Existing YAML configurations will automatically be imported and should be removed from configuration.yaml after migration.
 
 ---
 
