@@ -122,17 +122,23 @@ async def async_migrate_entry(hass, config_entry):
     """Migrate old config entries to new format."""
     _LOGGER.warning("=== MIGRATION FUNCTION CALLED ===")
     _LOGGER.warning("Migration check: config entry version %s.%s, current version %s.%s", 
-                   config_entry.version, config_entry.minor_version, 3, 1)
-    
+                   config_entry.version, config_entry.minor_version, 3, 2)
+
     # For existing entries that might have the wrong unique ID format
     # Check if migration is needed based on entity unique IDs rather than just version
     needs_migration = _check_if_migration_needed(hass, config_entry)
-    
+
     if config_entry.version < 3 or needs_migration:
-        _LOGGER.warning("Migrating config entry from version %s.%s to %s.%s", 
+        _LOGGER.warning("Migrating config entry from version %s.%s to %s.%s",
                        config_entry.version, config_entry.minor_version, 3, 1)
-        return await _migrate_entry_to_v3(hass, config_entry)
-    
+        if not await _migrate_entry_to_v3(hass, config_entry):
+            return False
+
+    if config_entry.version == 3 and config_entry.minor_version < 2:
+        _LOGGER.warning("Migrating config entry from version %s.%s to %s.%s",
+                       config_entry.version, config_entry.minor_version, 3, 2)
+        return await _migrate_entry_to_v3_2(hass, config_entry)
+
     _LOGGER.info("No migration needed for config entry %s", config_entry.title)
     return True
 
@@ -235,6 +241,82 @@ async def _migrate_entry_to_v3(hass, config_entry):
         
         return True
         
+    except Exception as e:
+        _LOGGER.error("Migration failed: %s", e)
+        return False
+
+
+async def _migrate_entry_to_v3_2(hass, config_entry):
+    """Migrate to version 3.2 - Cleanprofs fractions are now prefixed with 'Reiniging'."""
+    from homeassistant.const import CONF_RESOURCES
+    from homeassistant.helpers import entity_registry as er
+    from .const import CONF_NAME, CONF_NAME_PREFIX, CONF_POSTCODE, CONF_STREET_NUMBER
+    from .sensor import _format_unique_id
+
+    try:
+        config_data = {**config_entry.data, **config_entry.options}
+
+        if str(config_data.get(CONF_WASTE_COLLECTOR, "")).lower() != "cleanprofs":
+            hass.config_entries.async_update_entry(config_entry, version=3, minor_version=2)
+            return True
+
+        def _prefix(resource):
+            if str(resource).lower().startswith("reiniging"):
+                return resource
+            return f"Reiniging {resource}"
+
+        resource_mapping = {
+            resource: _prefix(resource) for resource in config_data.get(CONF_RESOURCES, [])
+        }
+
+        # Update the entity unique IDs so existing sensors keep their entity_id and history
+        entity_registry = er.async_get(hass)
+        unique_id_args = (
+            config_data.get(CONF_NAME), config_data.get(CONF_NAME_PREFIX), config_data.get(CONF_WASTE_COLLECTOR),
+        )
+        unique_id_mapping = {
+            _format_unique_id(*unique_id_args, old, config_entry.entry_id).lower():
+            _format_unique_id(*unique_id_args, new, config_entry.entry_id).lower()
+            for old, new in resource_mapping.items() if old != new
+        }
+
+        migrated_count = 0
+        for entity in list(entity_registry.entities.values()):
+            if (entity.domain == "sensor" and
+                entity.platform == DOMAIN and
+                entity.config_entry_id == config_entry.entry_id and
+                entity.unique_id in unique_id_mapping):
+
+                new_unique_id = unique_id_mapping[entity.unique_id]
+                if entity_registry.async_get_entity_id("sensor", DOMAIN, new_unique_id):
+                    _LOGGER.warning("Skipping migration of %s, unique_id %s already exists",
+                                    entity.entity_id, new_unique_id)
+                    continue
+
+                _LOGGER.info("Migrating entity %s: %s -> %s",
+                             entity.entity_id, entity.unique_id, new_unique_id)
+                entity_registry.async_update_entity(entity.entity_id, new_unique_id=new_unique_id)
+                migrated_count += 1
+
+        # Update the selected resources in both data and options
+        new_data = {**config_entry.data}
+        new_options = {**config_entry.options}
+        for store in (new_data, new_options):
+            if CONF_RESOURCES in store:
+                store[CONF_RESOURCES] = [_prefix(resource) for resource in store[CONF_RESOURCES]]
+
+        _LOGGER.info("Cleanprofs migration completed. Updated %d entities.", migrated_count)
+
+        hass.config_entries.async_update_entry(
+            config_entry,
+            data=new_data,
+            options=new_options,
+            version=3,
+            minor_version=2
+        )
+
+        return True
+
     except Exception as e:
         _LOGGER.error("Migration failed: %s", e)
         return False

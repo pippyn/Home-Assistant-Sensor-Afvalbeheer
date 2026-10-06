@@ -52,7 +52,7 @@ def _default_language(config):
 class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     
     VERSION = 3  # Increment this when config structure changes  
-    MINOR_VERSION = 1
+    MINOR_VERSION = 2
     
     def __init__(self):
         super().__init__()
