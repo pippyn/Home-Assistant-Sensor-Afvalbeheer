@@ -4,6 +4,7 @@ Original Author: Pippijn Stortelder
 Current Version: 6.5.28 20261006
 """
 
+import hashlib
 import logging
 from datetime import datetime
 from datetime import timedelta
@@ -25,6 +26,11 @@ _LOGGER = logging.getLogger(__name__)
 
 FRONTEND_URL = "/afvalbeheer/afvalbeheer-icons.js"
 FRONTEND_FILE = Path(__file__).parent / "frontend" / "afvalbeheer-icons.js"
+
+
+def _file_hash(path):
+    """Return a short hash of the file contents, used to bust the browser cache."""
+    return hashlib.sha1(path.read_bytes()).hexdigest()[:8]
 
 
 async def _async_register_frontend(hass: HomeAssistant):
@@ -53,7 +59,9 @@ async def _async_register_frontend(hass: HomeAssistant):
                     str(FRONTEND_FILE),
                     False,
                 )
-            add_extra_js_url(hass, f"{FRONTEND_URL}?v={__version__}")
+            # Include a content hash so browsers load the new file whenever it changes
+            content_hash = await hass.async_add_executor_job(_file_hash, FRONTEND_FILE)
+            add_extra_js_url(hass, f"{FRONTEND_URL}?v={__version__}-{content_hash}")
             _LOGGER.debug("Registered Afvalbeheer custom iconset at %s", FRONTEND_URL)
     except Exception as err:
         _LOGGER.warning("Could not register Afvalbeheer frontend icons: %s", err)
