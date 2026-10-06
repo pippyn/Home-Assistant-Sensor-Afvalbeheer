@@ -481,7 +481,7 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         
         # Icon settings
         schema_dict.update({
-            vol.Optional(CONF_ICON_SET, default=_icon_set_from_config(DEFAULT_CONFIG)): _icon_set_selector(),
+            vol.Optional(CONF_ICON_SET, default=ICON_SET_MODERN): _icon_set_selector(),
         })
         
         # Advanced settings
