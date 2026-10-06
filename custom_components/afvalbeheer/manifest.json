@@ -5,6 +5,6 @@
   "dependencies": [],
   "codeowners": ["@pippyn"],
   "requirements": [],
-  "version": "6.5.27",
+  "version": "6.5.28",
   "config_flow": true
 }
