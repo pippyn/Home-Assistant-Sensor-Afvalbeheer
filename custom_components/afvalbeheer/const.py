@@ -51,6 +51,7 @@ CONF_PRINT_AVAILABLE_WASTE_TYPE_SLUGS = 'printwastetypeslugs'
 CONF_UPDATE_INTERVAL = 'updateinterval'
 CONF_CUSTOMER_ID = 'customerid'
 CONF_CUSTOM_MAPPING = 'custommapping'
+CONF_CUSTOM_NAMES = 'customnames'
 CONF_EMAIL = 'email'
 CONF_PASSWORD = 'password'
 CONF_ENTRY_ID = 'entry_id'
@@ -85,6 +86,7 @@ PLATFORM_SCHEMA = vol.Schema(
         vol.Optional(CONF_UPDATE_INTERVAL, default=0): cv.positive_int,
         vol.Optional(CONF_CUSTOMER_ID, default=""): cv.string,
         vol.Optional(CONF_CUSTOM_MAPPING, default={}): dict,
+        vol.Optional(CONF_CUSTOM_NAMES, default={}): dict,
     }, extra=vol.ALLOW_EXTRA  # Allow extra required due when validating config as sensor (platform key is added to config)
 )
 
@@ -119,6 +121,7 @@ DEFAULT_CONFIG = {
     CONF_CUSTOMER_ID: "",
     CONF_UPDATE_INTERVAL: 24,
     CONF_CUSTOM_MAPPING: {},
+    CONF_CUSTOM_NAMES: {},
 }
 
 OPZET_COLLECTOR_URLS = {

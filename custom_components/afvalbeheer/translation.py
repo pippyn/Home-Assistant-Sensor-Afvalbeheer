@@ -103,3 +103,22 @@ def translate_date_text(language, value):
             value = value.replace(source, target)
 
     return value
+
+
+def normalize_custom_names(custom_names):
+    """Clean up user-given waste type names: lowercase keys, trimmed names, empty ones dropped."""
+    if not isinstance(custom_names, dict):
+        return {}
+    cleaned = {}
+    for waste_type, name in custom_names.items():
+        name = "" if name is None else str(name).strip()
+        if name:
+            cleaned[str(waste_type).strip().lower()] = name
+    return cleaned
+
+
+def waste_type_name(custom_names, waste_type):
+    """Name to show for a waste type: the user's own name if one is set, otherwise the waste type."""
+    if custom_names:
+        return custom_names.get(waste_type.lower(), waste_type)
+    return waste_type

@@ -12,7 +12,8 @@ from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 
-from .const import DOMAIN, CONF_ID, CONF_WASTE_COLLECTOR, CONF_ENTRY_ID
+from .const import DOMAIN, CONF_ID, CONF_WASTE_COLLECTOR, CONF_ENTRY_ID, CONF_CUSTOM_NAMES
+from .translation import normalize_custom_names, waste_type_name
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -80,6 +81,7 @@ class AfvalbeheerCalendar(CalendarEntity):
         self._attr_unique_id = f"{DOMAIN}_{config[CONF_ID]}"
         self.entry_id = config.get(CONF_ENTRY_ID)
         self.waste_collector = config.get(CONF_WASTE_COLLECTOR, "").lower()
+        self.custom_names = normalize_custom_names(config.get(CONF_CUSTOM_NAMES))
 
         self._event = None
 
@@ -108,7 +110,7 @@ class AfvalbeheerCalendar(CalendarEntity):
 
         waste_item = collections[0]
         return CalendarEvent(
-            summary=", ".join(sorted({item.waste_type for item in collections})),
+            summary=", ".join(sorted({waste_type_name(self.custom_names, item.waste_type) for item in collections})),
             start=waste_item.date.date(),
             end=(waste_item.date + timedelta(days=1)).date(),
         )
@@ -135,7 +137,7 @@ class AfvalbeheerCalendar(CalendarEntity):
             if start_date.date() <= waste_date <= end_date.date():
                 if waste_item.waste_type.lower() in resources_set:
                     event = CalendarEvent(
-                        summary=waste_item.waste_type,
+                        summary=waste_type_name(self.custom_names, waste_item.waste_type),
                         start=waste_date,
                         end=waste_date + timedelta(days=1),
                     )

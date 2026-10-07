@@ -176,6 +176,10 @@
                     "customerid": "Customer ID for Ximmio-based collectors (if required by your waste collector)",
                     "language": "Language used by integration-controlled text such as dates, helper sensor names, and notifications"
                 }
+            },
+            "names": {
+                "title": "Waste type names (optional)",
+                "description": "Give waste types your own name for the calendar and the Today, Tomorrow and first upcoming sensors. Leave a field empty to keep the standard name. Sensor names and entity IDs stay the same."
             }
         },
         "error": {

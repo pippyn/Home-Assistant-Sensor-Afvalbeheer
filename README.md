@@ -187,6 +187,11 @@ Select which waste types you want sensors for. At least one is required. Availab
 - **Name**: Custom name for your sensors (useful for multiple instances)
 - **Name Prefix**: Include waste collector name in sensor names (enabled by default)
 
+### Waste Type Names
+After setup, **Configure** ends with an optional screen that gives each selected waste type its own name, for example `pbd` as "Plastic". These names are shown in the calendar events and in the Today, Tomorrow and first upcoming sensors. Leave a field empty to keep the standard name. Sensor names and entity IDs stay the same; rename those in Home Assistant itself if you like.
+
+In YAML: `customnames: {pbd: Plastic, gft: Groente en fruit}`
+
 ### Icon Options
 
 Choose one icon set in the **Icons** dropdown:

@@ -176,6 +176,10 @@
                     "customerid": "Kunden-ID für Ximmio-basierte Entsorger (falls von Ihrem Abfallentsorger benötigt)",
                     "language": "Sprache, die für vom Integration gesteuerte Texte wie Datumsangaben, Hilfssensor-Namen und Benachrichtigungen verwendet wird"
                 }
+            },
+            "names": {
+                "title": "Namen der Abfallarten (optional)",
+                "description": "Gib Abfallarten einen eigenen Namen für den Kalender und die Sensoren Heute, Morgen und nächste Abholung. Lass ein Feld leer, um den Standardnamen zu behalten. Sensornamen und Entitäts-IDs bleiben gleich."
             }
         },
         "error": {

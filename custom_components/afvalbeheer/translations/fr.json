@@ -176,6 +176,10 @@
                     "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
                     "language": "Langue utilisée par les textes gérés par l'intégration, comme les dates, les noms de capteurs auxiliaires et les notifications"
                 }
+            },
+            "names": {
+                "title": "Noms des types de déchets (facultatif)",
+                "description": "Donnez votre propre nom aux types de déchets pour le calendrier et les capteurs Aujourd'hui, Demain et prochaine collecte. Laissez un champ vide pour garder le nom standard. Les noms des capteurs et les identifiants d'entité ne changent pas."
             }
         },
         "error": {

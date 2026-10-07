@@ -15,8 +15,9 @@ from .const import (
     CONF_TRANSLATE_DAYS, CONF_LANGUAGE, LANGUAGE_NL, LANGUAGE_EN, LANGUAGE_FR, LANGUAGE_EL, LANGUAGE_DE,
     CONF_DAY_OF_WEEK, CONF_DAY_OF_WEEK_ONLY, CONF_ALWAYS_SHOW_DAY,
     CONF_STREET_NAME, CONF_CITY_NAME, CONF_ADDRESS_ID, CONF_CUSTOMER_ID, CONF_UPDATE_INTERVAL,
-    CONF_CUSTOM_MAPPING, DEFAULT_CONFIG, XIMMIO_COLLECTOR_IDS, CONF_EMAIL, CONF_PASSWORD
+    CONF_CUSTOM_MAPPING, CONF_CUSTOM_NAMES, DEFAULT_CONFIG, XIMMIO_COLLECTOR_IDS, CONF_EMAIL, CONF_PASSWORD
 )
+from .translation import normalize_custom_names
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -208,6 +209,7 @@ class AfvalbeheerConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         config_data[CONF_CUSTOMER_ID] = import_config.get(CONF_CUSTOMER_ID, DEFAULT_CONFIG[CONF_CUSTOMER_ID])
         config_data[CONF_UPDATE_INTERVAL] = import_config.get(CONF_UPDATE_INTERVAL, DEFAULT_CONFIG[CONF_UPDATE_INTERVAL])
         config_data[CONF_CUSTOM_MAPPING] = import_config.get(CONF_CUSTOM_MAPPING, DEFAULT_CONFIG[CONF_CUSTOM_MAPPING])
+        config_data[CONF_CUSTOM_NAMES] = normalize_custom_names(import_config.get(CONF_CUSTOM_NAMES, DEFAULT_CONFIG[CONF_CUSTOM_NAMES]))
         
         # Generate unique ID for this configuration entry
         config_data[CONF_ID] = str(uuid.uuid4())
@@ -579,6 +581,7 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
         self._address_input = {}
         self._custom_mapping = {}
         self._omrin_credentials = {}
+        self._data = {}
 
     @property
     def config_entry(self):
@@ -800,7 +803,8 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
                 if old_mapping != custom_mapping:
                     await self._cleanup_entities_on_mapping_change(old_mapping, custom_mapping)
                 
-                return self.async_create_entry(title="", data=data)
+                self._data = data
+                return await self.async_step_names()
 
         # Build schema with conditional fields
         schema_dict = {
@@ -865,6 +869,24 @@ class AfvalbeheerOptionsFlowHandler(config_entries.OptionsFlow):
             errors=errors,
         )
     
+    async def async_step_names(self, user_input=None):
+        """Own names for the selected waste types, shown in the calendar and the upcoming sensors."""
+        resources = self._data.get(CONF_RESOURCES, [])
+
+        if user_input is not None:
+            names = normalize_custom_names({resource: user_input.get(resource, "") for resource in resources})
+            return self.async_create_entry(title="", data={**self._data, CONF_CUSTOM_NAMES: names})
+
+        current = {**self.config_entry.data, **self.config_entry.options}
+        current_names = normalize_custom_names(current.get(CONF_CUSTOM_NAMES))
+        # A suggested value instead of a default, so that emptying a field removes the name.
+        schema_dict = {
+            vol.Optional(resource, description={"suggested_value": current_names.get(resource.lower(), "")}): selector.TextSelector()
+            for resource in resources
+        }
+
+        return self.async_show_form(step_id="names", data_schema=vol.Schema(schema_dict))
+
     async def _cleanup_entities_on_mapping_change(self, old_mapping, new_mapping):
         """Clean up entities when custom mapping changes."""
         from homeassistant.helpers import entity_registry as er

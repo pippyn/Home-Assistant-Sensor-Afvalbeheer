@@ -176,6 +176,10 @@
                     "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
                     "language": "Taal voor tekst die door de integratie wordt beheerd, zoals datums, hulpsensornamen en meldingen"
                 }
+            },
+            "names": {
+                "title": "Namen van afvalsoorten (optioneel)",
+                "description": "Geef afvalsoorten een eigen naam voor de kalender en de sensoren Vandaag, Morgen en eerstvolgende. Laat een veld leeg om de standaardnaam te houden. Sensornamen en entity-ID's blijven hetzelfde."
             }
         },
         "error": {

@@ -10,7 +10,14 @@ from homeassistant.components import persistent_notification
 
 from .API import get_wastedata_from_config
 from .const import *
-from .translation import async_prepare_translations, resolve_language, text, translate_date_text
+from .translation import (
+    async_prepare_translations,
+    normalize_custom_names,
+    resolve_language,
+    text,
+    translate_date_text,
+    waste_type_name,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -129,6 +136,7 @@ class BaseSensor(RestoreEntity, SensorEntity):
         self.day_of_week_only = config.get(CONF_DAY_OF_WEEK_ONLY)
         self.always_show_day = config.get(CONF_ALWAYS_SHOW_DAY)
         self.waste_types = config[CONF_RESOURCES]
+        self.custom_names = normalize_custom_names(config.get(CONF_CUSTOM_NAMES))
         self.date_only = 1 if self.date_object else config.get(CONF_DATE_ONLY)
         self._today = text(self.language, "today")
         self._tomorrow = text(self.language, "tomorrow")
@@ -395,7 +403,7 @@ class WasteDateSensor(BaseSensor):
             self._state = text(self.language, "none")
         else:
             self._hidden = False
-            self._state = ", ".join(sorted({x.waste_type for x in collections}))
+            self._state = ", ".join(sorted({waste_type_name(self.custom_names, x.waste_type) for x in collections}))
         self._set_attr()
         self._set_picture()
 
@@ -451,7 +459,7 @@ class WasteUpcomingSensor(BaseSensor):
         else:
             self._hidden = False
             self.upcoming_day = self._format_date(collections[0].date)
-            self.upcoming_waste_types = ", ".join(sorted([x.waste_type for x in collections]))
+            self.upcoming_waste_types = ", ".join(sorted([waste_type_name(self.custom_names, x.waste_type) for x in collections]))
             self._state = f"{self.upcoming_day}: {self.upcoming_waste_types}"
 
         self._set_attr()
