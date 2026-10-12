@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 6.5.30 20261012
+Current Version: 6.5.32 20261012
 """
 
 import hashlib
