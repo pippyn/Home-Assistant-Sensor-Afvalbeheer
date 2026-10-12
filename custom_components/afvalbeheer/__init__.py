@@ -179,8 +179,9 @@ def _check_if_migration_needed(hass, config_entry):
 async def _migrate_entry_to_v3(hass, config_entry):
     """Migrate to version 3 - update entity unique IDs to new consistent format."""
     from homeassistant.helpers import entity_registry as er
-    from .const import CONF_WASTE_COLLECTOR, CONF_POSTCODE, CONF_STREET_NUMBER, CONF_NAME
-    
+    from .const import CONF_WASTE_COLLECTOR, CONF_POSTCODE, CONF_STREET_NUMBER, CONF_NAME, CONF_NAME_PREFIX
+    from .sensor import _format_unique_id
+
     try:
         entity_registry = er.async_get(hass)
         config_data = {**config_entry.data, **config_entry.options}
@@ -189,6 +190,7 @@ async def _migrate_entry_to_v3(hass, config_entry):
         postcode = config_data.get(CONF_POSTCODE, "")
         street_number = str(config_data.get(CONF_STREET_NUMBER, ""))
         name = config_data.get(CONF_NAME, "")
+        name_prefix = config_data.get(CONF_NAME_PREFIX, False)
         
         _LOGGER.info("Migrating entities for waste_collector=%s, postcode=%s, street_number=%s", 
                     waste_collector, postcode, street_number)
@@ -220,15 +222,13 @@ async def _migrate_entry_to_v3(hass, config_entry):
                         sensor_type = entity_name
                 
                 if sensor_type:
-                    # Generate new unique_id using the consistent format
-                    if not name:
-                        # Simple format like YAML used: just the sensor type  
-                        new_unique_id = sensor_type.lower()
-                    else:
-                        # If custom name is provided, include it for uniqueness
-                        parts = [name, sensor_type]
-                        new_unique_id = "_".join(parts).replace(" ", "_").replace("-", "_").lower()
-                    
+                    # Generate the new unique_id using the same canonical format
+                    # sensor.py itself uses, so collectors with special prefixing
+                    # rules (e.g. cleanprofs/frissekliko) migrate consistently.
+                    new_unique_id = _format_unique_id(
+                        name, name_prefix, waste_collector, sensor_type, config_entry.entry_id
+                    ).lower()
+
                     if new_unique_id != old_unique_id:
                         _LOGGER.info("Migrating entity %s: %s -> %s", 
                                    entity.entity_id, old_unique_id, new_unique_id)
