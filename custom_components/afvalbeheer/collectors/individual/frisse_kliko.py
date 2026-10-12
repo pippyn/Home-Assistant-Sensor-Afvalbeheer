@@ -37,7 +37,7 @@ def _extract_jwt_expiry(token: str) -> Optional[datetime]:
             exp_timestamp = payload.get("exp")
             if exp_timestamp:
                 return datetime.fromtimestamp(exp_timestamp, tz=timezone.utc).replace(tzinfo=None)
-    except Exception as exc:
+    except (ValueError, TypeError, KeyError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         _LOGGER.debug("Could not extract JWT expiry: %r", exc)
     return None
 
@@ -101,18 +101,6 @@ class FrisseKlikoCollector(WasteCollector):
                 _LOGGER.debug("Frisse Kliko token is expired")
                 return False
         return True
-
-    def __load_auth_data(self):
-        """Load persisted auth data once."""
-        if self._auth_loaded:
-            return
-
-        data = None
-        try:
-            # We call this synchronously from executor job if needed or via async helper
-            pass
-        except Exception:
-            pass
 
     async def async_load_and_init_auth(self):
         """Load stored auth credentials asynchronously."""
