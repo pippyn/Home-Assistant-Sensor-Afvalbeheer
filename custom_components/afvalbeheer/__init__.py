@@ -21,7 +21,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID, NOTIFICATION_ID, CONF_WASTE
 from .API import get_wastedata_from_config
 
 
-__version__ = "6.5.31"
+__version__ = "6.5.32"
 
 _LOGGER = logging.getLogger(__name__)
 
