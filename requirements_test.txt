@@ -1,0 +1,10 @@
+# Test-only dependencies. Not required to run the integration itself;
+# only needed to run `pytest tests/`.
+#
+# Setup:
+#   uv venv --python 3.13 .venv
+#   source .venv/bin/activate
+#   uv pip install -r requirements_test.txt
+#   python3 -m pytest tests/
+pytest
+pytest-homeassistant-custom-component

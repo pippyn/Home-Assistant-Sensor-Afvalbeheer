@@ -1,0 +1,32 @@
+name: Tests
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install test dependencies
+        run: python3 -m pip install -r requirements_test.txt
+
+      - name: Compile-check
+        run: python3 -m compileall custom_components/afvalbeheer
+
+      - name: Validate translation JSON
+        run: |
+          for f in custom_components/afvalbeheer/translations/*.json; do
+            python3 -m json.tool "$f" > /dev/null
+          done
+
+      - name: Run tests
+        run: python3 -m pytest tests/ -v
