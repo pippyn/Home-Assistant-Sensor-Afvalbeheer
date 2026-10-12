@@ -273,8 +273,6 @@
         if (!stateObj) return;
 
         const pic = stateObj.attributes && stateObj.attributes.entity_picture;
-        const entityId = (stateObj.entity_id || "").toLowerCase();
-        const friendlyName = (stateObj.attributes && stateObj.attributes.friendly_name || "").toLowerCase();
 
         // Determine if this is one of our 4 theme-switching fractions:
         let fraction = null;
@@ -295,22 +293,6 @@
           } else if (pic.includes("a2Nh") || pic.includes("afvalbeheer-kca") || pic.includes("bottle-water") || pic.includes("Ym90dGxlLXdhdGVy")) {
             fraction = "kca";
           } else if (pic.includes("cmVzdGFmdmFs") || pic.includes("afvalbeheer-restafval") || pic.includes("M50.4,31.4") || pic.includes("TTUwLjQsMzEuN")) {
-            fraction = "restafval";
-          }
-        }
-
-        // Fallback: check by entity_id or friendly_name if fraction is not yet detected and sensor is an afvalbeheer sensor
-        if (!fraction && svg === null && (entityId.includes("afval") || entityId.includes("waste") || (stateObj.attributes && stateObj.attributes.Wastecollector))) {
-          if (entityId.includes("glas") || friendlyName.includes("glas")) {
-            fraction = "glas";
-          } else if (entityId.includes("grofvuil") || friendlyName.includes("grofvuil")) {
-            fraction = "grofvuil";
-          } else if (entityId.includes("kca") || entityId.includes("chemisch") || friendlyName.includes("kca") || friendlyName.includes("chemisch")) {
-            fraction = "kca";
-          } else if (
-            entityId.includes("rest") || entityId.includes("sortibak") || entityId.includes("duobak") ||
-            friendlyName.includes("rest") || friendlyName.includes("sortibak") || friendlyName.includes("duobak")
-          ) {
             fraction = "restafval";
           }
         }
