@@ -7,7 +7,7 @@ import requests
 
 from ..base import WasteCollector
 from ...models import WasteCollection
-from ...const import WASTE_TYPE_GREEN, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER
+from ...const import WASTE_TYPE_GREEN, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER, DEFAULT_REQUEST_TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,7 +43,7 @@ class IradoCollector(WasteCollector):
             'User-Agent': 'Home-Assistant-Sensor-Afvalbeheer',
         }
 
-        return requests.get(url=get_url, headers=get_headers)
+        return requests.get(url=get_url, headers=get_headers, timeout=DEFAULT_REQUEST_TIMEOUT)
 
     def __parse_irado_date(self, date_str):
         if not date_str:

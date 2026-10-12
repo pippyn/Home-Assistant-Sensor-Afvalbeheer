@@ -10,7 +10,7 @@ from ..base import WasteCollector
 from ...models import WasteCollection
 from ...const import (
     WASTE_TYPE_BRANCHES, WASTE_TYPE_GREEN, WASTE_TYPE_GREY,
-    WASTE_TYPE_PAPER, WASTE_TYPE_TREE, WASTE_TYPE_PACKAGES
+    WASTE_TYPE_PAPER, WASTE_TYPE_TREE, WASTE_TYPE_PACKAGES, DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -52,7 +52,8 @@ class RD4Collector(WasteCollector):
             response = requests.get(
                 '{}?postal_code={}&house_number={}&house_number_extension={}&year={}'.format(
                     self.main_url, self.postcode, self.street_number, self.suffix, year
-                )
+                ),
+                timeout=DEFAULT_REQUEST_TIMEOUT
             )
             year_data = response.json()
 

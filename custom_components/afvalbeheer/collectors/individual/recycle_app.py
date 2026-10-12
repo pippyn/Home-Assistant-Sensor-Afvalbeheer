@@ -11,7 +11,7 @@ from ...models import WasteCollection
 from ...const import (
     WASTE_TYPE_BULKLITTER, WASTE_TYPE_GLASS, WASTE_TYPE_GREEN, WASTE_TYPE_GREY,
     WASTE_TYPE_PAPER, WASTE_TYPE_TEXTILE, WASTE_TYPE_PACKAGES, WASTE_TYPE_PLASTIC,
-    WASTE_TYPE_BRANCHES, WASTE_TYPE_SOFT_PLASTIC
+    WASTE_TYPE_BRANCHES, WASTE_TYPE_SOFT_PLASTIC, DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -74,6 +74,7 @@ class RecycleApp(WasteCollector):
             "{}zipcodes".format(self.main_url),
             headers=self.__get_headers(),
             params={'q': self.postcode},
+            timeout=DEFAULT_REQUEST_TIMEOUT,
         )
         if response.status_code != 200:
             _LOGGER.error('Invalid response from server for postcode_id')
@@ -89,6 +90,7 @@ class RecycleApp(WasteCollector):
                 "{}streets".format(self.main_url),
                 headers=self.__get_headers(),
                 params={'q': self.street_name, 'zipcodes': zipcode_id},
+                timeout=DEFAULT_REQUEST_TIMEOUT,
             )
             if response.status_code != 200:
                 _LOGGER.error('Invalid response from server for street_id')
@@ -149,6 +151,7 @@ class RecycleApp(WasteCollector):
                 'untilDate': enddate,
                 'size': 100,
             },
+            timeout=DEFAULT_REQUEST_TIMEOUT,
         )
         return response
 

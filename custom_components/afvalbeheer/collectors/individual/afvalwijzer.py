@@ -11,7 +11,8 @@ from ...const import (
     WASTE_TYPE_PAPER_PMD, WASTE_TYPE_GREENGREY, WASTE_TYPE_BRANCHES,
     WASTE_TYPE_BULKLITTER, WASTE_TYPE_BULKYGARDENWASTE, WASTE_TYPE_GLASS,
     WASTE_TYPE_GREEN, WASTE_TYPE_KCA_LOCATION, WASTE_TYPE_KCA, WASTE_TYPE_GREY,
-    WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER, WASTE_TYPE_TEXTILE, WASTE_TYPE_TREE
+    WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER, WASTE_TYPE_TEXTILE, WASTE_TYPE_TREE,
+    DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -51,7 +52,7 @@ class AfvalwijzerCollector(WasteCollector):
         _LOGGER.debug("Fetching data from Afvalwijzer")
         get_url = 'https://api.{}.nl/webservices/appsinput/?apikey={}&method=postcodecheck&postcode={}&street=&huisnummer={}&toevoeging={}&app_name=afvalwijzer&platform=web&afvaldata={}&langs=nl'.format(
                 self.waste_collector_url, self.apikey, self.postcode, self.street_number, self.suffix, datetime.today().strftime('%Y-%m-%d'))
-        return requests.get(get_url)
+        return requests.get(get_url, timeout=DEFAULT_REQUEST_TIMEOUT)
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Afvalwijzer API")

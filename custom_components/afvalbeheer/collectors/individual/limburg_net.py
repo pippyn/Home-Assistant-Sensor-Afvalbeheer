@@ -10,7 +10,7 @@ from ...models import WasteCollection
 from ...const import (
     WASTE_TYPE_BULKLITTER, WASTE_TYPE_BULKYGARDENWASTE, WASTE_TYPE_GREEN,
     WASTE_TYPE_GLASS, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER,
-    WASTE_TYPE_TEXTILE
+    WASTE_TYPE_TEXTILE, DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -52,7 +52,8 @@ class LimburgNetCollector(WasteCollector):
         _LOGGER.debug("Fetching address from Limburg.net")
         response = requests.get(
             '{}/afval-kalender/gemeenten/search'.format(self.main_url),
-            params={'query': self.city_name}
+            params={'query': self.city_name},
+            timeout=DEFAULT_REQUEST_TIMEOUT
         ).json()
 
         if not response or not response[0].get('nisCode'):
@@ -63,7 +64,8 @@ class LimburgNetCollector(WasteCollector):
 
         response = requests.get(
             '{}/afval-kalender/gemeente/{}/straten/search'.format(self.main_url, self.city_id),
-            params={'query': self.street_name}
+            params={'query': self.street_name},
+            timeout=DEFAULT_REQUEST_TIMEOUT
         ).json()
 
         if not response or not response[0].get('nummer'):
@@ -86,7 +88,8 @@ class LimburgNetCollector(WasteCollector):
             get_url = '{}/kalender/{}/{}-{}'.format(self.main_url, self.city_id, year, month)
             month_json = requests.get(
                 get_url,
-                params={'straatNummer': self.street_id, 'huisNummer': self.street_number, 'toevoeging': self.suffix}
+                params={'straatNummer': self.street_id, 'huisNummer': self.street_number, 'toevoeging': self.suffix},
+                timeout=DEFAULT_REQUEST_TIMEOUT
             ).json()
             data = data + month_json['events']
 

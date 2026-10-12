@@ -7,7 +7,7 @@ import requests
 
 from ..base import WasteCollector
 from ...models import WasteCollection
-from ...const import WASTE_TYPE_PLASTIC, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_TREE
+from ...const import WASTE_TYPE_PLASTIC, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_TREE, DEFAULT_REQUEST_TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class DeAfvalAppCollector(WasteCollector):
         _LOGGER.debug("Fetching data from DeAfvalApp")
         get_url = '{}/dataservice/DataServiceServlet?service=OPHAALSCHEMA&land=NL&postcode={}&straatId=0&huisnr={}&huisnrtoev={}'.format(
                 self.main_url, self.postcode, self.street_number, self.suffix)
-        response = requests.get(get_url)
+        response = requests.get(get_url, timeout=DEFAULT_REQUEST_TIMEOUT)
         return response.text
 
     async def update(self):

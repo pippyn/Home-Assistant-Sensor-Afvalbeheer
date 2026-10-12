@@ -7,7 +7,7 @@ import requests
 
 from ..base import WasteCollector
 from ...models import WasteCollection
-from ...const import WASTE_TYPE_GREEN, WASTE_TYPE_GREY, WASTE_TYPE_MILIEUB, WASTE_TYPE_TREE
+from ...const import WASTE_TYPE_GREEN, WASTE_TYPE_GREY, WASTE_TYPE_MILIEUB, WASTE_TYPE_TREE, DEFAULT_REQUEST_TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ class AfvalAlertCollector(WasteCollector):
         _LOGGER.debug("Fetching data from AfvalAlert")
         get_url = '{}/{}/{}{}'.format(
                 self.main_url, self.postcode, self.street_number, self.suffix)
-        return requests.get(get_url)
+        return requests.get(get_url, timeout=DEFAULT_REQUEST_TIMEOUT)
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using AfvalAlert API")

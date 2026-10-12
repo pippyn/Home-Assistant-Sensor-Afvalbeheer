@@ -11,10 +11,14 @@ from ..base import WasteCollector
 from ...models import WasteCollection
 from ...const import (
     WASTE_TYPE_BULKLITTER, WASTE_TYPE_GREEN, WASTE_TYPE_KCA, WASTE_TYPE_PACKAGES,
-    WASTE_TYPE_SORTI, WASTE_TYPE_PAPER, WASTE_TYPE_GREY
+    WASTE_TYPE_SORTI, WASTE_TYPE_PAPER, WASTE_TYPE_GREY, DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class OmrinApiError(Exception):
+    """Raised when the Omrin API returns an unexpected error response."""
 
 
 class OmrinCollector(WasteCollector):
@@ -83,7 +87,8 @@ class OmrinCollector(WasteCollector):
 
         response = self.session.post(
             f"{self.base_url}/api/auth/login",
-            json=login_data
+            json=login_data,
+            timeout=DEFAULT_REQUEST_TIMEOUT
         )
         response.raise_for_status()
         data = response.json()
@@ -105,7 +110,7 @@ class OmrinCollector(WasteCollector):
                     _LOGGER.warning("Failed to parse token expiration time: %s", expires_at_str)
             return self.token
         else:
-            raise Exception(f"Login failed: {data.get('errors', 'Unknown error')}")
+            raise OmrinApiError(f"Login failed: {data.get('errors', 'Unknown error')}")
 
     def __refresh_token_request(self) -> str:
         """Refresh the access token using the refresh token"""
@@ -121,7 +126,8 @@ class OmrinCollector(WasteCollector):
         
         response = self.session.post(
             f"{self.base_url}/api/auth/refreshtoken",
-            json=refresh_data
+            json=refresh_data,
+            timeout=DEFAULT_REQUEST_TIMEOUT
         )
         response.raise_for_status()
         data = response.json()
@@ -143,7 +149,7 @@ class OmrinCollector(WasteCollector):
                     _LOGGER.warning("Failed to parse token expiration time: %s", expires_at_str)
             return self.token
         else:
-            raise Exception(f"Token refresh failed: {data.get('errors', 'Unknown error')}")
+            raise OmrinApiError(f"Token refresh failed: {data.get('errors', 'Unknown error')}")
 
     def __clear_auth_data(self):
         """Clear stale Omrin auth data before logging in again."""
@@ -234,7 +240,8 @@ class OmrinCollector(WasteCollector):
         response = self.session.post(
             f"{self.base_url}/graphql",
             headers=headers,
-            json={'query': query}
+            json={'query': query},
+            timeout=DEFAULT_REQUEST_TIMEOUT
         )
 
         if response.status_code == 401 and retry:
@@ -248,7 +255,7 @@ class OmrinCollector(WasteCollector):
 
         if 'errors' in result and result['errors']:
             error_messages = ', '.join([e.get('message', str(e)) for e in result['errors']])
-            raise Exception(f"GraphQL error: {error_messages}")
+            raise OmrinApiError(f"GraphQL error: {error_messages}")
 
         return result
 
@@ -428,12 +435,12 @@ class OmrinCollector(WasteCollector):
                     diftar_response = await self.hass.async_add_executor_job(self.__fetch_diftar)
                     self.__parse_diftar_data(diftar_response)
                     await self.__save_auth_data()
-                except Exception as exc:
+                except (requests.exceptions.RequestException, OmrinApiError, ValueError, KeyError) as exc:
                     _LOGGER.warning('Failed to fetch diftar data: %r', exc)
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
             return False
-        except Exception as exc:
+        except (OmrinApiError, ValueError, KeyError, TypeError) as exc:
             _LOGGER.error('Unexpected error occurred: %r', exc)
             return False

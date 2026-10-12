@@ -7,7 +7,7 @@ import requests
 
 from ..base import WasteCollector
 from ...models import WasteCollection
-from ...const import WASTE_TYPE_GREEN, WASTE_TYPE_GREY
+from ...const import WASTE_TYPE_GREEN, WASTE_TYPE_GREY, DEFAULT_REQUEST_TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class CleanprofsCollector(WasteCollector):
         _LOGGER.debug("Fetching data from Cleanprofs")
         get_url = '{}api/get-plannings-address?zipcode={}&house_number={}'.format(
                 self.main_url, self.postcode, self.street_number)
-        return requests.get(get_url)
+        return requests.get(get_url, timeout=DEFAULT_REQUEST_TIMEOUT)
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Cleanprofs API")

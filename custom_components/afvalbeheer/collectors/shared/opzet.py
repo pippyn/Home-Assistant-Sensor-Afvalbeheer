@@ -15,7 +15,7 @@ from ...const import (
     WASTE_TYPE_PMD_GREY, WASTE_TYPE_PAPER_PMD, WASTE_TYPE_BRANCHES, WASTE_TYPE_BULKLITTER,
     WASTE_TYPE_GLASS, WASTE_TYPE_GREENGREY, WASTE_TYPE_GREEN, WASTE_TYPE_KCA,
     WASTE_TYPE_GREY_BAGS, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER,
-    WASTE_TYPE_TEXTILE, WASTE_TYPE_TREE, OPZET_COLLECTOR_URLS
+    WASTE_TYPE_TEXTILE, WASTE_TYPE_TREE, OPZET_COLLECTOR_URLS, DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -87,7 +87,7 @@ class OpzetCollector(WasteCollector):
         url = "{}/rest/adressen/{}-{}".format(self.main_url, self.postcode, self.street_number)
 
         with _force_ipv4_resolution():
-            response = self._session.get(url, verify=self._verify).json()
+            response = self._session.get(url, verify=self._verify, timeout=DEFAULT_REQUEST_TIMEOUT).json()
 
         if not response:
             _LOGGER.error('Address not found!')
@@ -106,7 +106,7 @@ class OpzetCollector(WasteCollector):
         url = "{}/rest/adressen/{}/afvalstromen".format(self.main_url, self.bag_id)
 
         with _force_ipv4_resolution():
-            return self._session.get(url, verify=self._verify)
+            return self._session.get(url, verify=self._verify, timeout=DEFAULT_REQUEST_TIMEOUT)
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Opzet API")

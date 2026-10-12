@@ -8,6 +8,10 @@ DOMAIN = "afvalbeheer"
 
 SCHEDULE_UPDATE_INTERVAL = timedelta(hours=12)
 
+# Default timeout (seconds) for all outgoing HTTP requests made by collectors,
+# so a hanging external API cannot block an executor thread indefinitely.
+DEFAULT_REQUEST_TIMEOUT = 30
+
 CONF_ID = "id"
 CONF_WASTE_COLLECTOR = 'wastecollector'
 CONF_CITY_NAME = 'cityname'
