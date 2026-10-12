@@ -222,8 +222,25 @@ def generate_js(js_text):
 
 
 def main():
-    CONST_FILE.write_text(generate_const(CONST_FILE.read_text()))
-    JS_FILE.write_text(generate_js(JS_FILE.read_text()))
+    # Keep the editable outline source shared by the backend and both themes.
+    source = Path(__file__).parent / "icons" / "restafvalzakken.svg"
+    light_svg = source.read_text().strip()
+    light = base64.b64encode(light_svg.encode()).decode()
+    dark = base64.b64encode(light_svg.replace("#1B1D3B", "#FFFFFF").encode()).decode()
+    const_text = re.sub(
+        r"('restafvalzakken': 'data:image/svg\+xml;base64,)[A-Za-z0-9+/=]+",
+        lambda match: match[1] + light,
+        CONST_FILE.read_text(), count=1,
+    )
+    js_text = JS_FILE.read_text()
+    for theme, encoded in (("LIGHT", light), ("DARK", dark)):
+        js_text = re.sub(
+            r'(const RESTAFVALZAKKEN_' + theme + r' = ")[A-Za-z0-9+/=]+',
+            lambda match: match[1] + encoded,
+            js_text, count=1,
+        )
+    CONST_FILE.write_text(generate_const(const_text))
+    JS_FILE.write_text(generate_js(js_text))
     print("Updated %s and %s" % (CONST_FILE.name, JS_FILE.name))
 
 

@@ -1,0 +1,9 @@
+<svg id="afvalbeheer-restafvalzakken" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 142 142">
+  <g fill="none" stroke="#1B1D3B" stroke-width="3.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M64 43 C60 35 54 29 51 23 C57 25 61 20 66 23 C71 26 77 20 82 23 L91 25 C87 32 81 38 78 43"/>
+    <path d="M63 43 Q71 40 79 43 Q83 46 79 49 Q71 52 63 49 Q59 46 63 43 Z"/>
+    <path d="M63 50 C55 56 43 61 38 73 C33 84 34 93 29 104 C25 113 31 117 42 116 C51 115 55 120 71 120 C87 120 91 115 100 116 C111 117 117 113 113 104 C108 93 109 84 104 73 C99 61 87 56 79 50"/>
+    <path d="M62 59 Q54 66 50 78 M70 58 Q65 70 63 83 M80 59 Q88 68 92 80"/>
+    <path d="M65 29 L69 39 M81 29 L75 39"/>
+  </g>
+</svg>
