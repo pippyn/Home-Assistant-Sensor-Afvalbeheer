@@ -1,15 +1,47 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_RESOURCES
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from homeassistant.components import persistent_notification
 
 from .API import get_wastedata_from_config
-from .const import *
+from .const import (
+    ATTR_DAYS_UNTIL,
+    ATTR_HIDDEN,
+    ATTR_SORT_DATE,
+    ATTR_UPCOMING_DAY,
+    ATTR_UPCOMING_WASTE_TYPES,
+    ATTR_WASTE_COLLECTOR,
+    CONF_ALWAYS_SHOW_DAY,
+    CONF_BOLD_ICONS,
+    CONF_BUILT_IN_ICONS,
+    CONF_BUILT_IN_ICONS_NEW,
+    CONF_DATE_FORMAT,
+    CONF_DATE_OBJECT,
+    CONF_DATE_ONLY,
+    CONF_DAY_OF_WEEK,
+    CONF_DAY_OF_WEEK_ONLY,
+    CONF_DISABLE_ICONS,
+    CONF_ENTRY_ID,
+    CONF_ID,
+    CONF_NAME,
+    CONF_NAME_PREFIX,
+    CONF_POSTCODE,
+    CONF_STREET_NUMBER,
+    CONF_UPCOMING,
+    CONF_WASTE_COLLECTOR,
+    DOMAIN,
+    FRACTION_ICONS,
+    FRACTION_ICONS_NEW,
+    FRACTION_ICONS_NEW_BOLD,
+    LANGUAGE_EN,
+    NOTIFICATION_ID,
+)
 from .translation import async_prepare_translations, resolve_language, text, translate_date_text
 
 _LOGGER = logging.getLogger(__name__)
