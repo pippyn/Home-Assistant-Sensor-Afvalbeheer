@@ -10,7 +10,7 @@ from ..base import WasteCollector
 from ...models import WasteCollection
 from ...const import (
     WASTE_TYPE_GREEN, WASTE_TYPE_PAPER, WASTE_TYPE_PACKAGES,
-    WASTE_TYPE_GREY, KLIKOGROEP_COLLECTOR_IDS
+    WASTE_TYPE_GREY, KLIKOGROEP_COLLECTOR_IDS, DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ class KlikogroepCollector(WasteCollector):
             'User-Agent': 'Home-Assistant-Sensor-Afvalbeheer',
         }
 
-        response = requests.get(url, headers=headers, verify=False)
+        response = requests.get(url, headers=headers, verify=False, timeout=DEFAULT_REQUEST_TIMEOUT)
         return response.json()
 
     async def update(self):

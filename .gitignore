@@ -6,3 +6,6 @@ API_SPLIT_PLAN.md
 custom_components/afvalbeheer/__pycache__/
 ha_forum_blog_post.md
 AGENTS.md
+.venv/
+.pytest_cache/
+__pycache__/

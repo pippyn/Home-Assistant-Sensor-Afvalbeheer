@@ -11,7 +11,7 @@ from ..base import WasteCollector
 from ...models import WasteCollection
 from ...const import (
     WASTE_TYPE_GREEN, WASTE_TYPE_PAPER, WASTE_TYPE_PMD_GREY, WASTE_TYPE_GREY,
-    WASTE_TYPE_PACKAGES, BURGERPORTAAL_COLLECTOR_IDS
+    WASTE_TYPE_PACKAGES, BURGERPORTAAL_COLLECTOR_IDS, DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -60,7 +60,9 @@ class BurgerportaalCollector(WasteCollector):
 
     def __fetch_refresh_token(self):
         _LOGGER.debug("Fetching refresh token from Burgerportaal")
-        response = requests.post("https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={}".format(self.apikey)).json()
+        response = requests.post(
+            "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={}".format(self.apikey),
+            timeout=DEFAULT_REQUEST_TIMEOUT).json()
         if not response:
             _LOGGER.error('Unable to fetch refresh token!')
             return
@@ -79,7 +81,9 @@ class BurgerportaalCollector(WasteCollector):
             'refresh_token' : self.refresh_token
         }
 
-        response = requests.post("https://securetoken.googleapis.com/v1/token?key={}".format(self.apikey), headers=headers, data=data).json()
+        response = requests.post(
+            "https://securetoken.googleapis.com/v1/token?key={}".format(self.apikey),
+            headers=headers, data=data, timeout=DEFAULT_REQUEST_TIMEOUT).json()
         if not response or 'id_token' not in response:
             _LOGGER.warning('Stored refresh token was rejected, obtaining new credentials')
             self.__fetch_refresh_token()
@@ -97,7 +101,7 @@ class BurgerportaalCollector(WasteCollector):
             "https://europe-west3-burgerportaal-production.cloudfunctions.net/exposed/organisations/{}/address?zipcode={}&housenumber={}".format(
                 self.company_code, self.postcode, self.street_number
             ),
-            headers=headers
+            headers=headers, timeout=DEFAULT_REQUEST_TIMEOUT
         )
         if response.status_code == 204 or not response.text:
             _LOGGER.error('Unable to fetch address!')
@@ -150,7 +154,7 @@ class BurgerportaalCollector(WasteCollector):
         }
 
         response = requests.get("https://europe-west3-burgerportaal-production.cloudfunctions.net/exposed/organisations/{}/address/{}/calendar".format(
-            self.company_code, self.address_id), headers=headers)
+            self.company_code, self.address_id), headers=headers, timeout=DEFAULT_REQUEST_TIMEOUT)
         if response.status_code == 204 or not response.text:
             return []
         return response.json()

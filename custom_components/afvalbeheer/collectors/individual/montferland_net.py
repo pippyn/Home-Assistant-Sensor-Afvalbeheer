@@ -9,7 +9,7 @@ from ..base import WasteCollector
 from ...models import WasteCollection
 from ...const import (
     WASTE_TYPE_GLASS, WASTE_TYPE_GREEN, WASTE_TYPE_GREY,
-    WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER, WASTE_TYPE_TEXTILE
+    WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER, WASTE_TYPE_TEXTILE, DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,7 +39,8 @@ class MontferlandNetCollector(WasteCollector):
     def __fetch_address(self):
         _LOGGER.debug("Fetching address from Montferland")
         response = requests.get('{}Login.ashx{}&Postcode={}&Huisnummer={}&Toevoeging='.format(
-            self.main_url, self.query_start, self.postcode, self.street_number, self.suffix)).json()
+            self.main_url, self.query_start, self.postcode, self.street_number, self.suffix),
+            timeout=DEFAULT_REQUEST_TIMEOUT).json()
 
         if not response[0]['AdresID']:
             _LOGGER.error('AdresID not found!')
@@ -61,7 +62,7 @@ class MontferlandNetCollector(WasteCollector):
             get_url = "{}/OphaalDatums.ashx/{}&ADM_ID={}&ADR_ID={}&Jaar={}".format(
                 self.main_url, self.query_start, self.administratie_id, self.adres_id, year
             )
-            year_data = requests.get(get_url).json()
+            year_data = requests.get(get_url, timeout=DEFAULT_REQUEST_TIMEOUT).json()
             if year_data:
                 data.extend(year_data)
             else:

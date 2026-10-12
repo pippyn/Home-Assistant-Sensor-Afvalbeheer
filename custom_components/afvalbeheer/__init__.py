@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 6.5.29 20261006
+Current Version: 6.5.30 20261012
 """
 
 import hashlib
@@ -12,6 +12,7 @@ from datetime import timedelta
 from homeassistant.const import Platform
 
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.typing import ConfigType
 from pathlib import Path
 from homeassistant.components import persistent_notification
@@ -20,7 +21,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID, NOTIFICATION_ID, CONF_WASTE
 from .API import get_wastedata_from_config
 
 
-__version__ = "6.5.29"
+__version__ = "6.5.30"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -63,7 +64,7 @@ async def _async_register_frontend(hass: HomeAssistant):
             content_hash = await hass.async_add_executor_job(_file_hash, FRONTEND_FILE)
             add_extra_js_url(hass, f"{FRONTEND_URL}?v={__version__}-{content_hash}")
             _LOGGER.debug("Registered Afvalbeheer custom iconset at %s", FRONTEND_URL)
-    except Exception as err:
+    except (OSError, HomeAssistantError) as err:
         _LOGGER.warning("Could not register Afvalbeheer frontend icons: %s", err)
 
 
@@ -170,7 +171,7 @@ def _check_if_migration_needed(hass, config_entry):
                     return True
         
         return False
-    except Exception as e:
+    except (KeyError, AttributeError) as e:
         _LOGGER.error("Error checking migration need: %s", e)
         return False
 
@@ -249,7 +250,7 @@ async def _migrate_entry_to_v3(hass, config_entry):
         
         return True
         
-    except Exception as e:
+    except (KeyError, AttributeError, ValueError) as e:
         _LOGGER.error("Migration failed: %s", e)
         return False
 
@@ -325,7 +326,7 @@ async def _migrate_entry_to_v3_2(hass, config_entry):
 
         return True
 
-    except Exception as e:
+    except (KeyError, AttributeError, ValueError) as e:
         _LOGGER.error("Migration failed: %s", e)
         return False
 

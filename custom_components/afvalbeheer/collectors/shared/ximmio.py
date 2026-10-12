@@ -13,7 +13,7 @@ from ...const import (
     WASTE_TYPE_PMD_GREY, WASTE_TYPE_GLASS, WASTE_TYPE_GREENGREY,
     WASTE_TYPE_GREEN, WASTE_TYPE_GREY, WASTE_TYPE_KCA, WASTE_TYPE_PACKAGES,
     WASTE_TYPE_PAPER, WASTE_TYPE_REMAINDER, WASTE_TYPE_TEXTILE, WASTE_TYPE_TREE,
-    XIMMIO_COLLECTOR_IDS
+    XIMMIO_COLLECTOR_IDS, DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -76,7 +76,7 @@ class XimmioCollector(WasteCollector):
 
         response = requests.post(
             "{}/api/FetchAdress".format(self.main_url),
-            data=data).json()
+            data=data, timeout=DEFAULT_REQUEST_TIMEOUT).json()
 
         if not response['dataList']:
             _LOGGER.error('Address not found!')
@@ -102,7 +102,7 @@ class XimmioCollector(WasteCollector):
 
         response = requests.post(
             "{}/api/GetCalendar".format(self.main_url),
-            data=data)
+            data=data, timeout=DEFAULT_REQUEST_TIMEOUT)
         return response
 
     async def update(self):

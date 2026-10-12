@@ -7,7 +7,7 @@ import requests
 
 from ..base import WasteCollector
 from ...models import WasteCollection
-from ...const import WASTE_TYPE_GREEN, WASTE_TYPE_PAPER, WASTE_TYPE_PACKAGES
+from ...const import WASTE_TYPE_GREEN, WASTE_TYPE_PAPER, WASTE_TYPE_PACKAGES, DEFAULT_REQUEST_TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,7 +29,8 @@ class ROVACollector(WasteCollector):
     def __get_data(self):
         _LOGGER.debug("Fetching data from ROVA")
         response = requests.get(
-            '{}/api/waste-calendar/upcoming?houseNumber={}&addition={}&postalcode={}&take=10'.format(self.main_url, self.street_number, self.suffix, self.postcode)
+            '{}/api/waste-calendar/upcoming?houseNumber={}&addition={}&postalcode={}&take=10'.format(self.main_url, self.street_number, self.suffix, self.postcode),
+            timeout=DEFAULT_REQUEST_TIMEOUT
         )
         return response
 

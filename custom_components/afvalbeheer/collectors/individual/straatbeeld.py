@@ -9,7 +9,7 @@ from ..base import WasteCollector
 from ...models import WasteCollection
 from ...const import (
     WASTE_TYPE_GREEN, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES,
-    WASTE_TYPE_PAPER, WASTE_TYPE_TREE
+    WASTE_TYPE_PAPER, WASTE_TYPE_TREE, DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -44,7 +44,7 @@ class StraatbeeldCollector(WasteCollector):
             "house_letter": self.suffix,
         }
 
-        return requests.post(f"{self.main_url}/v1/waste-calendar", headers=headers, json=data)
+        return requests.post(f"{self.main_url}/v1/waste-calendar", headers=headers, json=data, timeout=DEFAULT_REQUEST_TIMEOUT)
 
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Straatbeeld API")
