@@ -301,8 +301,7 @@ class WasteTypeSensor(BaseSensor):
     def icon(self):
         """Return the icon for the sensor."""
         if self.built_in_icons and not self.built_in_icons_new and not self.disable_icons:
-            key, waste_type_lower = _fraction_icon_keys(self.waste_type)
-            icon = self._classic_icon(FRACTION_ICONS.get(key) or FRACTION_ICONS.get(waste_type_lower))
+            icon = self._classic_fraction_icon()
             return icon or super().icon
         return super().icon
 
@@ -319,8 +318,11 @@ class WasteTypeSensor(BaseSensor):
 
     def _restore_entity_picture(self, state):
         """Restore the entity picture, preferring the current built-in icon."""
-        if self.built_in_icons_new and not self.disable_icons:
-            self._entity_picture = self._get_entity_picture() or state.attributes.get("entity_picture")
+        if not self.disable_icons:
+            if self.built_in_icons and not self.built_in_icons_new and self._classic_fraction_icon():
+                self._entity_picture = None
+            else:
+                self._entity_picture = self._get_entity_picture(None) or state.attributes.get("entity_picture")
             _LOGGER.debug("Restored entity picture: %s", self._entity_picture)
 
     def update(self):
@@ -360,18 +362,34 @@ class WasteTypeSensor(BaseSensor):
 
     def _set_picture(self, collection):
         """Set the entity picture based on collection data."""
-        if self.built_in_icons_new and not self.disable_icons:
-            self._entity_picture = self._get_entity_picture()
+        if not self.disable_icons:
+            self._entity_picture = self._get_entity_picture(collection)
             _LOGGER.debug("Entity picture set for %s: %s", self._name, self._entity_picture)
         else:
             self._entity_picture = None
 
-    def _get_entity_picture(self):
+    def _get_entity_picture(self, collection):
         """Get the appropriate entity picture for the waste type."""
-        if not self.built_in_icons_new or self.disable_icons:
+        if self.disable_icons:
             return None
+        if self.built_in_icons_new:
+            key, waste_type_lower = _fraction_icon_keys(self.waste_type)
+            icon = self._modern_icons.get(key) or self._modern_icons.get(waste_type_lower)
+            if icon:
+                return icon
+            if collection and collection.icon_data:
+                return collection.icon_data
+            return None
+        if self.built_in_icons and self._classic_fraction_icon():
+            return None
+        if collection and collection.icon_data:
+            return collection.icon_data
+        return None
+
+    def _classic_fraction_icon(self):
+        """Return the classic icon for this waste type, if one exists."""
         key, waste_type_lower = _fraction_icon_keys(self.waste_type)
-        return self._modern_icons.get(key) or self._modern_icons.get(waste_type_lower)
+        return self._classic_icon(FRACTION_ICONS.get(key) or FRACTION_ICONS.get(waste_type_lower))
 
 
 class WasteDateSensor(BaseSensor):

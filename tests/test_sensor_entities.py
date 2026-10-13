@@ -6,7 +6,8 @@ access required). This guards against regressions in sensor.py's module-level
 name resolution (e.g. after replacing `from .const import *` with explicit
 imports) as well as basic update()/property behavior.
 """
-from datetime import timedelta
+from datetime import datetime, timedelta
+from types import SimpleNamespace
 
 from custom_components.afvalbeheer.API import get_wastedata_from_config
 from custom_components.afvalbeheer.const import (
@@ -33,6 +34,7 @@ from custom_components.afvalbeheer.const import (
     CONF_UPDATE_INTERVAL,
     CONF_WASTE_COLLECTOR,
 )
+from custom_components.afvalbeheer.models import WasteCollection, WasteCollectionRepository
 from custom_components.afvalbeheer.sensor import (
     WasteDateSensor,
     WasteTypeSensor,
@@ -103,3 +105,61 @@ async def test_waste_upcoming_sensor_update_cycle(hass):
 
     assert sensor.name
     assert isinstance(sensor.extra_state_attributes, dict)
+
+
+def test_waste_type_sensor_uses_collector_icon_data_by_default():
+    icon_data = "data:image/svg+xml;base64,PHN2Zy8+"
+    collections = WasteCollectionRepository()
+    collections.add(WasteCollection.create(
+        date=datetime.now() + timedelta(days=1),
+        waste_type="Groente-, fruit- en tuinafval",
+        waste_type_slug="Groente-, fruit- en tuinafval",
+        icon_data=icon_data,
+    ))
+    data = SimpleNamespace(collections=collections)
+    config = _demo_config(**{
+        CONF_BUILT_IN_ICONS_NEW: False,
+        CONF_BUILT_IN_ICONS: False,
+        CONF_RESOURCES: ["Groente-, fruit- en tuinafval"],
+    })
+
+    sensor = WasteTypeSensor(data, "Groente-, fruit- en tuinafval", config)
+    sensor.update()
+
+    assert sensor.entity_picture == icon_data
+
+
+def test_waste_type_sensor_uses_collector_icon_data_for_classic_fraction_by_default():
+    collections = WasteCollectionRepository()
+    icon_data = "data:image/svg+xml;base64,PHN2Zy8+"
+    collections.add(WasteCollection.create(
+        date=datetime.now() + timedelta(days=1),
+        waste_type="restafval",
+        waste_type_slug="restafval",
+        icon_data=icon_data,
+    ))
+    data = SimpleNamespace(collections=collections)
+    config = _demo_config(**{CONF_BUILT_IN_ICONS_NEW: False, CONF_BUILT_IN_ICONS: False})
+
+    sensor = WasteTypeSensor(data, "restafval", config)
+    sensor.update()
+
+    assert sensor.entity_picture == icon_data
+
+
+def test_waste_type_sensor_prefers_classic_icon_over_collector_icon_data_when_enabled():
+    collections = WasteCollectionRepository()
+    collections.add(WasteCollection.create(
+        date=datetime.now() + timedelta(days=1),
+        waste_type="restafval",
+        waste_type_slug="restafval",
+        icon_data="data:image/svg+xml;base64,PHN2Zy8+",
+    ))
+    data = SimpleNamespace(collections=collections)
+    config = _demo_config(**{CONF_BUILT_IN_ICONS_NEW: False, CONF_BUILT_IN_ICONS: True})
+
+    sensor = WasteTypeSensor(data, "restafval", config)
+    sensor.update()
+
+    assert sensor.entity_picture is None
+    assert sensor.icon == "afvalbeheer:restafval"
