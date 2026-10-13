@@ -80,6 +80,61 @@
                     "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
                     "language": "Taal voor tekst die door de integratie wordt beheerd, zoals datums, hulpsensornamen en meldingen"
                 }
+            },
+            "custom": {
+                "title": "Overig",
+                "description": "Voer een naam in en kies het afvaltype waarvan je zelf de ophaaldatums invoert",
+                "data": {
+                    "name": "Naam",
+                    "customwastetype": "Afvaltype"
+                },
+                "data_description": {
+                    "name": "Een beschrijvende naam voor deze invoer, gebruikt in de sensornamen",
+                    "customwastetype": "Het type afval dat wordt opgehaald op de datums die je invoert"
+                }
+            },
+            "custom_dates": {
+                "title": "Ophaaldatums",
+                "description": "Kies een datum en klik op Toevoegen. Vink een datum uit om hem te verwijderen.",
+                "data": {
+                    "customdates": "Ophaaldatums",
+                    "date": "Datum toevoegen",
+                    "add_another": "Nog een datum toevoegen"
+                },
+                "data_description": {
+                    "customdates": "Vink een datum uit om hem te verwijderen",
+                    "date": "Laat leeg om naar de volgende stap te gaan",
+                    "add_another": "Laat aan om hierna nog een datum toe te voegen. Zet uit om deze datum toe te voegen en door te gaan."
+                },
+                "submit": "Toevoegen"
+            },
+            "custom_options": {
+                "title": "Weergave-opties",
+                "description": "Configureer hoe de sensoren van Overig worden weergegeven",
+                "data": {
+                    "wastecollectornameprefix": "Gebruik naam voorvoegsel",
+                    "dateformat": "Datumformaat",
+                    "upcomingsensor": "Komende sensoren",
+                    "dateonly": "Alleen datum",
+                    "dateobject": "Datum als tijdstempel",
+                    "language": "Taal voor sensortekst",
+                    "dayofweek": "Toon dag van de week",
+                    "dayofweekonly": "Alleen dagnamen",
+                    "alwaysshowday": "Altijd dagnamen tonen",
+                    "iconset": "Pictogrammen"
+                },
+                "data_description": {
+                    "wastecollectornameprefix": "Voeg afvalinzamelaarnaam toe als voorvoegsel aan sensornamen",
+                    "dateformat": "Datumformaat voor sensorwaarden (Python strftime formaat)",
+                    "upcomingsensor": "Maak extra sensoren voor vandaag, morgen en volgende komende ophaaldag",
+                    "dateonly": "Toon alleen datum zonder dagnamen (overschrijft andere daginstellingen)",
+                    "dateobject": "Gebruik tijdstempel objecten in plaats van opgemaakte tekst (voor automatiseringen)",
+                    "language": "Taal voor tekst die door de integratie wordt beheerd, zoals datums, hulpsensornamen en meldingen",
+                    "dayofweek": "Inclusief dag van de week in sensorwaarden (bijv. 'Maandag, 01-01-2024')",
+                    "dayofweekonly": "Toon alleen dagnamen voor nabije datums (vandaag, morgen, dagnamen)",
+                    "alwaysshowday": "Altijd dagnamen tonen, zelfs voor datums meer dan een week weg",
+                    "iconset": "Pictogrammenset voor de afvaltype sensoren"
+                }
             }
         },
         "error": {
@@ -89,7 +144,9 @@
             "no_resources": "Geen afvaltypes gevonden",
             "unknown_error": "Onbekende fout opgetreden",
             "invalid_custom_mapping": "Ongeldig JSON formaat in aangepaste mapping",
-            "already_configured": "Deze configuratie bestaat al"
+            "already_configured": "Deze configuratie bestaat al",
+            "name_required": "Een naam is verplicht",
+            "no_dates": "Voeg minimaal één ophaaldatum toe"
         },
         "abort": {
             "already_configured": "Deze afvalinzamelaar configuratie bestaat al"
@@ -176,6 +233,61 @@
                     "customerid": "Klant ID voor Ximmio-gebaseerde inzamelaars (indien vereist door uw afvalinzamelaar)",
                     "language": "Taal voor tekst die door de integratie wordt beheerd, zoals datums, hulpsensornamen en meldingen"
                 }
+            },
+            "custom": {
+                "title": "Overig",
+                "description": "Voer een naam in en kies het afvaltype waarvan je zelf de ophaaldatums invoert",
+                "data": {
+                    "name": "Naam",
+                    "customwastetype": "Afvaltype"
+                },
+                "data_description": {
+                    "name": "Een beschrijvende naam voor deze invoer, gebruikt in de sensornamen",
+                    "customwastetype": "Het type afval dat wordt opgehaald op de datums die je invoert"
+                }
+            },
+            "custom_dates": {
+                "title": "Ophaaldatums",
+                "description": "Kies een datum en klik op Toevoegen. Vink een datum uit om hem te verwijderen.",
+                "data": {
+                    "customdates": "Ophaaldatums",
+                    "date": "Datum toevoegen",
+                    "add_another": "Nog een datum toevoegen"
+                },
+                "data_description": {
+                    "customdates": "Vink een datum uit om hem te verwijderen",
+                    "date": "Laat leeg om naar de volgende stap te gaan",
+                    "add_another": "Laat aan om hierna nog een datum toe te voegen. Zet uit om deze datum toe te voegen en door te gaan."
+                },
+                "submit": "Toevoegen"
+            },
+            "custom_options": {
+                "title": "Weergave-opties",
+                "description": "Configureer hoe de sensoren van Overig worden weergegeven",
+                "data": {
+                    "wastecollectornameprefix": "Gebruik naam voorvoegsel",
+                    "dateformat": "Datumformaat",
+                    "upcomingsensor": "Komende sensoren",
+                    "dateonly": "Alleen datum",
+                    "dateobject": "Datum als tijdstempel",
+                    "language": "Taal voor sensortekst",
+                    "dayofweek": "Toon dag van de week",
+                    "dayofweekonly": "Alleen dagnamen",
+                    "alwaysshowday": "Altijd dagnamen tonen",
+                    "iconset": "Pictogrammen"
+                },
+                "data_description": {
+                    "wastecollectornameprefix": "Voeg afvalinzamelaarnaam toe als voorvoegsel aan sensornamen",
+                    "dateformat": "Datumformaat voor sensorwaarden (Python strftime formaat)",
+                    "upcomingsensor": "Maak extra sensoren voor vandaag, morgen en volgende komende ophaaldag",
+                    "dateonly": "Toon alleen datum zonder dagnamen (overschrijft andere daginstellingen)",
+                    "dateobject": "Gebruik tijdstempel objecten in plaats van opgemaakte tekst (voor automatiseringen)",
+                    "language": "Taal voor tekst die door de integratie wordt beheerd, zoals datums, hulpsensornamen en meldingen",
+                    "dayofweek": "Inclusief dag van de week in sensorwaarden (bijv. 'Maandag, 01-01-2024')",
+                    "dayofweekonly": "Toon alleen dagnamen voor nabije datums (vandaag, morgen, dagnamen)",
+                    "alwaysshowday": "Altijd dagnamen tonen, zelfs voor datums meer dan een week weg",
+                    "iconset": "Pictogrammenset voor de afvaltype sensoren"
+                }
             }
         },
         "error": {
@@ -184,7 +296,9 @@
             "invalid_collector": "Ongeldige inzamelaargegevens",
             "no_resources": "Geen afvaltypes gevonden",
             "unknown_error": "Onbekende fout opgetreden",
-            "invalid_custom_mapping": "Ongeldig JSON formaat in aangepaste mapping"
+            "invalid_custom_mapping": "Ongeldig JSON formaat in aangepaste mapping",
+            "name_required": "Een naam is verplicht",
+            "no_dates": "Voeg minimaal één ophaaldatum toe"
         }
     },
     "runtime": {
@@ -256,6 +370,11 @@
                 "classic_bold": "Klassiek vet",
                 "modern": "Modern",
                 "modern_bold": "Modern vet"
+            }
+        },
+        "wastecollector": {
+            "options": {
+                "Overig": "Overig"
             }
         }
     }
