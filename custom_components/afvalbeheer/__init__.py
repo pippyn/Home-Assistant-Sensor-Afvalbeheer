@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 6.5.32 20261012
+Current Version: 6.5.33 20261013
 """
 
 import hashlib
@@ -21,7 +21,7 @@ from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID, NOTIFICATION_ID, CONF_WASTE
 from .API import get_wastedata_from_config
 
 
-__version__ = "6.5.32"
+__version__ = "6.5.33"
 
 _LOGGER = logging.getLogger(__name__)
 
