@@ -124,18 +124,37 @@ class OpzetCollector(WasteCollector):
 
         return data if isinstance(data, list) else []
 
+    @staticmethod
+    def __parse_date(value):
+        """Return the date as a datetime, or None when it is missing or not a valid YYYY-MM-DD date."""
+        try:
+            return datetime.strptime(value, '%Y-%m-%d')
+        except (TypeError, ValueError):
+            return None
+
     def __get_calendar_dates(self, streams):
-        """Return (waste stream, date) pairs from today on, for this year and the next."""
-        streams_by_id = {item.get('id'): item for item in streams}
-        now = datetime.now()
-        today = now.strftime('%Y-%m-%d')
+        """Return (waste stream, date) pairs from today on, from this year's and next year's calendar.
+
+        Entries that can't be used (not an object, unknown stream, missing or invalid date) are skipped,
+        so one bad entry doesn't cost the rest of the calendar.
+        """
+        streams_by_id = {item.get('id'): item for item in streams if isinstance(item, dict)}
+        today = datetime.now().date()
         dates = []
-        for year in (now.year, now.year + 1):
+        for year in (today.year, today.year + 1):
             for entry in self.__get_calendar(year):
+                if not isinstance(entry, dict):
+                    _LOGGER.debug('Skipping calendar entry that is not an object: %r', entry)
+                    continue
                 item = streams_by_id.get(entry.get('afvalstroom_id'))
-                ophaaldatum = entry.get('ophaaldatum')
-                if item and ophaaldatum and ophaaldatum >= today:
-                    dates.append((item, ophaaldatum))
+                if not item:
+                    continue
+                date = self.__parse_date(entry.get('ophaaldatum'))
+                if date is None:
+                    _LOGGER.debug('Skipping calendar entry with an invalid date: %r', entry)
+                    continue
+                if date.date() >= today:
+                    dates.append((item, date))
         return dates
 
     async def update(self):
@@ -152,15 +171,20 @@ class OpzetCollector(WasteCollector):
                 _LOGGER.error('No Waste data found!')
                 return
 
-            self.collections.remove_all()
-
             # The afvalstromen endpoint only holds the next pickup per waste stream. The calendar endpoint,
-            # which the municipalities' own websites use, holds the whole year. Use it when it has dates.
-            dates = await self.hass.async_add_executor_job(self.__get_calendar_dates, response)
-            if not dates:
-                dates = [(item, item['ophaaldatum']) for item in response if item.get('ophaaldatum')]
+            # which the municipalities' own websites use, holds the whole year. Use both: a stream that the
+            # calendar leaves out still gets its next pickup.
+            calendar_dates = await self.hass.async_add_executor_job(self.__get_calendar_dates, response)
+            next_dates = []
+            for item in response:
+                date = self.__parse_date(item.get('ophaaldatum'))
+                if date is not None:
+                    next_dates.append((item, date))
 
-            for item, ophaaldatum in dates:
+            # Build the new collections first and replace the old ones only once that has succeeded, with no
+            # await in between: if anything fails, the previous collections stay as they were.
+            collections = []
+            for item, date in next_dates + calendar_dates:
                 waste_type = self.map_waste_type(item['menu_title'])
                 if not waste_type:
                     continue
@@ -169,13 +193,17 @@ class OpzetCollector(WasteCollector):
                 icon_data = item['icon_data'] if 'icon_data' in item else None
 
                 collection = WasteCollection.create(
-                    date=datetime.strptime(ophaaldatum, '%Y-%m-%d'),
+                    date=date,
                     waste_type=waste_type,
                     waste_type_slug=item['menu_title'],
                     icon_data=icon_data,
                 )
-                if collection not in self.collections:
-                    self.collections.add(collection)
+                if collection not in collections:
+                    collections.append(collection)
+
+            self.collections.remove_all()
+            for collection in collections:
+                self.collections.add(collection)
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
