@@ -108,6 +108,36 @@ class OpzetCollector(WasteCollector):
         with _force_ipv4_resolution():
             return self._session.get(url, verify=self._verify, timeout=DEFAULT_REQUEST_TIMEOUT)
 
+    def __get_calendar(self, year):
+        _LOGGER.debug("Fetching calendar for %s from Opzet", year)
+        url = "{}/rest/adressen/{}/kalender/{}".format(self.main_url, self.bag_id, year)
+
+        try:
+            with _force_ipv4_resolution():
+                response = self._session.get(url, verify=self._verify, timeout=DEFAULT_REQUEST_TIMEOUT)
+            if response.status_code != 200:
+                return []
+            data = response.json()
+        except (requests.exceptions.RequestException, ValueError) as exc:
+            _LOGGER.debug('Calendar for %s not available: %r', year, exc)
+            return []
+
+        return data if isinstance(data, list) else []
+
+    def __get_calendar_dates(self, streams):
+        """Return (waste stream, date) pairs from today on, for this year and the next."""
+        streams_by_id = {item.get('id'): item for item in streams}
+        now = datetime.now()
+        today = now.strftime('%Y-%m-%d')
+        dates = []
+        for year in (now.year, now.year + 1):
+            for entry in self.__get_calendar(year):
+                item = streams_by_id.get(entry.get('afvalstroom_id'))
+                ophaaldatum = entry.get('ophaaldatum')
+                if item and ophaaldatum and ophaaldatum >= today:
+                    dates.append((item, ophaaldatum))
+        return dates
+
     async def update(self):
         _LOGGER.debug("Updating Waste collection dates using Opzet API")
 
@@ -124,10 +154,13 @@ class OpzetCollector(WasteCollector):
 
             self.collections.remove_all()
 
-            for item in response:
-                if not item['ophaaldatum']:
-                    continue
+            # The afvalstromen endpoint only holds the next pickup per waste stream. The calendar endpoint,
+            # which the municipalities' own websites use, holds the whole year. Use it when it has dates.
+            dates = await self.hass.async_add_executor_job(self.__get_calendar_dates, response)
+            if not dates:
+                dates = [(item, item['ophaaldatum']) for item in response if item.get('ophaaldatum')]
 
+            for item, ophaaldatum in dates:
                 waste_type = self.map_waste_type(item['menu_title'])
                 if not waste_type:
                     continue
@@ -136,7 +169,7 @@ class OpzetCollector(WasteCollector):
                 icon_data = item['icon_data'] if 'icon_data' in item else None
 
                 collection = WasteCollection.create(
-                    date=datetime.strptime(item['ophaaldatum'], '%Y-%m-%d'),
+                    date=datetime.strptime(ophaaldatum, '%Y-%m-%d'),
                     waste_type=waste_type,
                     waste_type_slug=item['menu_title'],
                     icon_data=icon_data,
