@@ -12,7 +12,7 @@ from ...const import (
     WASTE_TYPE_BULKLITTER, WASTE_TYPE_BULKYGARDENWASTE, WASTE_TYPE_GLASS,
     WASTE_TYPE_GREEN, WASTE_TYPE_KCA_LOCATION, WASTE_TYPE_KCA, WASTE_TYPE_GREY,
     WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER, WASTE_TYPE_TEXTILE, WASTE_TYPE_TREE,
-    DEFAULT_REQUEST_TIMEOUT
+    WASTE_TYPE_VET_GOED, DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -29,6 +29,7 @@ class AfvalwijzerCollector(WasteCollector):
         'grofvuil': WASTE_TYPE_BULKLITTER,
         'tuinafval': WASTE_TYPE_BULKYGARDENWASTE,
         'glas': WASTE_TYPE_GLASS,
+        'vet-goed': WASTE_TYPE_VET_GOED,
         'gft': WASTE_TYPE_GREEN,
         'keukenafval': WASTE_TYPE_GREEN,
         'kcalocatie': WASTE_TYPE_KCA_LOCATION,
@@ -79,14 +80,18 @@ class AfvalwijzerCollector(WasteCollector):
                 if not item['date']:
                     continue
 
-                waste_type = self.map_waste_type(item['type'])
+                # Vet-goed (Vetten, Elektrische apparaten, Textiel) is reported with
+                # type 'keukenafval', so it can only be told apart by its nameType.
+                raw_type = 'vet-goed' if item.get('nameType') == 'vet-goed' else item['type']
+
+                waste_type = self.map_waste_type(raw_type)
                 if not waste_type:
                     continue
 
                 collection = WasteCollection.create(
                     date=datetime.strptime(item['date'], '%Y-%m-%d'),
                     waste_type=waste_type,
-                    waste_type_slug=item['type']
+                    waste_type_slug=raw_type
                 )
                 if collection not in self.collections:
                     self.collections.add(collection)

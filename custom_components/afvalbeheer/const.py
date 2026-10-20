@@ -240,6 +240,7 @@ WASTE_TYPE_REMAINDER = 'Restwagen'
 WASTE_TYPE_TEXTILE = 'Textiel'
 WASTE_TYPE_TREE = 'Kerstbomen'
 WASTE_TYPE_BULKYGARDENWASTE = 'Tuinafval'
+WASTE_TYPE_VET_GOED = 'VET-goed'
 
 FRACTION_ICONS = {
     "gft": "afvalbeheer:gft",
