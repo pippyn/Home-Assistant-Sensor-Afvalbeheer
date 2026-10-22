@@ -55,6 +55,8 @@ CONF_PRINT_AVAILABLE_WASTE_TYPE_SLUGS = 'printwastetypeslugs'
 CONF_UPDATE_INTERVAL = 'updateinterval'
 CONF_CUSTOMER_ID = 'customerid'
 CONF_CUSTOM_MAPPING = 'custommapping'
+CONF_CUSTOM_DATES = 'customdates'
+CONF_CUSTOM_WASTE_TYPE = 'customwastetype'
 CONF_EMAIL = 'email'
 CONF_PASSWORD = 'password'
 CONF_ENTRY_ID = 'entry_id'
@@ -241,6 +243,34 @@ WASTE_TYPE_TEXTILE = 'Textiel'
 WASTE_TYPE_TREE = 'Kerstbomen'
 WASTE_TYPE_BULKYGARDENWASTE = 'Tuinafval'
 WASTE_TYPE_VET_GOED = 'VET-goed'
+
+# Collector for manually entered collection dates (CustomCollector)
+CUSTOM_COLLECTOR = 'Overig'
+
+# Waste types offered for the manually entered collection dates
+PREDEFINED_WASTE_TYPES = [
+    WASTE_TYPE_GREEN,
+    WASTE_TYPE_GREY,
+    WASTE_TYPE_PACKAGES,
+    WASTE_TYPE_PAPER,
+    WASTE_TYPE_GLASS,
+    WASTE_TYPE_TEXTILE,
+    WASTE_TYPE_BULKLITTER,
+    WASTE_TYPE_BRANCHES,
+    WASTE_TYPE_GREENGREY,
+    WASTE_TYPE_GREY_BAGS,
+    WASTE_TYPE_SORTI,
+    WASTE_TYPE_KCA,
+    WASTE_TYPE_KCA_LOCATION,
+    WASTE_TYPE_MILIEUB,
+    WASTE_TYPE_PAPER_PMD,
+    WASTE_TYPE_PMD_GREY,
+    WASTE_TYPE_PLASTIC,
+    WASTE_TYPE_SOFT_PLASTIC,
+    WASTE_TYPE_REMAINDER,
+    WASTE_TYPE_TREE,
+    WASTE_TYPE_BULKYGARDENWASTE,
+]
 
 FRACTION_ICONS = {
     "gft": "afvalbeheer:gft",

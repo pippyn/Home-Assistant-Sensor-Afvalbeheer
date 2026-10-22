@@ -80,6 +80,61 @@
                     "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
                     "language": "Langue utilisée par les textes gérés par l'intégration, comme les dates, les noms de capteurs auxiliaires et les notifications"
                 }
+            },
+            "custom": {
+                "title": "Autre",
+                "description": "Entrez un nom et choisissez le type de déchet dont vous saisissez vous-même les dates de collecte",
+                "data": {
+                    "name": "Nom",
+                    "customwastetype": "Type de déchet"
+                },
+                "data_description": {
+                    "name": "Un nom descriptif pour cette entrée, utilisé dans les noms des capteurs",
+                    "customwastetype": "Le type de déchet collecté aux dates que vous saisissez"
+                }
+            },
+            "custom_dates": {
+                "title": "Dates de collecte",
+                "description": "Choisissez une date et cliquez sur Ajouter. Décochez une date pour la supprimer.",
+                "data": {
+                    "customdates": "Dates de collecte",
+                    "date": "Ajouter une date",
+                    "add_another": "Ajouter une autre date"
+                },
+                "data_description": {
+                    "customdates": "Décochez une date pour la supprimer",
+                    "date": "Laissez vide pour passer à l'étape suivante",
+                    "add_another": "Laissez activé pour ajouter d'autres dates ensuite. Désactivez pour ajouter cette date et continuer."
+                },
+                "submit": "Ajouter"
+            },
+            "custom_options": {
+                "title": "Options d'affichage",
+                "description": "Configurez l'affichage des capteurs pour ces dates de collecte",
+                "data": {
+                    "wastecollectornameprefix": "Utiliser Préfixe de Nom",
+                    "dateformat": "Format de Date",
+                    "upcomingsensor": "Capteurs à Venir",
+                    "dateonly": "Date Uniquement",
+                    "dateobject": "Date comme Timestamp",
+                    "language": "Langue du texte des capteurs",
+                    "dayofweek": "Afficher Jour de la Semaine",
+                    "dayofweekonly": "Noms des Jours Uniquement",
+                    "alwaysshowday": "Toujours Afficher les Noms des Jours",
+                    "iconset": "Icônes"
+                },
+                "data_description": {
+                    "wastecollectornameprefix": "Ajouter le nom du collecteur de déchets comme préfixe aux noms de capteurs",
+                    "dateformat": "Format de date pour les valeurs des capteurs (format Python strftime)",
+                    "upcomingsensor": "Créer des capteurs supplémentaires pour aujourd'hui, demain et la prochaine collecte",
+                    "dateonly": "Afficher seulement la date sans les noms des jours (remplace les autres paramètres de jour)",
+                    "dateobject": "Utiliser des objets timestamp au lieu de texte formaté (pour les automatisations)",
+                    "language": "Langue utilisée par les textes gérés par l'intégration, comme les dates, les noms de capteurs auxiliaires et les notifications",
+                    "dayofweek": "Inclure le jour de la semaine dans les valeurs des capteurs (ex. 'Lundi, 01-01-2024')",
+                    "dayofweekonly": "Afficher seulement les noms des jours pour les dates proches (aujourd'hui, demain, noms des jours)",
+                    "alwaysshowday": "Toujours afficher les noms des jours, même pour les dates à plus d'une semaine",
+                    "iconset": "Jeu d'icônes utilisé pour les capteurs de types de déchets"
+                }
             }
         },
         "error": {
@@ -89,7 +144,9 @@
             "no_resources": "Aucun type de déchet trouvé",
             "unknown_error": "Erreur inconnue survenue",
             "invalid_custom_mapping": "Format JSON invalide dans le mappage personnalisé",
-            "already_configured": "Cette configuration existe déjà"
+            "already_configured": "Cette configuration existe déjà",
+            "name_required": "Un nom est requis",
+            "no_dates": "Ajoutez au moins une date de collecte"
         },
         "abort": {
             "already_configured": "Cette configuration de collecteur de déchets existe déjà"
@@ -176,6 +233,61 @@
                     "customerid": "ID client pour les collecteurs basés sur Ximmio (si requis par votre collecteur de déchets)",
                     "language": "Langue utilisée par les textes gérés par l'intégration, comme les dates, les noms de capteurs auxiliaires et les notifications"
                 }
+            },
+            "custom": {
+                "title": "Autre",
+                "description": "Entrez un nom et choisissez le type de déchet dont vous saisissez vous-même les dates de collecte",
+                "data": {
+                    "name": "Nom",
+                    "customwastetype": "Type de déchet"
+                },
+                "data_description": {
+                    "name": "Un nom descriptif pour cette entrée, utilisé dans les noms des capteurs",
+                    "customwastetype": "Le type de déchet collecté aux dates que vous saisissez"
+                }
+            },
+            "custom_dates": {
+                "title": "Dates de collecte",
+                "description": "Choisissez une date et cliquez sur Ajouter. Décochez une date pour la supprimer.",
+                "data": {
+                    "customdates": "Dates de collecte",
+                    "date": "Ajouter une date",
+                    "add_another": "Ajouter une autre date"
+                },
+                "data_description": {
+                    "customdates": "Décochez une date pour la supprimer",
+                    "date": "Laissez vide pour passer à l'étape suivante",
+                    "add_another": "Laissez activé pour ajouter d'autres dates ensuite. Désactivez pour ajouter cette date et continuer."
+                },
+                "submit": "Ajouter"
+            },
+            "custom_options": {
+                "title": "Options d'affichage",
+                "description": "Configurez l'affichage des capteurs pour ces dates de collecte",
+                "data": {
+                    "wastecollectornameprefix": "Utiliser Préfixe de Nom",
+                    "dateformat": "Format de Date",
+                    "upcomingsensor": "Capteurs à Venir",
+                    "dateonly": "Date Uniquement",
+                    "dateobject": "Date comme Timestamp",
+                    "language": "Langue du texte des capteurs",
+                    "dayofweek": "Afficher Jour de la Semaine",
+                    "dayofweekonly": "Noms des Jours Uniquement",
+                    "alwaysshowday": "Toujours Afficher les Noms des Jours",
+                    "iconset": "Icônes"
+                },
+                "data_description": {
+                    "wastecollectornameprefix": "Ajouter le nom du collecteur de déchets comme préfixe aux noms de capteurs",
+                    "dateformat": "Format de date pour les valeurs des capteurs (format Python strftime)",
+                    "upcomingsensor": "Créer des capteurs supplémentaires pour aujourd'hui, demain et la prochaine collecte",
+                    "dateonly": "Afficher seulement la date sans les noms des jours (remplace les autres paramètres de jour)",
+                    "dateobject": "Utiliser des objets timestamp au lieu de texte formaté (pour les automatisations)",
+                    "language": "Langue utilisée par les textes gérés par l'intégration, comme les dates, les noms de capteurs auxiliaires et les notifications",
+                    "dayofweek": "Inclure le jour de la semaine dans les valeurs des capteurs (ex. 'Lundi, 01-01-2024')",
+                    "dayofweekonly": "Afficher seulement les noms des jours pour les dates proches (aujourd'hui, demain, noms des jours)",
+                    "alwaysshowday": "Toujours afficher les noms des jours, même pour les dates à plus d'une semaine",
+                    "iconset": "Jeu d'icônes utilisé pour les capteurs de types de déchets"
+                }
             }
         },
         "error": {
@@ -184,7 +296,9 @@
             "invalid_collector": "Données de collecteur invalides",
             "no_resources": "Aucun type de déchet trouvé",
             "unknown_error": "Erreur inconnue survenue",
-            "invalid_custom_mapping": "Format JSON invalide dans le mappage personnalisé"
+            "invalid_custom_mapping": "Format JSON invalide dans le mappage personnalisé",
+            "name_required": "Un nom est requis",
+            "no_dates": "Ajoutez au moins une date de collecte"
         }
     },
     "runtime": {
@@ -256,6 +370,11 @@
                 "classic_bold": "Classique gras",
                 "modern": "Moderne",
                 "modern_bold": "Moderne gras"
+            }
+        },
+        "wastecollector": {
+            "options": {
+                "Overig": "Autre"
             }
         }
     }
