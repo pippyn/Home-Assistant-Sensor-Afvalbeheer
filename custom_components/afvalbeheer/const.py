@@ -11,6 +11,9 @@ SCHEDULE_UPDATE_INTERVAL = timedelta(hours=12)
 # Default timeout (seconds) for all outgoing HTTP requests made by collectors,
 # so a hanging external API cannot block an executor thread indefinitely.
 DEFAULT_REQUEST_TIMEOUT = 30
+BURGERPORTAAL_USER_AGENT = (
+    'Afvalbeheer (+https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer)'
+)
 
 CONF_ID = "id"
 CONF_WASTE_COLLECTOR = 'wastecollector'
@@ -352,4 +355,3 @@ FRACTION_ICONS_NEW_BOLD.update({
     'first-upcoming': FRACTION_ICONS_NEW_BOLD['upcoming'],
 })
 # END GENERATED BOLD ICONS
-

@@ -11,7 +11,7 @@ from ..base import WasteCollector
 from ...models import WasteCollection
 from ...const import (
     WASTE_TYPE_GREEN, WASTE_TYPE_PAPER, WASTE_TYPE_PMD_GREY, WASTE_TYPE_GREY,
-    WASTE_TYPE_PACKAGES, BURGERPORTAAL_COLLECTOR_IDS, DEFAULT_REQUEST_TIMEOUT
+    WASTE_TYPE_PACKAGES, BURGERPORTAAL_COLLECTOR_IDS, BURGERPORTAAL_USER_AGENT, DEFAULT_REQUEST_TIMEOUT
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -62,8 +62,10 @@ class BurgerportaalCollector(WasteCollector):
         _LOGGER.debug("Fetching refresh token from Burgerportaal")
         response = requests.post(
             "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key={}".format(self.apikey),
-            timeout=DEFAULT_REQUEST_TIMEOUT).json()
-        if not response:
+            headers={'User-Agent': BURGERPORTAAL_USER_AGENT}, timeout=DEFAULT_REQUEST_TIMEOUT)
+        response.raise_for_status()
+        response = response.json()
+        if not response or not response.get('refreshToken') or not response.get('idToken'):
             _LOGGER.error('Unable to fetch refresh token!')
             return
         self.refresh_token = response['refreshToken']
@@ -73,7 +75,8 @@ class BurgerportaalCollector(WasteCollector):
     def __fetch_id_token(self):
         _LOGGER.debug("Fetching ID token from Burgerportaal")
         headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': BURGERPORTAAL_USER_AGENT,
         }
 
         data = {
@@ -83,7 +86,13 @@ class BurgerportaalCollector(WasteCollector):
 
         response = requests.post(
             "https://securetoken.googleapis.com/v1/token?key={}".format(self.apikey),
-            headers=headers, data=data, timeout=DEFAULT_REQUEST_TIMEOUT).json()
+            headers=headers, data=data, timeout=DEFAULT_REQUEST_TIMEOUT)
+        if response.status_code == 400:
+            _LOGGER.warning('Stored refresh token was rejected, obtaining new credentials')
+            self.__fetch_refresh_token()
+            return
+        response.raise_for_status()
+        response = response.json()
         if not response or 'id_token' not in response:
             _LOGGER.warning('Stored refresh token was rejected, obtaining new credentials')
             self.__fetch_refresh_token()
@@ -94,7 +103,8 @@ class BurgerportaalCollector(WasteCollector):
     def __fetch_address_id(self):
         _LOGGER.debug("Fetching address ID from Burgerportaal")
         headers = {
-            'authorization': self.id_token
+            'authorization': self.id_token,
+            'User-Agent': BURGERPORTAAL_USER_AGENT,
         }
 
         response = requests.get(
@@ -103,6 +113,7 @@ class BurgerportaalCollector(WasteCollector):
             ),
             headers=headers, timeout=DEFAULT_REQUEST_TIMEOUT
         )
+        response.raise_for_status()
         if response.status_code == 204 or not response.text:
             _LOGGER.error('Unable to fetch address!')
             return
@@ -150,11 +161,13 @@ class BurgerportaalCollector(WasteCollector):
     def __get_data(self):
         _LOGGER.debug("Fetching data from Burgerportaal")
         headers = {
-            'authorization': self.id_token
+            'authorization': self.id_token,
+            'User-Agent': BURGERPORTAAL_USER_AGENT,
         }
 
         response = requests.get("https://europe-west3-burgerportaal-production.cloudfunctions.net/exposed/organisations/{}/address/{}/calendar".format(
             self.company_code, self.address_id), headers=headers, timeout=DEFAULT_REQUEST_TIMEOUT)
+        response.raise_for_status()
         if response.status_code == 204 or not response.text:
             return []
         return response.json()
@@ -172,9 +185,15 @@ class BurgerportaalCollector(WasteCollector):
                 await self.hass.async_add_executor_job(self.__fetch_id_token)
                 await self.__save_auth_data()
 
+            if not self.id_token or not self.refresh_token:
+                return False
+
             if not self.address_id:
                 await self.hass.async_add_executor_job(self.__fetch_address_id)
                 await self.__save_auth_data()
+
+            if not self.address_id:
+                return False
 
             response = await self.hass.async_add_executor_job(self.__get_data)
 
