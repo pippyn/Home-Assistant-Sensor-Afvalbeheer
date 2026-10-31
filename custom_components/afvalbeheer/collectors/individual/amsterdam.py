@@ -126,6 +126,21 @@ class AmsterdamCollector(WasteCollector):
         _LOGGER.error('Unable to process date: %s', date_str)
         return None
 
+    def _generate_first_weekday_dates_for_year(self, week_day, today):
+        """Generate dates for the first matching weekday of each month."""
+        dates = []
+        for month_offset in range(0, 13):
+            year = today.year + ((today.month - 1 + month_offset) // 12)
+            month = ((today.month - 1 + month_offset) % 12) + 1
+            first_of_month = datetime(year, month, 1)
+            day_delta = (week_day - first_of_month.isocalendar()[2]) % 7
+            dates.append(first_of_month + timedelta(days=day_delta))
+        return self.date_in_future(dates, today)
+
+    def _is_first_of_month_frequency(self, frequency):
+        """Check if frequency indicates first pickup weekday of each month."""
+        return frequency and frequency.strip().lower().replace(' ', '') == '1evandemaand'
+
     def _calculate_day_delta(self, week_day, today, frequency_type=None):
         """Calculate day delta for collection day calculation."""
         current_iso = today.isocalendar()
@@ -179,6 +194,8 @@ class AmsterdamCollector(WasteCollector):
                 # Weekly collection
                 day_delta = self._calculate_day_delta(week_day, today)
                 future_dates.extend(self.generate_dates_for_year(day_delta, 1, today, False))
+            elif self._is_first_of_month_frequency(frequency):
+                future_dates.extend(self._generate_first_weekday_dates_for_year(week_day, today))
             elif 'weken' in frequency or 'week' in frequency:
                 # Bi-weekly collection (odd/even weeks)
                 frequency_clean = frequency.replace(' weken', '').replace(' week', '')
