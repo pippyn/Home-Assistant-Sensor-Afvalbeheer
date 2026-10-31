@@ -135,7 +135,8 @@ class AmsterdamCollector(WasteCollector):
             first_of_month = datetime(year, month, 1)
             day_delta = (week_day - first_of_month.isocalendar()[2]) % 7
             dates.append(first_of_month + timedelta(days=day_delta))
-        return self.date_in_future(dates, today)
+        # Keep today's pickup visible for the entire collection day.
+        return [date for date in dates if date.date() >= today.date()]
 
     def _is_first_of_month_frequency(self, frequency):
         """Check if frequency indicates first pickup weekday of each month."""
