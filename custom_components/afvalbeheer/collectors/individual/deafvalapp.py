@@ -26,13 +26,17 @@ class DeAfvalAppCollector(WasteCollector):
 
     def __init__(self, hass, waste_collector, postcode, street_number, suffix, custom_mapping):
         super().__init__(hass, waste_collector, postcode, street_number, suffix, custom_mapping)
-        self.main_url = "http://dataservice.deafvalapp.nl"
+        self.main_url = "https://dataservice.deafvalapp.nl"
 
     def __get_data(self):
         _LOGGER.debug("Fetching data from DeAfvalApp")
         get_url = '{}/dataservice/DataServiceServlet?service=OPHAALSCHEMA&land=NL&postcode={}&straatId=0&huisnr={}&huisnrtoev={}'.format(
                 self.main_url, self.postcode, self.street_number, self.suffix)
-        response = requests.get(get_url, timeout=DEFAULT_REQUEST_TIMEOUT)
+        # Never follow a redirect that could send the address over plain HTTP.
+        response = requests.get(get_url, timeout=DEFAULT_REQUEST_TIMEOUT, allow_redirects=False)
+        if 300 <= response.status_code < 400:
+            raise requests.exceptions.RequestException("DeAfvalApp returned an unexpected redirect")
+        response.raise_for_status()
         return response.text
 
     async def update(self):
