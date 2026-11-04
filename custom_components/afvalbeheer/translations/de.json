@@ -80,6 +80,61 @@
                     "customerid": "Kunden-ID für Ximmio-basierte Entsorger (falls von Ihrem Abfallentsorger benötigt)",
                     "language": "Sprache, die für vom Integration gesteuerte Texte wie Datumsangaben, Hilfssensor-Namen und Benachrichtigungen verwendet wird"
                 }
+            },
+            "custom": {
+                "title": "Sonstige",
+                "description": "Geben Sie einen Namen ein und wählen Sie die Abfallart, deren Abholtermine Sie selbst eingeben",
+                "data": {
+                    "name": "Name",
+                    "customwastetype": "Abfallart"
+                },
+                "data_description": {
+                    "name": "Ein beschreibender Name für diesen Eintrag, der in den Sensornamen verwendet wird",
+                    "customwastetype": "Die Abfallart, die an den eingegebenen Daten abgeholt wird"
+                }
+            },
+            "custom_dates": {
+                "title": "Abholtermine",
+                "description": "Wählen Sie ein Datum und klicken Sie auf Hinzufügen. Entfernen Sie den Haken bei einem Datum, um es zu löschen.",
+                "data": {
+                    "customdates": "Abholtermine",
+                    "date": "Datum hinzufügen",
+                    "add_another": "Weiteres Datum hinzufügen"
+                },
+                "data_description": {
+                    "customdates": "Entfernen Sie den Haken, um ein Datum zu löschen",
+                    "date": "Leer lassen, um zum nächsten Schritt zu gehen",
+                    "add_another": "Eingeschaltet lassen, um danach weitere Daten hinzuzufügen. Ausschalten, um dieses Datum hinzuzufügen und fortzufahren."
+                },
+                "submit": "Hinzufügen"
+            },
+            "custom_options": {
+                "title": "Anzeigeoptionen",
+                "description": "Legen Sie fest, wie die Sensoren für diese Abholtermine angezeigt werden",
+                "data": {
+                    "wastecollectornameprefix": "Namenspräfix verwenden",
+                    "dateformat": "Datumsformat",
+                    "upcomingsensor": "Anstehende Sensoren",
+                    "dateonly": "Nur Datum",
+                    "dateobject": "Datum als Zeitstempel",
+                    "language": "Sprache für Sensortext",
+                    "dayofweek": "Wochentag anzeigen",
+                    "dayofweekonly": "Nur Wochentagsnamen",
+                    "alwaysshowday": "Wochentagsnamen immer anzeigen",
+                    "iconset": "Symbole"
+                },
+                "data_description": {
+                    "wastecollectornameprefix": "Name des Abfallentsorgers als Präfix zu Sensornamen hinzufügen",
+                    "dateformat": "Datumsformat für Sensorwerte (Python-strftime-Format)",
+                    "upcomingsensor": "Zusätzliche Sensoren für heute, morgen und die nächste anstehende Abholung erstellen",
+                    "dateonly": "Nur Datum ohne Wochentagsnamen anzeigen (überschreibt andere Wochentag-Einstellungen)",
+                    "dateobject": "Zeitstempel-Objekte anstelle von formatiertem Text verwenden (für Automatisierungen)",
+                    "language": "Sprache, die für vom Integration gesteuerte Texte wie Datumsangaben, Hilfssensor-Namen und Benachrichtigungen verwendet wird",
+                    "dayofweek": "Wochentag in Sensorwerten einschließen (z. B. „Montag, 01.01.2024“)",
+                    "dayofweekonly": "Für nahegelegene Termine nur Wochentagsnamen anzeigen (heute, morgen, Wochentagsnamen)",
+                    "alwaysshowday": "Wochentagsnamen immer anzeigen, auch für Termine, die mehr als eine Woche entfernt sind",
+                    "iconset": "Symbolsatz für die Abfallart-Sensoren"
+                }
             }
         },
         "error": {
@@ -89,7 +144,9 @@
             "no_resources": "Keine Abfallarten gefunden",
             "unknown_error": "Unbekannter Fehler aufgetreten",
             "invalid_custom_mapping": "Ungültiges JSON-Format in der benutzerdefinierten Zuordnung",
-            "already_configured": "Diese Konfiguration existiert bereits"
+            "already_configured": "Diese Konfiguration existiert bereits",
+            "name_required": "Ein Name ist erforderlich",
+            "no_dates": "Fügen Sie mindestens einen Abholtermin hinzu"
         },
         "abort": {
             "already_configured": "Diese Abfallentsorger-Konfiguration existiert bereits"
@@ -176,6 +233,61 @@
                     "customerid": "Kunden-ID für Ximmio-basierte Entsorger (falls von Ihrem Abfallentsorger benötigt)",
                     "language": "Sprache, die für vom Integration gesteuerte Texte wie Datumsangaben, Hilfssensor-Namen und Benachrichtigungen verwendet wird"
                 }
+            },
+            "custom": {
+                "title": "Sonstige",
+                "description": "Geben Sie einen Namen ein und wählen Sie die Abfallart, deren Abholtermine Sie selbst eingeben",
+                "data": {
+                    "name": "Name",
+                    "customwastetype": "Abfallart"
+                },
+                "data_description": {
+                    "name": "Ein beschreibender Name für diesen Eintrag, der in den Sensornamen verwendet wird",
+                    "customwastetype": "Die Abfallart, die an den eingegebenen Daten abgeholt wird"
+                }
+            },
+            "custom_dates": {
+                "title": "Abholtermine",
+                "description": "Wählen Sie ein Datum und klicken Sie auf Hinzufügen. Entfernen Sie den Haken bei einem Datum, um es zu löschen.",
+                "data": {
+                    "customdates": "Abholtermine",
+                    "date": "Datum hinzufügen",
+                    "add_another": "Weiteres Datum hinzufügen"
+                },
+                "data_description": {
+                    "customdates": "Entfernen Sie den Haken, um ein Datum zu löschen",
+                    "date": "Leer lassen, um zum nächsten Schritt zu gehen",
+                    "add_another": "Eingeschaltet lassen, um danach weitere Daten hinzuzufügen. Ausschalten, um dieses Datum hinzuzufügen und fortzufahren."
+                },
+                "submit": "Hinzufügen"
+            },
+            "custom_options": {
+                "title": "Anzeigeoptionen",
+                "description": "Legen Sie fest, wie die Sensoren für diese Abholtermine angezeigt werden",
+                "data": {
+                    "wastecollectornameprefix": "Namenspräfix verwenden",
+                    "dateformat": "Datumsformat",
+                    "upcomingsensor": "Anstehende Sensoren",
+                    "dateonly": "Nur Datum",
+                    "dateobject": "Datum als Zeitstempel",
+                    "language": "Sprache für Sensortext",
+                    "dayofweek": "Wochentag anzeigen",
+                    "dayofweekonly": "Nur Wochentagsnamen",
+                    "alwaysshowday": "Wochentagsnamen immer anzeigen",
+                    "iconset": "Symbole"
+                },
+                "data_description": {
+                    "wastecollectornameprefix": "Name des Abfallentsorgers als Präfix zu Sensornamen hinzufügen",
+                    "dateformat": "Datumsformat für Sensorwerte (Python-strftime-Format)",
+                    "upcomingsensor": "Zusätzliche Sensoren für heute, morgen und die nächste anstehende Abholung erstellen",
+                    "dateonly": "Nur Datum ohne Wochentagsnamen anzeigen (überschreibt andere Wochentag-Einstellungen)",
+                    "dateobject": "Zeitstempel-Objekte anstelle von formatiertem Text verwenden (für Automatisierungen)",
+                    "language": "Sprache, die für vom Integration gesteuerte Texte wie Datumsangaben, Hilfssensor-Namen und Benachrichtigungen verwendet wird",
+                    "dayofweek": "Wochentag in Sensorwerten einschließen (z. B. „Montag, 01.01.2024“)",
+                    "dayofweekonly": "Für nahegelegene Termine nur Wochentagsnamen anzeigen (heute, morgen, Wochentagsnamen)",
+                    "alwaysshowday": "Wochentagsnamen immer anzeigen, auch für Termine, die mehr als eine Woche entfernt sind",
+                    "iconset": "Symbolsatz für die Abfallart-Sensoren"
+                }
             }
         },
         "error": {
@@ -184,7 +296,9 @@
             "invalid_collector": "Ungültige Entsorgerdaten",
             "no_resources": "Keine Abfallarten gefunden",
             "unknown_error": "Unbekannter Fehler aufgetreten",
-            "invalid_custom_mapping": "Ungültiges JSON-Format in der benutzerdefinierten Zuordnung"
+            "invalid_custom_mapping": "Ungültiges JSON-Format in der benutzerdefinierten Zuordnung",
+            "name_required": "Ein Name ist erforderlich",
+            "no_dates": "Fügen Sie mindestens einen Abholtermin hinzu"
         }
     },
     "runtime": {
@@ -256,6 +370,11 @@
                 "classic_bold": "Klassisch fett",
                 "modern": "Modern",
                 "modern_bold": "Modern fett"
+            }
+        },
+        "wastecollector": {
+            "options": {
+                "Overig": "Sonstige"
             }
         }
     }

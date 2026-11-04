@@ -80,6 +80,61 @@
                     "customerid": "Customer ID for Ximmio-based collectors (if required by your waste collector)",
                     "language": "Language used by integration-controlled text such as dates, helper sensor names, and notifications"
                 }
+            },
+            "custom": {
+                "title": "Other",
+                "description": "Enter a name and choose the waste type for which you enter the collection dates yourself",
+                "data": {
+                    "name": "Name",
+                    "customwastetype": "Waste Type"
+                },
+                "data_description": {
+                    "name": "A descriptive name for this entry, used in the sensor names",
+                    "customwastetype": "The type of waste collected on the dates you enter"
+                }
+            },
+            "custom_dates": {
+                "title": "Collection Dates",
+                "description": "Pick a date and press Add. Uncheck a date to remove it.",
+                "data": {
+                    "customdates": "Collection dates",
+                    "date": "Add date",
+                    "add_another": "Add another date"
+                },
+                "data_description": {
+                    "customdates": "Uncheck a date to remove it",
+                    "date": "Leave empty to continue to the next step",
+                    "add_another": "Keep on to add more dates after this one. Turn off to add this date and continue."
+                },
+                "submit": "Add"
+            },
+            "custom_options": {
+                "title": "Display Options",
+                "description": "Configure how the sensors for these collection dates are displayed",
+                "data": {
+                    "wastecollectornameprefix": "Use Name Prefix",
+                    "dateformat": "Date Format",
+                    "upcomingsensor": "Upcoming Sensors",
+                    "dateonly": "Date Only",
+                    "dateobject": "Date as Timestamp",
+                    "language": "Sensor text language",
+                    "dayofweek": "Show Day of Week",
+                    "dayofweekonly": "Day Names Only",
+                    "alwaysshowday": "Always Show Day Names",
+                    "iconset": "Icons"
+                },
+                "data_description": {
+                    "wastecollectornameprefix": "Add waste collector name as prefix to sensor names",
+                    "dateformat": "Date format for sensor values (Python strftime format)",
+                    "upcomingsensor": "Create additional sensors for today, tomorrow, and next upcoming collection",
+                    "dateonly": "Show only date without day names (overrides other day settings)",
+                    "dateobject": "Use timestamp objects instead of formatted text (for automations)",
+                    "language": "Language used by integration-controlled text such as dates, helper sensor names, and notifications",
+                    "dayofweek": "Include day of week in sensor values (e.g., 'Monday, 01-01-2024')",
+                    "dayofweekonly": "Show only day names for nearby dates (today, tomorrow, day names)",
+                    "alwaysshowday": "Always show day names, even for dates more than a week away",
+                    "iconset": "Icon set used for the waste type sensors"
+                }
             }
         },
         "error": {
@@ -89,7 +144,9 @@
             "no_resources": "No waste types found",
             "unknown_error": "Unknown error occurred",
             "invalid_custom_mapping": "Invalid JSON format in custom mapping",
-            "already_configured": "This configuration already exists"
+            "already_configured": "This configuration already exists",
+            "name_required": "A name is required",
+            "no_dates": "Add at least one collection date"
         },
         "abort": {
             "already_configured": "This waste collector configuration already exists"
@@ -176,6 +233,61 @@
                     "customerid": "Customer ID for Ximmio-based collectors (if required by your waste collector)",
                     "language": "Language used by integration-controlled text such as dates, helper sensor names, and notifications"
                 }
+            },
+            "custom": {
+                "title": "Other",
+                "description": "Enter a name and choose the waste type for which you enter the collection dates yourself",
+                "data": {
+                    "name": "Name",
+                    "customwastetype": "Waste Type"
+                },
+                "data_description": {
+                    "name": "A descriptive name for this entry, used in the sensor names",
+                    "customwastetype": "The type of waste collected on the dates you enter"
+                }
+            },
+            "custom_dates": {
+                "title": "Collection Dates",
+                "description": "Pick a date and press Add. Uncheck a date to remove it.",
+                "data": {
+                    "customdates": "Collection dates",
+                    "date": "Add date",
+                    "add_another": "Add another date"
+                },
+                "data_description": {
+                    "customdates": "Uncheck a date to remove it",
+                    "date": "Leave empty to continue to the next step",
+                    "add_another": "Keep on to add more dates after this one. Turn off to add this date and continue."
+                },
+                "submit": "Add"
+            },
+            "custom_options": {
+                "title": "Display Options",
+                "description": "Configure how the sensors for these collection dates are displayed",
+                "data": {
+                    "wastecollectornameprefix": "Use Name Prefix",
+                    "dateformat": "Date Format",
+                    "upcomingsensor": "Upcoming Sensors",
+                    "dateonly": "Date Only",
+                    "dateobject": "Date as Timestamp",
+                    "language": "Sensor text language",
+                    "dayofweek": "Show Day of Week",
+                    "dayofweekonly": "Day Names Only",
+                    "alwaysshowday": "Always Show Day Names",
+                    "iconset": "Icons"
+                },
+                "data_description": {
+                    "wastecollectornameprefix": "Add waste collector name as prefix to sensor names",
+                    "dateformat": "Date format for sensor values (Python strftime format)",
+                    "upcomingsensor": "Create additional sensors for today, tomorrow, and next upcoming collection",
+                    "dateonly": "Show only date without day names (overrides other day settings)",
+                    "dateobject": "Use timestamp objects instead of formatted text (for automations)",
+                    "language": "Language used by integration-controlled text such as dates, helper sensor names, and notifications",
+                    "dayofweek": "Include day of week in sensor values (e.g., 'Monday, 01-01-2024')",
+                    "dayofweekonly": "Show only day names for nearby dates (today, tomorrow, day names)",
+                    "alwaysshowday": "Always show day names, even for dates more than a week away",
+                    "iconset": "Icon set used for the waste type sensors"
+                }
             }
         },
         "error": {
@@ -184,7 +296,9 @@
             "invalid_collector": "Invalid collector data",
             "no_resources": "No waste types found",
             "unknown_error": "Unknown error occurred",
-            "invalid_custom_mapping": "Invalid JSON format in custom mapping"
+            "invalid_custom_mapping": "Invalid JSON format in custom mapping",
+            "name_required": "A name is required",
+            "no_dates": "Add at least one collection date"
         }
     },
     "runtime": {
@@ -256,6 +370,11 @@
                 "classic_bold": "Classic bold",
                 "modern": "Modern",
                 "modern_bold": "Modern bold"
+            }
+        },
+        "wastecollector": {
+            "options": {
+                "Overig": "Other"
             }
         }
     }
