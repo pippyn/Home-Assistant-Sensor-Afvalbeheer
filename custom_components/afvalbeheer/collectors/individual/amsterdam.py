@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_BULKLITTER, WASTE_TYPE_GREEN, WASTE_TYPE_GREY, 
     WASTE_TYPE_PAPER, WASTE_TYPE_TEXTILE, WASTE_TYPE_GLASS, 
@@ -215,7 +215,7 @@ class AmsterdamCollector(WasteCollector):
         
         return future_dates
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         """Update waste collection dates using Rest API."""
         _LOGGER.debug('Updating Waste collection dates using Rest API')
 
@@ -223,14 +223,14 @@ class AmsterdamCollector(WasteCollector):
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
 
-            if len(response['_embedded']['afvalwijzer']) < 1:
-                _LOGGER.error('No Waste data found!')
-                return
-            
-            self.collections.remove_all()
+            items = response['_embedded']['afvalwijzer']
+            if not isinstance(items, list):
+                return False
+
+            collections = WasteCollectionRepository()
             today = datetime.now()
 
-            for item in response['_embedded']['afvalwijzer']:
+            for item in items:
                 if not self._is_item_valid(item):
                     continue
 
@@ -246,8 +246,11 @@ class AmsterdamCollector(WasteCollector):
                         waste_type=waste_type,
                         waste_type_slug=item['afvalwijzerFractieCode'].lower()
                     )
-                    if collection not in self.collections:
-                        self.collections.add(collection)
+                    if collection not in collections:
+                        collections.add(collection)
+
+            self.collections = collections
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

@@ -9,7 +9,7 @@ from typing import Any, Dict, Optional
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_BRANCHES,
     WASTE_TYPE_BULKLITTER,
@@ -251,7 +251,7 @@ class FrisseKlikoCollector(WasteCollector):
         self, customer: Dict[str, Any], planning: Optional[Dict[str, Any]] = None
     ) -> None:
         """Parse customer bin cleaning dates into collections repository."""
-        self.collections.remove_all()
+        collections = WasteCollectionRepository()
 
         # 1. Parse per-bin next cleaning dates from planning endpoint if available
         next_by_bin = planning.get("next_by_bin") if isinstance(planning, dict) else None
@@ -275,8 +275,8 @@ class FrisseKlikoCollector(WasteCollector):
                         waste_type=waste_type,
                         waste_type_slug=slug,
                     )
-                    if container_collection not in self.collections:
-                        self.collections.add(container_collection)
+                    if container_collection not in collections:
+                        collections.add(container_collection)
                 except (ValueError, TypeError) as exc:
                     _LOGGER.warning(
                         "Error parsing bin cleaning date '%s' for container '%s': %r",
@@ -284,6 +284,7 @@ class FrisseKlikoCollector(WasteCollector):
                         container_key,
                         exc,
                     )
+                    raise
 
         # 2. Fall back to clean_dates / next_clean_date per container if next_by_bin was unavailable
         else:
@@ -334,12 +335,15 @@ class FrisseKlikoCollector(WasteCollector):
                                 waste_type=waste_type,
                                 waste_type_slug=slug,
                             )
-                            if container_collection not in self.collections:
-                                self.collections.add(container_collection)
+                            if container_collection not in collections:
+                                collections.add(container_collection)
                 except (ValueError, TypeError) as exc:
                     _LOGGER.warning("Error parsing cleaning date '%s': %r", clean_date_entry, exc)
+                    raise
 
-    async def update(self):
+        self.collections = collections
+
+    async def _async_update(self) -> bool:
         """Update cleaning dates using Frisse Kliko API."""
         _LOGGER.debug("Updating cleaning dates using Frisse Kliko API")
 

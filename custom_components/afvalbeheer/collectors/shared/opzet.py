@@ -10,7 +10,7 @@ from contextlib import contextmanager
 import urllib3.util.connection as _urllib3_connection
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_PMD_GREY, WASTE_TYPE_PAPER_PMD, WASTE_TYPE_BRANCHES, WASTE_TYPE_BULKLITTER,
     WASTE_TYPE_GLASS, WASTE_TYPE_GREENGREY, WASTE_TYPE_GREEN, WASTE_TYPE_KCA,
@@ -157,7 +157,7 @@ class OpzetCollector(WasteCollector):
                     dates.append((item, date))
         return dates
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Updating Waste collection dates using Opzet API")
 
         try:
@@ -169,7 +169,7 @@ class OpzetCollector(WasteCollector):
 
             if not response:
                 _LOGGER.error('No Waste data found!')
-                return
+                return False
 
             # The afvalstromen endpoint only holds the next pickup per waste stream. The calendar endpoint,
             # which the municipalities' own websites use, holds the whole year. Use both: a stream that the
@@ -201,9 +201,11 @@ class OpzetCollector(WasteCollector):
                 if collection not in collections:
                     collections.append(collection)
 
-            self.collections.remove_all()
+            repository = WasteCollectionRepository()
             for collection in collections:
-                self.collections.add(collection)
+                repository.add(collection)
+            self.collections = repository
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

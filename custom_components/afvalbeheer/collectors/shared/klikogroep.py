@@ -7,7 +7,7 @@ from datetime import datetime
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_GREEN, WASTE_TYPE_PAPER, WASTE_TYPE_PACKAGES,
     WASTE_TYPE_GREY, KLIKOGROEP_COLLECTOR_IDS, DEFAULT_REQUEST_TIMEOUT
@@ -47,17 +47,17 @@ class KlikogroepCollector(WasteCollector):
         response = requests.get(url, headers=headers, verify=False, timeout=DEFAULT_REQUEST_TIMEOUT)
         return response.json()
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Updating Waste collection dates using Klikogroep API")
 
         try:
             response = await self.hass.async_add_executor_job(self.__get_data)
 
-            if not response or 'calendar' not in response or not response['calendar']:
+            if not isinstance(response, dict) or not isinstance(response.get('calendar'), dict):
                 _LOGGER.error('No Waste data found!')
-                return
+                return False
 
-            self.collections.remove_all()
+            collections = WasteCollectionRepository()
 
             for date_string, trash_types in response['calendar'].items():
                 try:
@@ -74,12 +74,15 @@ class KlikogroepCollector(WasteCollector):
                             waste_type=waste_type,
                             waste_type_slug=trash_type_name.lower()
                         )
-                        if collection not in self.collections:
-                            self.collections.add(collection)
+                        if collection not in collections:
+                            collections.add(collection)
 
                 except ValueError as e:
                     _LOGGER.warning(f'Error parsing date {date_string}: %r', e)
-                    continue
+                    return False
+
+            self.collections = collections
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

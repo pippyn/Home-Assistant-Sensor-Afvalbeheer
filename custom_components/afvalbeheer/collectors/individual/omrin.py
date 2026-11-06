@@ -8,7 +8,7 @@ from typing import Dict
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_BULKLITTER, WASTE_TYPE_GREEN, WASTE_TYPE_KCA, WASTE_TYPE_PACKAGES,
     WASTE_TYPE_SORTI, WASTE_TYPE_PAPER, WASTE_TYPE_GREY, DEFAULT_REQUEST_TIMEOUT
@@ -380,7 +380,7 @@ class OmrinCollector(WasteCollector):
                 emptied_dates[0].strftime('%Y-%m-%d') if emptied_dates else 'never'
             )
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Updating Waste collection dates using Omrin API")
 
         try:
@@ -394,11 +394,11 @@ class OmrinCollector(WasteCollector):
             response = await self.hass.async_add_executor_job(self.__fetch_calendar)
             await self.__save_auth_data()
 
-            if not response:
+            if not isinstance(response, list):
                 _LOGGER.error('No Waste data found!')
-                return
+                return False
             
-            self.collections.remove_all()
+            collections = WasteCollectionRepository()
 
             for item in response:
                 if not item.get('date'):
@@ -417,17 +417,17 @@ class OmrinCollector(WasteCollector):
                     collection_date = collection_date.replace(tzinfo=None)
                 except ValueError as e:
                     _LOGGER.warning(f"Failed to parse date {item['date']}: {e}")
-                    continue
+                    return False
 
                 collection = WasteCollection.create(
                     date=collection_date,
                     waste_type=waste_type,
                     waste_type_slug=item['type']
                 )
-                if collection not in self.collections:
-                    self.collections.add(collection)
+                if collection not in collections:
+                    collections.add(collection)
 
-            _LOGGER.debug(f"Found {len(self.collections)} waste collections")
+            _LOGGER.debug("Found %d waste collections", len(collections))
 
             # Fetch diftar data if credentials are available
             if self.has_credentials:
@@ -437,6 +437,9 @@ class OmrinCollector(WasteCollector):
                     await self.__save_auth_data()
                 except (requests.exceptions.RequestException, OmrinApiError, ValueError, KeyError) as exc:
                     _LOGGER.warning('Failed to fetch diftar data: %r', exc)
+
+            self.collections = collections
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

@@ -6,7 +6,7 @@ from datetime import datetime
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import WASTE_TYPE_PLASTIC, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_TREE, DEFAULT_REQUEST_TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ class DeAfvalAppCollector(WasteCollector):
         response.raise_for_status()
         return response.text
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Updating Waste collection dates using DeAfvalApp API")
 
         try:
@@ -47,9 +47,9 @@ class DeAfvalAppCollector(WasteCollector):
 
             if not response:
                 _LOGGER.error('No Waste data found!')
-                return
+                return False
             
-            self.collections.remove_all()
+            collections = WasteCollectionRepository()
 
             for rows in response.strip().split('\n'):
                 waste_type = self.map_waste_type(rows.split(';')[0])
@@ -65,8 +65,11 @@ class DeAfvalAppCollector(WasteCollector):
                         waste_type=waste_type,
                         waste_type_slug=rows.split(';')[0]
                     )
-                    if collection not in self.collections:
-                        self.collections.add(collection)
+                    if collection not in collections:
+                        collections.add(collection)
+
+            self.collections = collections
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

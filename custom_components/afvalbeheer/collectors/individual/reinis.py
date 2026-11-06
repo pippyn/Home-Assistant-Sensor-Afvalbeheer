@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_BRANCHES, WASTE_TYPE_BULKLITTER, WASTE_TYPE_BULKYGARDENWASTE,
     WASTE_TYPE_PMD_GREY, WASTE_TYPE_GLASS, WASTE_TYPE_GREENGREY,
@@ -69,7 +69,7 @@ class ReinisCollector(WasteCollector):
                 _LOGGER.debug("No Reinis data found for year %s", year)
         return data
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Updating Waste collection dates using Reinis API")
 
         try:
@@ -79,11 +79,11 @@ class ReinisCollector(WasteCollector):
             response = await self.hass.async_add_executor_job(self.__get_data)
             waste_types = await self.hass.async_add_executor_job(self.__get_waste_types)
 
-            if not response:
+            if not isinstance(response, list):
                 _LOGGER.error('No Waste data found!')
-                return
+                return False
             
-            self.collections.remove_all()
+            collections = WasteCollectionRepository()
 
             for item in response:
                 waste_type = next((self.map_waste_type(a['title']) for a in waste_types if a['id'] == item['afvalstroom_id']), None)
@@ -96,8 +96,11 @@ class ReinisCollector(WasteCollector):
                     waste_type=waste_type,
                     waste_type_slug=item['afvalstroom_id']
                 )
-                if collection not in self.collections:
-                    self.collections.add(collection)
+                if collection not in collections:
+                    collections.add(collection)
+
+            self.collections = collections
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

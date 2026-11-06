@@ -216,6 +216,16 @@ The bold variants use thicker lines. In YAML, use `builtinicons: 1` (classic) or
 
 If the integration cannot retrieve data from your waste collector (e.g., due to network issues or API changes), the previous valid data will be kept and a persistent notification may be shown in Home Assistant. Check the Home Assistant logs for more details if you encounter issues.
 
+Collection updates are published only after parsing completes successfully. Sensor attributes expose refresh health:
+
+- `Last_update_success`: `true` or `false` after a refresh, or `null` before the first attempt.
+- `Last_successful_update`: the UTC timestamp of the most recent successful refresh in the current session.
+- `Data_stale`: `true` before the first successful refresh or when the latest refresh failed. This is a refresh-health indicator, not an age-based expiry of individual collection dates.
+
+A failed refresh retains the last valid calendar, including when a response contains a malformed item after valid ones. A provider-confirmed empty calendar can replace existing dates; ambiguous empty responses from DeAfvalApp, Opzet and Frisse Kliko are treated as failures instead. Refresh-health timestamps are reset when the integration restarts.
+
+Cached collection dates remain usable after a failed refresh, but past dates are excluded from upcoming results. When no matching cached entry exists, today/tomorrow and upcoming sensors show `unknown` if refresh health is stale, rather than implying there is definitely no collection. After a successful refresh, no matching collection is displayed as the translated “none” value. Waste-type date sensors continue to show `unknown` when no upcoming date is known.
+
 ---
 
 ## Credits

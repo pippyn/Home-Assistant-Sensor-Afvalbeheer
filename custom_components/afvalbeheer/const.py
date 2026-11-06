@@ -101,6 +101,9 @@ ATTR_UPCOMING_WASTE_TYPES = 'Upcoming_waste_types'
 ATTR_HIDDEN = 'Hidden'
 ATTR_SORT_DATE = 'Sort_date'
 ATTR_DAYS_UNTIL = 'Days_until'
+ATTR_LAST_UPDATE_SUCCESS = 'Last_update_success'
+ATTR_LAST_SUCCESSFUL_UPDATE = 'Last_successful_update'
+ATTR_DATA_STALE = 'Data_stale'
 
 NOTIFICATION_ID = "Afvalbeheer"
 

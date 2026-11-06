@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_BRANCHES, WASTE_TYPE_BULKLITTER, WASTE_TYPE_BULKYGARDENWASTE,
     WASTE_TYPE_PMD_GREY, WASTE_TYPE_GLASS, WASTE_TYPE_GREENGREY,
@@ -105,7 +105,7 @@ class XimmioCollector(WasteCollector):
             data=data, timeout=DEFAULT_REQUEST_TIMEOUT)
         return response
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Updating Waste collection dates using Ximmio API")
 
         try:
@@ -115,11 +115,11 @@ class XimmioCollector(WasteCollector):
             r = await self.hass.async_add_executor_job(self.__get_data)
             response = r.json()
 
-            if not response or not response['dataList']:
+            if not isinstance(response, dict) or not isinstance(response.get('dataList'), list):
                 _LOGGER.error('No Waste data found!')
-                return
+                return False
             
-            self.collections.remove_all()
+            collections = WasteCollectionRepository()
 
             for item in response['dataList']:
                 for date in item['pickupDates']:
@@ -132,8 +132,11 @@ class XimmioCollector(WasteCollector):
                         waste_type=waste_type,
                         waste_type_slug=item['_pickupTypeText']
                     )
-                    if collection not in self.collections:
-                        self.collections.add(collection)
+                    if collection not in collections:
+                        collections.add(collection)
+
+            self.collections = collections
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

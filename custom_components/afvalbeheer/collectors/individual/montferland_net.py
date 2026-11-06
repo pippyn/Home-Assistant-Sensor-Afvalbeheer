@@ -6,7 +6,7 @@ from urllib.parse import quote
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     DEFAULT_REQUEST_TIMEOUT,
     WASTE_TYPE_GREEN,
@@ -53,7 +53,7 @@ class MontferlandNetCollector(WasteCollector):
         response.raise_for_status()
         return response.json()
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         """Replace collections only after a complete, successful response."""
         try:
             response = await self.hass.async_add_executor_job(self.__get_data)
@@ -93,6 +93,8 @@ class MontferlandNetCollector(WasteCollector):
             _LOGGER.error("Montferland API returned invalid collection data")
             return False
 
-        self.collections.remove_all()
+        repository = WasteCollectionRepository()
         for collection in collections:
-            self.collections.add(collection)
+            repository.add(collection)
+        self.collections = repository
+        return True

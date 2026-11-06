@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_PAPER, WASTE_TYPE_GREEN, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_TREE,
     DEFAULT_REQUEST_TIMEOUT,
@@ -104,23 +104,27 @@ class CirculusCollector(WasteCollector):
         else:
             _LOGGER.error("Unable to get Logged-in Cookie")
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Updating Waste collection dates using Circulus API")
 
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
             if r is None:
                 _LOGGER.error('No response received from Circulus API!')
-                return
+                return False
             response = r.json()
 
-            if not response or 'customData' not in response or not response['customData']['response']['garbage']:
+            if not response or 'customData' not in response:
                 _LOGGER.error('No Waste data found!')
-                return
-            
-            self.collections.remove_all()
+                return False
 
-            for item in response['customData']['response']['garbage']:
+            items = response['customData']['response']['garbage']
+            if not isinstance(items, list):
+                return False
+            
+            collections = WasteCollectionRepository()
+
+            for item in items:
                 for date in item['dates']:
                     waste_type = self.map_waste_type(item['code'])
                     if not waste_type:
@@ -131,8 +135,11 @@ class CirculusCollector(WasteCollector):
                         waste_type=waste_type,
                         waste_type_slug=item['code']
                     )
-                    if collection not in self.collections:
-                        self.collections.add(collection)
+                    if collection not in collections:
+                        collections.add(collection)
+
+            self.collections = collections
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

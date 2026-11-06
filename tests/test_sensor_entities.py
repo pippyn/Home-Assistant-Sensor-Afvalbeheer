@@ -8,9 +8,15 @@ imports) as well as basic update()/property behavior.
 """
 from datetime import datetime, timedelta
 from types import SimpleNamespace
+from unittest.mock import AsyncMock, patch
+
+import pytest
 
 from custom_components.afvalbeheer.API import get_wastedata_from_config
 from custom_components.afvalbeheer.const import (
+    ATTR_DATA_STALE,
+    ATTR_LAST_SUCCESSFUL_UPDATE,
+    ATTR_LAST_UPDATE_SUCCESS,
     CONF_ALWAYS_SHOW_DAY,
     CONF_BOLD_ICONS,
     CONF_BUILT_IN_ICONS,
@@ -105,6 +111,80 @@ async def test_waste_upcoming_sensor_update_cycle(hass):
 
     assert sensor.name
     assert isinstance(sensor.extra_state_attributes, dict)
+
+
+async def test_sensor_exposes_failed_refresh_and_recovery(hass):
+    config = _demo_config()
+    data = get_wastedata_from_config(hass, config)
+    sensor = WasteTypeSensor(data, 'restafval', config)
+    assert sensor.extra_state_attributes[ATTR_DATA_STALE] is True
+    assert sensor.extra_state_attributes[ATTR_LAST_UPDATE_SUCCESS] is None
+
+    await data.collector.update()
+    sensor.update()
+    timestamp = data.collector.last_successful_update
+    state = sensor.state
+    assert sensor.extra_state_attributes[ATTR_DATA_STALE] is False
+    assert sensor.extra_state_attributes[ATTR_LAST_SUCCESSFUL_UPDATE] == timestamp
+
+    with patch.object(data.collector, '_async_update', new=AsyncMock(return_value=False)):
+        await data.collector.update()
+    sensor.update()
+    assert sensor.state == state
+    assert sensor.extra_state_attributes[ATTR_LAST_UPDATE_SUCCESS] is False
+    assert sensor.extra_state_attributes[ATTR_DATA_STALE] is True
+    assert sensor.extra_state_attributes[ATTR_LAST_SUCCESSFUL_UPDATE] == timestamp
+
+    await data.collector.update()
+    assert sensor.extra_state_attributes[ATTR_LAST_UPDATE_SUCCESS] is True
+    assert sensor.extra_state_attributes[ATTR_DATA_STALE] is False
+
+
+@pytest.mark.parametrize('kind', ['today', 'tomorrow', 'upcoming'])
+@pytest.mark.parametrize('success', [None, False, True])
+async def test_exhausted_calendar_distinguishes_stale_from_empty(hass, kind, success):
+    """Yesterday's cached entry must not imply a confirmed empty calendar."""
+    config = _demo_config()
+    data = get_wastedata_from_config(hass, config)
+    data.collections.add(WasteCollection.create(
+        date=datetime.now() - timedelta(days=1),
+        waste_type='restafval', waste_type_slug='restafval',
+    ))
+    data.collector.last_update_success = success
+    if kind == 'upcoming':
+        sensor = WasteUpcomingSensor(data, config)
+    else:
+        sensor = WasteDateSensor(data, config, timedelta(days=kind == 'tomorrow'))
+
+    sensor.update()
+    if success is True:
+        assert sensor.state is not None
+    else:
+        assert sensor.state is None
+    assert sensor.extra_state_attributes[ATTR_DATA_STALE] is (success is not True)
+
+
+@pytest.mark.parametrize('kind', ['today', 'tomorrow', 'upcoming', 'type'])
+async def test_failed_refresh_keeps_matching_cached_dates_visible(hass, kind):
+    config = _demo_config()
+    data = get_wastedata_from_config(hass, config)
+    data.collections.add(WasteCollection.create(
+        date=(datetime.now() + timedelta(days=kind != 'today')).replace(
+            hour=0, minute=0, second=0, microsecond=0,
+        ),
+        waste_type='restafval', waste_type_slug='restafval',
+    ))
+    data.collector.last_update_success = False
+    if kind == 'upcoming':
+        sensor = WasteUpcomingSensor(data, config)
+    elif kind == 'type':
+        sensor = WasteTypeSensor(data, 'restafval', config)
+    else:
+        sensor = WasteDateSensor(data, config, timedelta(days=kind == 'tomorrow'))
+
+    sensor.update()
+    assert sensor.state is not None
+    assert sensor.extra_state_attributes[ATTR_DATA_STALE] is True
 
 
 def test_waste_type_sensor_uses_collector_icon_data_by_default():

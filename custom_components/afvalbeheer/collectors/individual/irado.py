@@ -6,7 +6,7 @@ from datetime import datetime
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import WASTE_TYPE_GREEN, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER, DEFAULT_REQUEST_TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ class IradoCollector(WasteCollector):
             _LOGGER.warning("Invalid date format: %s", date_str)
             return None
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Updating waste collection dates using Irado API")
 
         try:
@@ -63,27 +63,28 @@ class IradoCollector(WasteCollector):
 
             if r.status_code != 200:
                 _LOGGER.error("Irado API error %s", r.status_code)
-                return
+                return False
     
             try:
                 response = r.json()
             except ValueError:
-                _LOGGER.error("Irado API returned invalid JSON: %s", r.text[:500])
-                return
+                _LOGGER.error("Irado API returned invalid JSON")
+                return False
            
             items = response.get("data")
-            if not items:
+            if not isinstance(items, list):
                 _LOGGER.error("No waste data found in response object!")
-                return
+                return False
 
-            self.collections.remove_all()
+            collections = WasteCollectionRepository()
 
             for item in items:
                 waste_type_raw = item.get("type")
                 date = self.__parse_irado_date(item.get("date"))
                 
                 if not waste_type_raw or not date:
-                    continue
+                    _LOGGER.error("Irado API returned invalid collection data")
+                    return False
 
                 waste_type = self.map_waste_type(waste_type_raw)
                 if not waste_type:
@@ -96,8 +97,11 @@ class IradoCollector(WasteCollector):
                     waste_type_slug=waste_type
                 )
 
-                if collection not in self.collections:
-                    self.collections.add(collection)
+                if collection not in collections:
+                    collections.add(collection)
+
+            self.collections = collections
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

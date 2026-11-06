@@ -6,7 +6,7 @@ from datetime import datetime
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_PAPER_PMD, WASTE_TYPE_GREENGREY, WASTE_TYPE_BRANCHES,
     WASTE_TYPE_BULKLITTER, WASTE_TYPE_BULKYGARDENWASTE, WASTE_TYPE_GLASS,
@@ -55,7 +55,7 @@ class AfvalwijzerCollector(WasteCollector):
                 self.waste_collector_url, self.apikey, self.postcode, self.street_number, self.suffix, datetime.today().strftime('%Y-%m-%d'))
         return requests.get(get_url, timeout=DEFAULT_REQUEST_TIMEOUT)
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Updating Waste collection dates using Afvalwijzer API")
 
         try:
@@ -64,17 +64,24 @@ class AfvalwijzerCollector(WasteCollector):
 
             data = []
 
+            if not isinstance(response, dict):
+                return False
+
             if 'ophaaldagen' in response:
+                if not isinstance(response['ophaaldagen']['data'], list):
+                    return False
                 data = data + response['ophaaldagen']['data']
 
             if 'ophaaldagenNext' in response:
+                if not isinstance(response['ophaaldagenNext']['data'], list):
+                    return False
                 data = data + response['ophaaldagenNext']['data']
 
-            if not data:
+            if 'ophaaldagen' not in response and 'ophaaldagenNext' not in response:
                 _LOGGER.error('No Waste data found!')
-                return
+                return False
             
-            self.collections.remove_all()
+            collections = WasteCollectionRepository()
 
             for item in data:
                 if not item['date']:
@@ -93,8 +100,11 @@ class AfvalwijzerCollector(WasteCollector):
                     waste_type=waste_type,
                     waste_type_slug=raw_type
                 )
-                if collection not in self.collections:
-                    self.collections.add(collection)
+                if collection not in collections:
+                    collections.add(collection)
+
+            self.collections = collections
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

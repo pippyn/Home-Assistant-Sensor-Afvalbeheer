@@ -6,7 +6,7 @@ import logging
 from datetime import datetime, timedelta
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_BRANCHES, WASTE_TYPE_BULKLITTER, WASTE_TYPE_BULKYGARDENWASTE,
     WASTE_TYPE_GLASS, WASTE_TYPE_GREEN, WASTE_TYPE_GREENGREY, WASTE_TYPE_GREY,
@@ -40,15 +40,18 @@ class DemoCollector(WasteCollector):
     """
     WASTE_TYPE_MAPPING = {}
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Generating demo waste collection dates")
-        self.collections.remove_all()
+        collections = WasteCollectionRepository()
         today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
         for index, waste_type in enumerate(DEMO_WASTE_TYPES):
             for repeat in range(DEMO_REPEATS):
-                self.collections.add(WasteCollection.create(
+                collections.add(WasteCollection.create(
                     date=today + timedelta(days=index // 2 + repeat * DEMO_REPEAT_DAYS),
                     waste_type=self.map_waste_type(waste_type),
                     waste_type_slug=waste_type.lower(),
                 ))
+
+        self.collections = collections
+        return True

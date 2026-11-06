@@ -8,7 +8,7 @@ import requests
 import re
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_GREEN, WASTE_TYPE_PAPER, WASTE_TYPE_PMD_GREY, WASTE_TYPE_GREY,
     WASTE_TYPE_PACKAGES, BURGERPORTAAL_COLLECTOR_IDS, BURGERPORTAAL_USER_AGENT, DEFAULT_REQUEST_TIMEOUT
@@ -172,7 +172,7 @@ class BurgerportaalCollector(WasteCollector):
             return []
         return response.json()
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Updating Waste collection dates using Burgerportaal API")
 
         try:
@@ -197,11 +197,11 @@ class BurgerportaalCollector(WasteCollector):
 
             response = await self.hass.async_add_executor_job(self.__get_data)
 
-            if not response:
+            if not isinstance(response, list):
                 _LOGGER.error('No Waste data found!')
-                return
+                return False
 
-            self.collections.remove_all()
+            collections = WasteCollectionRepository()
             
             for item in response:
                 if not item['collectionDate']:
@@ -216,8 +216,11 @@ class BurgerportaalCollector(WasteCollector):
                     waste_type=waste_type,
                     waste_type_slug=item['fraction'].lower()
                 )
-                if collection not in self.collections:
-                    self.collections.add(collection)
+                if collection not in collections:
+                    collections.add(collection)
+
+            self.collections = collections
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

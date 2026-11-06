@@ -6,7 +6,7 @@ from datetime import datetime
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_GREEN, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES,
     WASTE_TYPE_PAPER, WASTE_TYPE_TREE, DEFAULT_REQUEST_TIMEOUT
@@ -46,21 +46,21 @@ class StraatbeeldCollector(WasteCollector):
 
         return requests.post(f"{self.main_url}/v1/waste-calendar", headers=headers, json=data, timeout=DEFAULT_REQUEST_TIMEOUT)
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Updating Waste collection dates using Straatbeeld API")
 
         try:
             r = await self.hass.async_add_executor_job(self.__get_data)
             if r.status_code != 200:
                 _LOGGER.error('Invalid response from server for collection data')
-                return
+                return False
             response = r.json()
 
-            if not response:
+            if not isinstance(response, dict) or not isinstance(response.get('collections'), dict):
                 _LOGGER.error('No Waste data found!')
-                return
+                return False
 
-            self.collections.remove_all()
+            collections = WasteCollectionRepository()
 
             for _, months in response['collections'].items():
                 for _, days in months.items():
@@ -79,8 +79,11 @@ class StraatbeeldCollector(WasteCollector):
                                 waste_type=waste_type,
                                 waste_type_slug=item['name']
                             )
-                            if collection not in self.collections:
-                                self.collections.add(collection)
+                            if collection not in collections:
+                                collections.add(collection)
+
+            self.collections = collections
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)

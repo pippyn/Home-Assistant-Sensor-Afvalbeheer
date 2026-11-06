@@ -13,6 +13,9 @@ from .API import get_wastedata_from_config
 from .const import (
     ATTR_DAYS_UNTIL,
     ATTR_HIDDEN,
+    ATTR_DATA_STALE,
+    ATTR_LAST_SUCCESSFUL_UPDATE,
+    ATTR_LAST_UPDATE_SUCCESS,
     ATTR_SORT_DATE,
     ATTR_UPCOMING_DAY,
     ATTR_UPCOMING_WASTE_TYPES,
@@ -179,7 +182,15 @@ class BaseSensor(RestoreEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         """Return additional state attributes."""
-        return self._attrs
+        attributes = dict(self._attrs)
+        collector = getattr(self.data, "collector", None)
+        if collector is not None:
+            attributes.update({
+                ATTR_LAST_UPDATE_SUCCESS: collector.last_update_success,
+                ATTR_LAST_SUCCESSFUL_UPDATE: collector.last_successful_update,
+                ATTR_DATA_STALE: collector.last_update_success is not True,
+            })
+        return attributes
 
     @property
     def entity_picture(self):
@@ -241,6 +252,13 @@ class BaseSensor(RestoreEntity, SensorEntity):
         translated = translate_date_text(self.language, state)
         _LOGGER.debug("Translated state: %s", translated)
         return translated
+
+    def _no_collection_state(self):
+        """Distinguish a confirmed absence from missing, stale calendar data."""
+        collector = getattr(self.data, "collector", None)
+        if collector is not None and collector.last_update_success is not True:
+            return None
+        return text(self.language, "none")
 
     def _format_date(self, collection_date):
         """
@@ -442,7 +460,7 @@ class WasteDateSensor(BaseSensor):
         collections = self.data.collections.get_by_date(date, self.waste_types)
         if not collections:
             self._hidden = True
-            self._state = text(self.language, "none")
+            self._state = self._no_collection_state()
         else:
             self._hidden = False
             self._state = ", ".join(sorted({x.waste_type for x in collections}))
@@ -495,7 +513,7 @@ class WasteUpcomingSensor(BaseSensor):
         collections = self.data.collections.get_first_upcoming(self.waste_types)
         if not collections:
             self._hidden = True
-            self._state = text(self.language, "none")
+            self._state = self._no_collection_state()
             self.upcoming_day = None
             self.upcoming_waste_types = None
         else:

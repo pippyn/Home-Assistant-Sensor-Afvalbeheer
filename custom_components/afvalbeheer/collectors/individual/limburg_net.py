@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import requests
 
 from ..base import WasteCollector
-from ...models import WasteCollection
+from ...models import WasteCollection, WasteCollectionRepository
 from ...const import (
     WASTE_TYPE_BULKLITTER, WASTE_TYPE_BULKYGARDENWASTE, WASTE_TYPE_GREEN,
     WASTE_TYPE_GLASS, WASTE_TYPE_GREY, WASTE_TYPE_PACKAGES, WASTE_TYPE_PAPER,
@@ -95,7 +95,7 @@ class LimburgNetCollector(WasteCollector):
 
         return data
 
-    async def update(self):
+    async def _async_update(self) -> bool:
         _LOGGER.debug("Updating Waste collection dates using Limburg.net API")
 
         try:
@@ -104,11 +104,11 @@ class LimburgNetCollector(WasteCollector):
 
             response = await self.hass.async_add_executor_job(self.__get_data)
 
-            if not response:
+            if not isinstance(response, list):
                 _LOGGER.error('No Waste data found!')
-                return
+                return False
             
-            self.collections.remove_all()
+            collections = WasteCollectionRepository()
 
             for item in response:
                 if not item['date']:
@@ -123,8 +123,11 @@ class LimburgNetCollector(WasteCollector):
                     waste_type=waste_type,
                     waste_type_slug=item['title']
                 )
-                if collection not in self.collections:
-                    self.collections.add(collection)
+                if collection not in collections:
+                    collections.add(collection)
+
+            self.collections = collections
+            return True
 
         except requests.exceptions.RequestException as exc:
             _LOGGER.error('Error occurred while fetching data: %r', exc)
