@@ -3,11 +3,11 @@
   "name": "Afvalbeheer",
   "codeowners": ["@pippyn"],
   "config_flow": true,
-  "dependencies": [],
+  "dependencies": ["http"],
   "documentation": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer",
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/issues",
   "requirements": [],
-  "version": "6.5.39"
+  "version": "6.5.40"
 }

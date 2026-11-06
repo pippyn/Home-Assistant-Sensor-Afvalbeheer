@@ -187,67 +187,6 @@
             "invalid_custom_mapping": "Ungültiges JSON-Format in der benutzerdefinierten Zuordnung"
         }
     },
-    "runtime": {
-        "today": "Heute",
-        "tomorrow": "Morgen",
-        "none": "Keine",
-        "first_upcoming": "nächste Abholung",
-        "days": {
-            "Monday": "Montag",
-            "Tuesday": "Dienstag",
-            "Wednesday": "Mittwoch",
-            "Thursday": "Donnerstag",
-            "Friday": "Freitag",
-            "Saturday": "Samstag",
-            "Sunday": "Sonntag"
-        },
-        "days_short": {
-            "Mon": "Mo",
-            "Tue": "Di",
-            "Wed": "Mi",
-            "Thu": "Do",
-            "Fri": "Fr",
-            "Sat": "Sa",
-            "Sun": "So"
-        },
-        "months": {
-            "January": "Januar",
-            "February": "Februar",
-            "March": "März",
-            "April": "April",
-            "May": "Mai",
-            "June": "Juni",
-            "July": "Juli",
-            "August": "August",
-            "September": "September",
-            "October": "Oktober",
-            "November": "November",
-            "December": "Dezember"
-        },
-        "months_short": {
-            "Jan": "Jan",
-            "Feb": "Feb",
-            "Mar": "Mär",
-            "Apr": "Apr",
-            "May": "Mai",
-            "Jun": "Jun",
-            "Jul": "Jul",
-            "Aug": "Aug",
-            "Sept": "Sept",
-            "Sep": "Sep",
-            "Oct": "Okt",
-            "Nov": "Nov",
-            "Dec": "Dez"
-        },
-        "notifications": {
-            "available_waste_types": "Verfügbare Abfallarten: {types}",
-            "available_waste_type_slugs": "Von der API verwendete Abfallart-Kürzel: {slugs}",
-            "collector_not_found": "Abfallentsorger \"{collector}\" nicht gefunden!",
-            "deprecated_collector": "Aktualisieren Sie Ihre Konfiguration auf {new_collector}! Sie verwenden noch {old_collector} als Abfallentsorger, was veraltet ist. Überprüfen Sie auch Ihre Automatisierungen und die Lovelace-Konfiguration, da sich die Sensornamen ebenfalls geändert haben könnten!",
-            "city_required": "Konfiguration ungültig! Für {collector} ist ein Stadtname erforderlich",
-            "street_required": "Konfiguration ungültig! Für {collector} ist ein Straßenname erforderlich"
-        }
-    },
     "selector": {
         "iconset": {
             "options": {

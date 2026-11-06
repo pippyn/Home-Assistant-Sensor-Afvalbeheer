@@ -187,67 +187,6 @@
             "invalid_custom_mapping": "Ongeldig JSON formaat in aangepaste mapping"
         }
     },
-    "runtime": {
-        "today": "Vandaag",
-        "tomorrow": "Morgen",
-        "none": "Geen",
-        "first_upcoming": "eerstvolgende",
-        "days": {
-            "Monday": "Maandag",
-            "Tuesday": "Dinsdag",
-            "Wednesday": "Woensdag",
-            "Thursday": "Donderdag",
-            "Friday": "Vrijdag",
-            "Saturday": "Zaterdag",
-            "Sunday": "Zondag"
-        },
-        "days_short": {
-            "Mon": "Maa",
-            "Tue": "Din",
-            "Wed": "Woe",
-            "Thu": "Don",
-            "Fri": "Vri",
-            "Sat": "Zat",
-            "Sun": "Zon"
-        },
-        "months": {
-            "January": "januari",
-            "February": "februari",
-            "March": "maart",
-            "April": "april",
-            "May": "mei",
-            "June": "juni",
-            "July": "juli",
-            "August": "augustus",
-            "September": "september",
-            "October": "oktober",
-            "November": "november",
-            "December": "december"
-        },
-        "months_short": {
-            "Jan": "jan",
-            "Feb": "feb",
-            "Mar": "mrt",
-            "Apr": "apr",
-            "May": "mei",
-            "Jun": "jun",
-            "Jul": "jul",
-            "Aug": "aug",
-            "Sept": "sep",
-            "Sep": "sep",
-            "Oct": "okt",
-            "Nov": "nov",
-            "Dec": "dec"
-        },
-        "notifications": {
-            "available_waste_types": "Beschikbare afvaltypes: {types}",
-            "available_waste_type_slugs": "Afvaltype slugs gebruikt door API: {slugs}",
-            "collector_not_found": "Afvalinzamelaar \"{collector}\" niet gevonden!",
-            "deprecated_collector": "Werk je configuratie bij naar {new_collector}! Je gebruikt nog {old_collector} als afvalinzamelaar, deze is verouderd. Controleer ook je automatiseringen en Lovelace-configuratie, omdat sensornamen mogelijk gewijzigd zijn!",
-            "city_required": "Configuratie ongeldig! Plaatsnaam is vereist voor {collector}",
-            "street_required": "Configuratie ongeldig! Straatnaam is vereist voor {collector}"
-        }
-    },
     "selector": {
         "iconset": {
             "options": {

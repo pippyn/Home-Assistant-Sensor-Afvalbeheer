@@ -46,8 +46,8 @@ async def async_prepare_translations(hass, language):
 
 @lru_cache(maxsize=None)
 def _load_translations(language):
-    """Load a translation JSON file from translations/<language>.json."""
-    path = Path(__file__).parent / "translations" / f"{language}.json"
+    """Load integration-owned text separately from Home Assistant translations."""
+    path = Path(__file__).parent / "runtime_translations" / f"{language}.json"
 
     try:
         with path.open(encoding="utf-8") as file:

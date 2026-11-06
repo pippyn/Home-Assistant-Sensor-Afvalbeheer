@@ -37,8 +37,20 @@ def test_release_versions_match():
     assert len(set(versions)) == 1, f"Release version mismatch: {versions}"
 
 
-@pytest.mark.parametrize("translation", sorted((INTEGRATION / "translations").glob("*.json")), ids=lambda p: p.stem)
-def test_translation_keys_match_english(translation):
-    expected = _keys(json.loads((INTEGRATION / "translations" / "en.json").read_text()))
+@pytest.mark.parametrize("directory", ["translations", "runtime_translations"])
+@pytest.mark.parametrize("language", ["de", "el", "en", "fr", "nl"])
+def test_translation_keys_match_english(directory, language):
+    translation = INTEGRATION / directory / f"{language}.json"
+    expected = _keys(json.loads((INTEGRATION / directory / "en.json").read_text()))
     actual = _keys(json.loads(translation.read_text()))
     assert actual == expected, f"Missing: {sorted(expected - actual)}; extra: {sorted(actual - expected)}"
+
+
+def test_frontend_http_dependency_is_declared():
+    manifest = json.loads((INTEGRATION / "manifest.json").read_text())
+    assert "http" in manifest["dependencies"]
+
+
+@pytest.mark.parametrize("translation", sorted((INTEGRATION / "translations").glob("*.json")), ids=lambda p: p.stem)
+def test_home_assistant_translations_exclude_runtime_text(translation):
+    assert "runtime" not in json.loads(translation.read_text())
