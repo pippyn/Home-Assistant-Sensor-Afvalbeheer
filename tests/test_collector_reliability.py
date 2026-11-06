@@ -204,15 +204,8 @@ async def test_real_collector_failure_is_atomic(parsing_case, hass):
     assert collector.last_successful_update is None
 
 
-async def test_valid_empty_calendar_is_success(parsing_case, hass, request):
+async def test_valid_empty_calendar_is_success(parsing_case, hass):
     collector, _, empty = parsing_case
-    if isinstance(collector, FrisseKlikoCollector):
-        request.node.add_marker(pytest.mark.xfail(
-            strict=True,
-            raises=AssertionError,
-            reason='Frisse Kliko rejects customers without cleaning dates; '
-                   'verify whether this is an authoritative empty schedule before changing the collector',
-        ))
     # Keep a known waste stream/customer, but no pickup dates. A missing
     # response is tested separately and must not erase the previous calendar.
     _seed(collector)
@@ -222,6 +215,43 @@ async def test_valid_empty_calendar_is_success(parsing_case, hass, request):
     assert len(collector.collections) == 0
     assert collector.last_update_success is True
     assert collector.last_successful_update is not None
+
+
+@pytest.mark.parametrize('customer, planning, success', [
+    ({'clean_dates': [], 'clean_containers': ['paper']}, None, True),
+    ({'cleaning_dates': []}, None, True),
+    ({'id': 'synthetic'}, {'next_by_bin': {}}, True),
+    ({'id': 'synthetic'}, None, False),
+    ({'id': 'synthetic'}, {}, False),
+    ({'detail': 'Unauthorized', 'clean_dates': []}, None, False),
+    ({'clean_dates': []}, {'detail': 'Unavailable'}, False),
+    ({'clean_dates': []}, [], False),
+    ({'clean_dates': {}}, None, False),
+    ({'id': 'synthetic'}, {'next_by_bin': []}, False),
+    ({'clean_dates': ['invalid'], 'cleaning_dates': []}, None, False),
+    ({'clean_dates': ['2099-01-02'], 'clean_containers': [], 'cleaning_dates': []}, None, False),
+])
+async def test_frisse_kliko_empty_schedule_requires_explicit_valid_data(hass, customer, planning, success):
+    collector = FrisseKlikoCollector.__new__(FrisseKlikoCollector)
+    WasteCollector.__init__(collector, hass, 'frissekliko', '1234AB', '1', '', {})
+    collector.async_load_and_init_auth = AsyncMock()
+    collector._auth_changed = False
+    repository, collection = _seed(collector)
+    timestamp = datetime(2098, 1, 1)
+    collector.last_successful_update = timestamp
+
+    with patch.object(collector, '_FrisseKlikoCollector__get_customer', return_value=customer), patch.object(
+        collector, '_FrisseKlikoCollector__get_planning', return_value=planning,
+    ):
+        assert await collector.update() is success
+    assert collector.last_update_success is success
+    if success:
+        assert len(collector.collections) == 0
+        assert collector.last_successful_update != timestamp
+    else:
+        assert collector.collections is repository
+        assert list(repository) == [collection]
+        assert collector.last_successful_update == timestamp
 
 
 @pytest.mark.parametrize('error', [requests.exceptions.Timeout, requests.exceptions.HTTPError, ValueError])

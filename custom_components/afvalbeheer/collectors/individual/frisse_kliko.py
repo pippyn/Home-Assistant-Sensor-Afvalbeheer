@@ -351,18 +351,41 @@ class FrisseKlikoCollector(WasteCollector):
             await self.async_load_and_init_auth()
 
             customer = await self.hass.async_add_executor_job(self.__get_customer)
-            if not customer:
+            if not isinstance(customer, dict) or not customer or "detail" in customer:
                 _LOGGER.error("No waste data found for Frisse Kliko at %s %s", self.postcode, self.street_number)
                 return False
 
             planning = await self.hass.async_add_executor_job(self.__get_planning)
+            if planning is not None and (not isinstance(planning, dict) or "detail" in planning):
+                _LOGGER.error("Invalid Frisse Kliko planning response")
+                return False
+
+            # Only explicit empty date fields can confirm an empty schedule.
+            # Missing fields or an unavailable planning endpoint alone cannot.
+            date_values = []
+            for source in (customer, planning or {}):
+                for key in ("clean_dates", "cleaning_dates", "next_clean_date"):
+                    if key in source:
+                        value = source[key]
+                        if value is not None and not isinstance(value, (str, list)):
+                            _LOGGER.error("Invalid Frisse Kliko cleaning date field")
+                            return False
+                        date_values.append(value)
+                if "next_by_bin" in source:
+                    value = source["next_by_bin"]
+                    if not isinstance(value, dict):
+                        _LOGGER.error("Invalid Frisse Kliko per-bin planning")
+                        return False
+                    date_values.append(value)
+            explicit_empty_schedule = any(value == [] or value == {} for value in date_values)
+            has_dates = any(bool(value) for value in date_values)
 
             if self._auth_changed:
                 await self.async_save_current_auth()
 
             self._parse_collections(customer, planning)
 
-            if len(self.collections) == 0:
+            if len(self.collections) == 0 and not (explicit_empty_schedule and not has_dates):
                 _LOGGER.error("No waste collections could be parsed for Frisse Kliko")
                 return False
 
