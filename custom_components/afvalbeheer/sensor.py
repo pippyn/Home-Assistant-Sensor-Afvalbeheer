@@ -89,7 +89,8 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             notification_id=f"{NOTIFICATION_ID}_yaml_import_{config.get(CONF_WASTE_COLLECTOR, '')}".lower(),
         )
 
-    schedule_update = not (discovery_info and "config" in discovery_info)
+    entry_id = config.get(CONF_ENTRY_ID)
+    schedule_update = not entry_id and not (discovery_info and "config" in discovery_info)
     _LOGGER.debug("Schedule update: %s", schedule_update)
 
     config_data = discovery_info["config"] if discovery_info and "config" in discovery_info else config
@@ -101,7 +102,10 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     await async_prepare_translations(hass, resolve_language(config_data))
 
-    data = hass.data[DOMAIN].get(config_data[CONF_ID], None) if not schedule_update else get_wastedata_from_config(hass, config)
+    if entry_id:
+        data = hass.data[DOMAIN][entry_id]["waste_data"]
+    else:
+        data = hass.data[DOMAIN].get(config_data[CONF_ID], None) if not schedule_update else get_wastedata_from_config(hass, config)
     _LOGGER.debug("Data source: %s", data)
 
     entities = [WasteTypeSensor(data, resource, config_data) for resource in config_data[CONF_RESOURCES]]
@@ -128,16 +132,11 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
 async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
     """Set up Afvalbeheer sensors from a config entry."""
-    entry.async_on_unload(entry.add_update_listener(async_reload_entry))
-    config = dict({**entry.data, **entry.options})  # Make a mutable copy
+    config = dict(hass.data[DOMAIN][entry.entry_id]["config"])
     config[CONF_ENTRY_ID] = entry.entry_id  # Add entry_id to config
 
 
     await async_setup_platform(hass, config, async_add_entities)
-
-async def async_reload_entry(hass, entry):
-    await hass.config_entries.async_reload(entry.entry_id)
-
 
 class BaseSensor(RestoreEntity, SensorEntity):
     """

@@ -95,7 +95,7 @@ CASES = [
      {'customData': {'response': {'garbage': []}}}),
     (CleanprofsCollector, [{'full_date': '2099-01-02', 'product_name': 'paper'},
                           {'full_date': 'invalid', 'product_name': 'paper'}], []),
-    (DeAfvalAppCollector, 'paper;02-01-2099;invalid;', None),
+    (DeAfvalAppCollector, 'paper;02-01-2099;invalid;', 'paper;'),
     (LimburgNetCollector, [{'date': '2099-01-02T00:00:00+0000', 'title': 'paper'},
                           {'date': 'invalid', 'title': 'paper'}], []),
     (MontferlandNetCollector, {'errorCode': 0, 'collections': [
@@ -126,8 +126,10 @@ CASES = [
     (StraatbeeldCollector, {'collections': {'1': {'1': [
         {'date': {'formatted': '2099-01-02'}, 'data': [{'name': 'paper'}]},
         {'date': {'formatted': 'invalid'}, 'data': [{'name': 'paper'}]}]}}}, {'collections': {}}),
-    (OpzetCollector, [{'menu_title': 'paper', 'ophaaldatum': '2099-01-02'}, None], None),
-    (FrisseKlikoCollector, {'clean_dates': ['2099-01-02', 'invalid'], 'clean_containers': ['paper']}, None),
+    (OpzetCollector, [{'menu_title': 'paper', 'ophaaldatum': '2099-01-02'}, None],
+     [{'menu_title': 'paper', 'ophaaldatum': None}]),
+    (FrisseKlikoCollector, {'clean_dates': ['2099-01-02', 'invalid'], 'clean_containers': ['paper']},
+     {'clean_dates': [], 'clean_containers': ['paper']}),
 ]
 
 
@@ -202,10 +204,17 @@ async def test_real_collector_failure_is_atomic(parsing_case, hass):
     assert collector.last_successful_update is None
 
 
-async def test_valid_empty_calendar_is_success(parsing_case, hass):
+async def test_valid_empty_calendar_is_success(parsing_case, hass, request):
     collector, _, empty = parsing_case
-    if empty is None:
-        pytest.skip('Provider currently treats an empty response as unavailable data')
+    if isinstance(collector, FrisseKlikoCollector):
+        request.node.add_marker(pytest.mark.xfail(
+            strict=True,
+            raises=AssertionError,
+            reason='Frisse Kliko rejects customers without cleaning dates; '
+                   'verify whether this is an authoritative empty schedule before changing the collector',
+        ))
+    # Keep a known waste stream/customer, but no pickup dates. A missing
+    # response is tested separately and must not erase the previous calendar.
     _seed(collector)
 
     with patch.object(hass, 'async_add_executor_job', side_effect=_executor(collector, empty)):

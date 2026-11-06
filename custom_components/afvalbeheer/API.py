@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import timedelta
 
@@ -65,6 +66,9 @@ class WasteData(object):
         self.password = password
         self.custom_mapping = custom_mapping
         self.language = language or LANGUAGE_NL
+        self._cancel_update = None
+        self._stopped = False
+        self._update_lock = asyncio.Lock()
         self.__select_collector()
 
     def __select_collector(self):
@@ -108,12 +112,32 @@ class WasteData(object):
                 f'{NOTIFICATION_ID}_collectornotfound_{self.waste_collector}'
             )
 
-    async def schedule_update(self, interval):
-        _LOGGER.debug(f"Scheduling update with interval: {interval}")
+    async def schedule_update(self, interval: timedelta) -> None:
+        """Schedule exactly one refresh, unless this data source was stopped."""
+        if self._cancel_update is not None:
+            self._cancel_update()
+            self._cancel_update = None
+        if self._stopped:
+            return
+        _LOGGER.debug("Scheduling update with interval: %s", interval)
         nxt = dt_util.utcnow() + interval
-        async_track_point_in_utc_time(self.hass, self.async_update, nxt)
+        self._cancel_update = async_track_point_in_utc_time(self.hass, self.async_update, nxt)
 
-    async def async_update(self, *_):
+    def async_stop(self) -> None:
+        """Cancel polling and prevent an in-flight refresh from rescheduling."""
+        self._stopped = True
+        if self._cancel_update is not None:
+            self._cancel_update()
+            self._cancel_update = None
+
+    async def async_update(self, *_) -> None:
+        """Serialize refreshes and schedule the next one while active."""
+        async with self._update_lock:
+            if self._stopped:
+                return
+            await self._async_refresh()
+
+    async def _async_refresh(self) -> None:
         _LOGGER.debug("Performing async update")
         try:
             await self.collector.update()
@@ -122,6 +146,8 @@ class WasteData(object):
                 await self.schedule_update(timedelta(hours=self.update_interval))
             else:
                 await self.schedule_update(SCHEDULE_UPDATE_INTERVAL)
+        if self._stopped:
+            return
         if self.print_waste_type:
             persistent_notification.create(
                 self.hass,

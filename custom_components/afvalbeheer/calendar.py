@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, time
 from datetime import timedelta
 from typing import Optional, List
 
@@ -11,6 +11,7 @@ from homeassistant.const import CONF_RESOURCES
 from homeassistant.components.calendar import CalendarEntity, CalendarEvent
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.util import dt as dt_util
 
 from .const import DOMAIN, CONF_ID, CONF_WASTE_COLLECTOR, CONF_ENTRY_ID
 
@@ -37,7 +38,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
 async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
     """Set up Afvalbeheer calendar from a config entry."""
-    config = dict({**entry.data, **entry.options})
+    config = dict(hass.data[DOMAIN][entry.entry_id]["config"])
     config[CONF_ENTRY_ID] = entry.entry_id  # Add entry_id to config
 
     # CONF_ID should now be provided by config flow
@@ -45,13 +46,7 @@ async def async_setup_entry(hass, entry: ConfigEntry, async_add_entities):
         _LOGGER.error("Missing CONF_ID in calendar configuration")
         return
 
-    # Always create a new WasteData object with the latest config
-    waste_data = get_wastedata_from_config(hass, config)
-
-    if hasattr(waste_data, "async_update"):
-        await waste_data.async_update()
-    elif hasattr(waste_data, "schedule_update"):
-        await waste_data.schedule_update(timedelta())
+    waste_data = hass.data[DOMAIN][entry.entry_id]["waste_data"]
 
     async_add_entities([AfvalbeheerCalendar(waste_data, config)])
 
@@ -129,10 +124,14 @@ class AfvalbeheerCalendar(CalendarEntity):
         """
         resources_set = {resource.lower() for resource in self.config[CONF_RESOURCES]}
         events: List[CalendarEvent] = []
+        if start_date >= end_date:
+            return events
 
         for waste_item in self.WasteData.collections:
             waste_date = waste_item.date.date()
-            if start_date.date() <= waste_date <= end_date.date():
+            event_start = datetime.combine(waste_date, time.min, tzinfo=dt_util.DEFAULT_TIME_ZONE)
+            event_end = datetime.combine(waste_date + timedelta(days=1), time.min, tzinfo=dt_util.DEFAULT_TIME_ZONE)
+            if event_start < end_date and event_end > start_date:
                 if waste_item.waste_type.lower() in resources_set:
                     event = CalendarEvent(
                         summary=waste_item.waste_type,

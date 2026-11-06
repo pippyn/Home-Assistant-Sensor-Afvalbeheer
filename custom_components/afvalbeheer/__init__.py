@@ -4,6 +4,7 @@ Original Author: Pippijn Stortelder
 Current Version: 6.5.38 20261106
 """
 
+import asyncio
 import hashlib
 import logging
 from datetime import datetime
@@ -17,7 +18,7 @@ from homeassistant.helpers.typing import ConfigType
 from pathlib import Path
 from homeassistant.components import persistent_notification
 
-from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID, NOTIFICATION_ID, CONF_WASTE_COLLECTOR
+from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID, NOTIFICATION_ID, CONF_WASTE_COLLECTOR, CONF_ENTRY_ID
 from .API import get_wastedata_from_config
 
 
@@ -332,17 +333,36 @@ async def _migrate_entry_to_v3_2(hass, config_entry):
 
 
 async def async_setup_entry(hass, entry):
+    """Create one shared data source and own its entire polling lifecycle."""
     await _async_register_frontend(hass)
     config = {**entry.data, **entry.options}
+    config[CONF_ENTRY_ID] = entry.entry_id
+    waste_data = get_wastedata_from_config(hass, config)
+    if waste_data is None or waste_data.collector is None:
+        return False
 
     if DOMAIN not in hass.data:
         hass.data[DOMAIN] = {}
     hass.data[DOMAIN][entry.entry_id] = {
         "config": config,
+        "waste_data": waste_data,
     }
 
-    await hass.config_entries.async_forward_entry_setups(entry, ["sensor", "calendar"])
+    entry.async_on_unload(waste_data.async_stop)
+    entry.async_on_unload(entry.add_update_listener(async_reload_entry))
+    try:
+        await waste_data.async_update()
+        await hass.config_entries.async_forward_entry_setups(entry, ["sensor", "calendar"])
+    except (Exception, asyncio.CancelledError):
+        waste_data.async_stop()
+        hass.data[DOMAIN].pop(entry.entry_id, None)
+        raise
     return True
+
+
+async def async_reload_entry(hass, entry):
+    """Apply option changes to all platforms and their shared data source."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass, entry):
@@ -350,6 +370,8 @@ async def async_unload_entry(hass, entry):
 
     # Clean up stored data
     if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id, None)
+        data = hass.data[DOMAIN].pop(entry.entry_id, None)
+        if data is not None:
+            data["waste_data"].async_stop()
 
     return unload_ok
