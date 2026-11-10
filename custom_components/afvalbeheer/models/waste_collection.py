@@ -24,6 +24,25 @@ class WasteCollection(object):
         collection.icon_data = icon_data
         return collection
 
+    def as_dict(self):
+        """Return a JSON-serialisable copy, used to keep the calendar across restarts."""
+        return {
+            "date": self.date.isoformat(),
+            "waste_type": self.waste_type,
+            "waste_type_slug": self.waste_type_slug,
+            "icon_data": self.icon_data,
+        }
+
+    @classmethod
+    def from_dict(cls, data, icon_data=None):
+        """Rebuild a collection stored by as_dict."""
+        return cls.create(
+            date=datetime.fromisoformat(data["date"]),
+            waste_type=data["waste_type"],
+            waste_type_slug=data.get("waste_type_slug"),
+            icon_data=icon_data,
+        )
+
     def __eq__(self, other):
         """Overrides the default implementation"""
         if isinstance(other, WasteCollection):

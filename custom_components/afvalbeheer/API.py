@@ -27,6 +27,7 @@ from .const import (
     LANGUAGE_NL,
     NOTIFICATION_ID,
     OPZET_COLLECTOR_URLS,
+    RETRY_UPDATE_INTERVALS,
     SCHEDULE_UPDATE_INTERVAL,
     XIMMIO_COLLECTOR_IDS,
 )
@@ -69,6 +70,8 @@ class WasteData(object):
         self._cancel_update = None
         self._stopped = False
         self._update_lock = asyncio.Lock()
+        self._failed_refreshes = 0
+        self._stored_calendar_loaded = False
         self.__select_collector()
 
     def __select_collector(self):
@@ -135,17 +138,33 @@ class WasteData(object):
         async with self._update_lock:
             if self._stopped:
                 return
+            if not self._stored_calendar_loaded:
+                # Start from the last calendar fetched before a restart, so a
+                # collector that is unreachable at startup does not empty it.
+                self._stored_calendar_loaded = True
+                await self.collector.async_load_stored_collections()
             await self._async_refresh()
+
+    def _next_update_interval(self, success: bool) -> timedelta:
+        """Return the regular interval after a success, a short backoff after a failure."""
+        if self.update_interval is not None and self.update_interval != 0:
+            interval = timedelta(hours=self.update_interval)
+        else:
+            interval = SCHEDULE_UPDATE_INTERVAL
+        if success:
+            self._failed_refreshes = 0
+            return interval
+        retry = RETRY_UPDATE_INTERVALS[min(self._failed_refreshes, len(RETRY_UPDATE_INTERVALS) - 1)]
+        self._failed_refreshes += 1
+        return min(retry, interval)
 
     async def _async_refresh(self) -> None:
         _LOGGER.debug("Performing async update")
+        success = False
         try:
-            await self.collector.update()
+            success = await self.collector.update() is True
         finally:
-            if self.update_interval is not None and self.update_interval != 0:
-                await self.schedule_update(timedelta(hours=self.update_interval))
-            else:
-                await self.schedule_update(SCHEDULE_UPDATE_INTERVAL)
+            await self.schedule_update(self._next_update_interval(success))
         if self._stopped:
             return
         if self.print_waste_type:

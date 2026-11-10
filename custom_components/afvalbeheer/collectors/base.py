@@ -5,11 +5,12 @@ import asyncio
 import logging
 from abc import ABC, abstractmethod
 
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
 from ..const import DOMAIN
-from ..models import WasteCollectionRepository
+from ..models import WasteCollection, WasteCollectionRepository
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,12 +32,21 @@ class WasteCollector(ABC):
         self.last_successful_update = None
         self._update_lock = asyncio.Lock()
         self._auth_store = Store(hass, 1, self._auth_store_key)
+        self._collections_store = Store(hass, 1, self._collections_store_key)
+
+    @property
+    def _store_address(self):
+        return f"{self.postcode}_{self.street_number}_{self.suffix or ''}".lower()
 
     @property
     def _auth_store_key(self):
         """Return a unique storage key for collector authentication data."""
-        address = f"{self.postcode}_{self.street_number}_{self.suffix or ''}".lower()
-        return f"{DOMAIN}.{self.waste_collector}_{address}_auth"
+        return f"{DOMAIN}.{self.waste_collector}_{self._store_address}_auth"
+
+    @property
+    def _collections_store_key(self):
+        """Return a unique storage key for the last successfully fetched calendar."""
+        return f"{DOMAIN}.{self.waste_collector}_{self._store_address}_collections"
 
     async def update(self) -> bool:
         """Refresh collections, retaining the last valid calendar on failure.
@@ -62,11 +72,62 @@ class WasteCollector(ABC):
                     self.collections = previous
             if success:
                 self.last_successful_update = dt_util.utcnow()
+                await self._async_save_collections()
             return success
 
     @abstractmethod
     async def _async_update(self) -> bool:
         """Build and publish a complete calendar, returning explicit success."""
+
+    async def _async_save_collections(self):
+        """Keep the calendar across restarts; icons are stored once per waste type."""
+        icons = {}
+        collections = []
+        for collection in self.collections:
+            item = collection.as_dict()
+            icon_data = item.pop("icon_data")
+            if icon_data is not None:
+                icons[collection.waste_type] = icon_data
+            collections.append(item)
+        try:
+            await self._collections_store.async_save({
+                "last_successful_update": self.last_successful_update.isoformat(),
+                "collections": collections,
+                "icons": icons,
+            })
+        except (HomeAssistantError, OSError) as exc:
+            _LOGGER.warning(
+                "Could not store the calendar of %s (%s)", self.waste_collector, type(exc).__name__,
+            )
+
+    async def async_load_stored_collections(self):
+        """Start from the calendar stored after the last successful refresh.
+
+        The stored calendar is only a starting point: the collector still
+        refreshes, and its sensors report the data as stale until it succeeds.
+        """
+        if len(self.collections):
+            return
+        try:
+            data = await self._collections_store.async_load()
+        except (HomeAssistantError, OSError) as exc:
+            _LOGGER.warning(
+                "Could not read the stored calendar of %s (%s)", self.waste_collector, type(exc).__name__,
+            )
+            return
+        if not isinstance(data, dict):
+            return
+        collections = WasteCollectionRepository()
+        try:
+            icons = data.get("icons") or {}
+            for item in data["collections"]:
+                collections.add(WasteCollection.from_dict(item, icons.get(item["waste_type"])))
+            last_successful_update = dt_util.parse_datetime(data["last_successful_update"])
+        except (AttributeError, KeyError, TypeError, ValueError):
+            _LOGGER.warning("Ignoring the unreadable stored calendar of %s", self.waste_collector)
+            return
+        self.collections = collections
+        self.last_successful_update = last_successful_update
 
     async def async_load_auth_data(self):
         """Load persisted collector authentication data."""
