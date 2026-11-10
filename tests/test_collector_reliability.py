@@ -82,6 +82,9 @@ async def test_cancellation_preserves_repository(hass):
     assert collector.last_successful_update is None
 
 
+REINIS_FEED = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\n{events}END:VCALENDAR\r\n'
+REINIS_EVENT = 'BEGIN:VEVENT\r\nDTSTART;VALUE=DATE:{date}\r\nSUMMARY:paper inzameling\r\nEND:VEVENT\r\n'
+
 # Each response contains a valid item followed by an invalid date. The previous
 # repository must survive even when parsing already produced a replacement item.
 CASES = [
@@ -102,8 +105,9 @@ CASES = [
         {'fraction': 0, 'collectionDate': 'invalid'}]}, {'errorCode': 0, 'collections': []}),
     (RD4Collector, [{'date': '2099-01-02', 'type': 'paper'},
                     {'date': 'invalid', 'type': 'paper'}], []),
-    (ReinisCollector, [{'ophaaldatum': '2099-01-02', 'afvalstroom_id': 1},
-                       {'ophaaldatum': 'invalid', 'afvalstroom_id': 1}], []),
+    (ReinisCollector, REINIS_FEED.format(events=REINIS_EVENT.format(date='20990102')
+                                         + REINIS_EVENT.format(date='invalid')),
+     REINIS_FEED.format(events='')),
     (ROVACollector, [{'date': '2099-01-02T00:00:00+0000', 'wasteType': {'title': 'paper'}},
                      {'date': 'invalid', 'wasteType': {'title': 'paper'}}], []),
     (BurgerportaalCollector, [{'collectionDate': '2099-01-02', 'fraction': 'paper'},
@@ -154,6 +158,9 @@ def parsing_case(hass, request):
     if cls is BurgerportaalCollector:
         collector._BurgerportaalCollector__load_auth_data = AsyncMock()
         collector._BurgerportaalCollector__save_auth_data = AsyncMock()
+    if cls is ReinisCollector:
+        collector.feed_url = 'cached'
+        collector._ReinisCollector__load_auth_data = AsyncMock()
     if cls is OmrinCollector:
         collector.token = 'test-token'
         collector.email = collector.password = None
@@ -300,6 +307,8 @@ async def test_valid_response_replaces_calendar(parsing_case, hass):
         payload['collections']['1']['1'] = payload['collections']['1']['1'][:1]
     elif isinstance(collector, FrisseKlikoCollector):
         payload['clean_dates'] = ['2099-01-02']
+    elif isinstance(collector, ReinisCollector):
+        payload = REINIS_FEED.format(events=REINIS_EVENT.format(date='20990102'))
     else:
         payload = payload[:1]
 
