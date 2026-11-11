@@ -107,6 +107,13 @@ class WasteData(object):
 
         if collector_class:
             self.collector = collector_class(*args)
+            self.collector.configure_collections_store({
+                "city_name": self.city_name,
+                "street_name": self.street_name,
+                "address_id": self.address_id,
+                "customer_id": self.customer_id,
+                "email": self.email,
+            })
         else:
             persistent_notification.create(
                 self.hass,

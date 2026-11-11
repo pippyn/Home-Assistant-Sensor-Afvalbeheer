@@ -2,6 +2,8 @@
 Base class for all waste collectors.
 """
 import asyncio
+import hashlib
+import json
 import logging
 from abc import ABC, abstractmethod
 
@@ -32,6 +34,7 @@ class WasteCollector(ABC):
         self.last_successful_update = None
         self._update_lock = asyncio.Lock()
         self._auth_store = Store(hass, 1, self._auth_store_key)
+        self._collections_identity = {}
         self._collections_store = Store(hass, 1, self._collections_store_key)
 
     @property
@@ -46,7 +49,19 @@ class WasteCollector(ABC):
     @property
     def _collections_store_key(self):
         """Return a unique storage key for the last successfully fetched calendar."""
-        return f"{DOMAIN}.{self.waste_collector}_{self._store_address}_collections"
+        identity = {"address": self._collections_identity, "mapping": list((self.custom_mapping or {}).items())}
+        digest = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
+        return f"{DOMAIN}.{self.waste_collector}_{self._store_address}_{digest}_collections"
+
+    def configure_collections_store(self, identity: dict) -> None:
+        """Scope cached, mapped dates to the complete configured address.
+
+        Use configuration rather than resolved collector IDs, which can change
+        during a refresh. Mapping order matters because the first match wins.
+        Authentication storage deliberately keeps its existing key.
+        """
+        self._collections_identity = identity.copy()
+        self._collections_store = Store(self.hass, 1, self._collections_store_key)
 
     async def update(self) -> bool:
         """Refresh collections, retaining the last valid calendar on failure.

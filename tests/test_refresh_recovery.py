@@ -1,5 +1,5 @@
 """Recovery after failed refreshes: quick retries and a calendar kept across restarts."""
-from datetime import timedelta
+from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -9,9 +9,38 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry, async_
 
 from custom_components.afvalbeheer.API import get_wastedata_from_config
 from custom_components.afvalbeheer.collectors.individual.demo import DemoCollector
+from custom_components.afvalbeheer.models import WasteCollection
 from custom_components.afvalbeheer.const import ATTR_DATA_STALE, CONF_UPDATE_INTERVAL, DOMAIN
+from custom_components.afvalbeheer.const import (
+    CONF_CITY_NAME, CONF_CUSTOM_MAPPING, CONF_STREET_NAME, CONF_WASTE_COLLECTOR,
+)
 
 from .test_sensor_entities import _demo_config
+
+
+@pytest.mark.parametrize("changed", [
+    {CONF_STREET_NAME: "Street B"},
+    {CONF_CITY_NAME: "Other city"},
+    {CONF_CUSTOM_MAPPING: {"papier": "Custom paper"}},
+])
+async def test_calendar_cache_is_scoped_to_complete_configuration(hass, changed):
+    config = _demo_config(**{
+        CONF_WASTE_COLLECTOR: "limburg.net",
+        CONF_STREET_NAME: "Street A", CONF_CITY_NAME: "City",
+    })
+    first = get_wastedata_from_config(hass, config)
+    other = get_wastedata_from_config(hass, {**config, **changed})
+    first.collector.collections.add(WasteCollection.create(datetime(2099, 1, 1), "Papier", "paper"))
+    first.collector.last_successful_update = dt_util.utcnow()
+    await first.collector._async_save_collections()
+    await other.collector.async_load_stored_collections()
+    assert len(other.collections) == 0
+    assert first.collector._collections_store_key != other.collector._collections_store_key
+    assert first.collector._auth_store_key == other.collector._auth_store_key
+
+    same = get_wastedata_from_config(hass, config)
+    await same.collector.async_load_stored_collections()
+    assert len(same.collections) == 1
 
 
 async def _scheduled_intervals(data, results):
