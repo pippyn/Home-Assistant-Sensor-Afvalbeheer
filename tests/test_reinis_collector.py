@@ -184,3 +184,37 @@ async def test_utc_start_time_is_read_as_the_local_day(hass):
     assert reinis._event_date('20991231T230000Z') == datetime(2100, 1, 1)
     assert reinis._event_date('20990102') == datetime(2099, 1, 2)
     assert reinis._event_date('20990102T070000') == datetime(2099, 1, 2)
+
+
+@pytest.mark.parametrize('feed', [
+    'BEGIN:VCALENDAR\r\n',
+    'BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nDTSTART;VALUE=DATE:20990102\r\n',
+    FEED.replace('END:VCALENDAR\r\n', ''),
+    FEED.replace('END:VEVENT', 'END:VTODO', 1),
+    FEED.replace('SUMMARY:GFT inzameling\r\n', '', 1),
+])
+async def test_incomplete_calendar_preserves_previous_dates(collector, website, monkeypatch, feed):
+    collector.async_load_auth_data = AsyncMock(return_value={'feed_url': FEED_URL})
+    monkeypatch.setattr(reinis.requests, 'get', Mock(return_value=_response(feed)))
+    previous = collector.collections
+    previous.add(WasteCollection.create(datetime(2099, 1, 1), WASTE_TYPE_GREEN, 'GFT'))
+    assert await collector.update() is False
+    assert collector.collections is previous
+    assert len(collector.collections) == 1
+
+
+async def test_valid_empty_calendar_replaces_previous_dates(collector, website, monkeypatch):
+    collector.async_load_auth_data = AsyncMock(return_value={'feed_url': FEED_URL})
+    monkeypatch.setattr(reinis.requests, 'get', Mock(return_value=_response(
+        'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nEND:VCALENDAR\r\n',
+    )))
+    collector.collections.add(WasteCollection.create(datetime(2099, 1, 1), WASTE_TYPE_GREEN, 'GFT'))
+    assert await collector.update() is True
+    assert len(collector.collections) == 0
+
+
+def test_alarm_properties_do_not_replace_collection_properties():
+    feed = FEED.replace('END:VEVENT', (
+        'BEGIN:VALARM\r\nSUMMARY:Reminder\r\nEND:VALARM\r\nEND:VEVENT'
+    ), 1)
+    assert reinis._parse_events(feed)[0]['SUMMARY'] == 'GFT inzameling'

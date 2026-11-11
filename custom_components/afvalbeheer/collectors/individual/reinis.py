@@ -207,16 +207,40 @@ def _parse_events(feed):
         else:
             lines.append(line)
     events, event = [], None
+    components = []
+    calendar_seen = False
     for line in lines:
-        if line == 'BEGIN:VEVENT':
-            event = {}
-        elif line == 'END:VEVENT':
-            if event is not None:
+        if not line:
+            continue
+        if line.startswith('BEGIN:'):
+            component = line[6:]
+            if not components:
+                if calendar_seen or component != 'VCALENDAR':
+                    raise ValueError('Invalid calendar root')
+                calendar_seen = True
+            elif component == 'VCALENDAR':
+                raise ValueError('Nested calendar')
+            if component == 'VEVENT':
+                if components != ['VCALENDAR']:
+                    raise ValueError('Invalid event nesting')
+                event = {}
+            components.append(component)
+        elif line.startswith('END:'):
+            component = line[4:]
+            if not components or components.pop() != component:
+                raise ValueError('Mismatched calendar component')
+            if component == 'VEVENT':
+                if not event.get('SUMMARY') or not event.get('DTSTART'):
+                    raise ValueError('Incomplete collection event')
                 events.append(event)
-            event = None
-        elif event is not None and ':' in line:
+                event = None
+        elif not components:
+            raise ValueError('Property outside calendar')
+        elif components[-1] == 'VEVENT' and ':' in line:
             name, value = line.split(':', 1)
             event[name.split(';', 1)[0].upper()] = value.replace('\\,', ',').replace('\\;', ';')
+    if not calendar_seen or components:
+        raise ValueError('Unfinished calendar')
     return events
 
 
