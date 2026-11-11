@@ -8,6 +8,15 @@ DOMAIN = "afvalbeheer"
 
 SCHEDULE_UPDATE_INTERVAL = timedelta(hours=12)
 
+# After a failed refresh, retry sooner than the normal update interval (which
+# defaults to 24 hours) and back off while the collector stays unreachable.
+RETRY_UPDATE_INTERVALS = (
+    timedelta(minutes=5),
+    timedelta(minutes=15),
+    timedelta(minutes=30),
+    timedelta(hours=1),
+)
+
 # Default timeout (seconds) for all outgoing HTTP requests made by collectors,
 # so a hanging external API cannot block an executor thread indefinitely.
 DEFAULT_REQUEST_TIMEOUT = 30
