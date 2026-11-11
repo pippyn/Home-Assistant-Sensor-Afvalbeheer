@@ -32,7 +32,6 @@ from .const import (
     XIMMIO_COLLECTOR_IDS,
 )
 from .translation import resolve_language, text
-from .models import WasteCollectionRepository
 from .collectors import (
     XimmioCollector, BurgerportaalCollector, OpzetCollector, KlikogroepCollector,
     AfvalAlertCollector, AfvalwijzerCollector, AmsterdamCollector, CirculusCollector, CleanprofsCollector,

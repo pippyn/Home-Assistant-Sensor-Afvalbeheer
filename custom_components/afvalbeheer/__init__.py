@@ -7,18 +7,14 @@ Current Version: 6.5.41 20261111
 import asyncio
 import hashlib
 import logging
-from datetime import datetime
-from datetime import timedelta
-
-from homeassistant.const import Platform
-
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.typing import ConfigType
 from pathlib import Path
 from homeassistant.components import persistent_notification
 
-from .const import DOMAIN, PLATFORM_SCHEMA, CONF_ID, NOTIFICATION_ID, CONF_WASTE_COLLECTOR, CONF_ENTRY_ID
+from .const import DOMAIN, NOTIFICATION_ID, CONF_WASTE_COLLECTOR, CONF_ENTRY_ID
+from .const import PLATFORM_SCHEMA as PLATFORM_SCHEMA  # Preserve the legacy schema export.
 from .API import get_wastedata_from_config
 
 
@@ -260,7 +256,7 @@ async def _migrate_entry_to_v3_2(hass, config_entry):
     """Migrate to version 3.2 - Cleanprofs fractions are now prefixed with 'Reiniging'."""
     from homeassistant.const import CONF_RESOURCES
     from homeassistant.helpers import entity_registry as er
-    from .const import CONF_NAME, CONF_NAME_PREFIX, CONF_POSTCODE, CONF_STREET_NUMBER
+    from .const import CONF_NAME, CONF_NAME_PREFIX
     from .sensor import _format_unique_id
 
     try:
