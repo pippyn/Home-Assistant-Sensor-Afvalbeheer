@@ -9,5 +9,5 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/pippyn/Home-Assistant-Sensor-Afvalbeheer/issues",
   "requirements": [],
-  "version": "6.5.40"
+  "version": "6.5.41"
 }
