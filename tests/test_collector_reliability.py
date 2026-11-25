@@ -318,6 +318,74 @@ async def test_valid_response_replaces_calendar(parsing_case, hass):
     assert collector.last_successful_update is not None
 
 
+def _recycle_app(hass):
+    collector = RecycleApp.__new__(RecycleApp)
+    WasteCollector.__init__(collector, hass, 'recycleapp', '9820', '1', '', {})
+    collector.main_url = 'https://example.invalid/'
+    collector.xconsumer = 'test'
+    collector.street_name = 'Teststraat'
+    collector.postcode_id = 'old-zip'
+    collector.street_id = 'old-street'
+    collector._auth_loaded = True
+    collector._auth_changed = False
+    collector._RecycleApp__save_auth_data = AsyncMock()
+    collector.map_waste_type = lambda name: name
+    return collector
+
+
+def _recycle_response(items):
+    return Mock(status_code=200, json=Mock(return_value={'items': items}))
+
+
+async def test_recycleapp_refreshes_stale_location_ids_on_empty_response(hass):
+    collector = _recycle_app(hass)
+    item = {'timestamp': '2099-01-02T00:00:00Z', 'fraction': {'name': {'nl': 'paper'}}}
+    seen_ids = []
+
+    def get_data():
+        seen_ids.append((collector.postcode_id, collector.street_id))
+        return _recycle_response([item] if collector.postcode_id == 'new-zip' else [])
+
+    def get_location_ids():
+        collector.postcode_id, collector.street_id = 'new-zip', 'new-street'
+        collector._auth_changed = True
+
+    async def execute(function, *args):
+        return function(*args)
+
+    with patch.object(hass, 'async_add_executor_job', side_effect=execute), patch.object(
+        collector, '_RecycleApp__get_data', side_effect=get_data,
+    ), patch.object(collector, '_RecycleApp__get_location_ids', side_effect=get_location_ids):
+        assert await collector.update() is True
+
+    assert seen_ids == [('old-zip', 'old-street'), ('new-zip', 'new-street')]
+    assert len(collector.collections) == 1
+    collector._RecycleApp__save_auth_data.assert_awaited()
+
+
+async def test_recycleapp_keeps_location_ids_when_lookup_fails_on_empty_response(hass):
+    collector = _recycle_app(hass)
+    calls = 0
+
+    def get_data():
+        nonlocal calls
+        calls += 1
+        return _recycle_response([])
+
+    async def execute(function, *args):
+        return function(*args)
+
+    with patch.object(hass, 'async_add_executor_job', side_effect=execute), patch.object(
+        collector, '_RecycleApp__get_data', side_effect=get_data,
+    ), patch.object(collector, '_RecycleApp__get_location_ids'):
+        assert await collector.update() is True
+
+    assert calls == 1
+    assert (collector.postcode_id, collector.street_id) == ('old-zip', 'old-street')
+    assert collector._auth_changed is False
+    assert len(collector.collections) == 0
+
+
 async def test_overlapping_refreshes_are_serialized(hass):
     collector = ContractCollector(hass, 'test', '1234AB', '1', '', {})
     entered = asyncio.Event()

@@ -160,6 +160,25 @@ class RecycleApp(WasteCollector):
         self.street_id = ''
         self._auth_changed = True
 
+    def __refresh_location_ids(self) -> bool:
+        """Look up the location IDs again and report whether they changed.
+
+        Stale IDs (for example after a municipality merger) can make the API
+        answer 200 with an empty list. The old IDs are restored when the lookup
+        fails, so a temporary API problem does not discard working data.
+        """
+        old_ids = (self.postcode_id, self.street_id)
+        old_auth_changed = self._auth_changed
+        self.__clear_location_ids()
+        self.__get_location_ids()
+        if not self.postcode_id or not self.street_id:
+            self.postcode_id, self.street_id = old_ids
+            self._auth_changed = old_auth_changed
+            return False
+        changed = (self.postcode_id, self.street_id) != old_ids
+        self._auth_changed = old_auth_changed or changed
+        return changed
+
     async def _async_update(self) -> bool:
         _LOGGER.debug("Updating Waste collection dates using RecycleApp API")
 
@@ -189,6 +208,19 @@ class RecycleApp(WasteCollector):
             if not isinstance(response, dict) or not isinstance(response.get('items'), list):
                 _LOGGER.error('No Waste data found!')
                 return False
+
+            if not response['items']:
+                _LOGGER.debug("RecycleApp returned no collections, checking for changed location IDs")
+                if await self.hass.async_add_executor_job(self.__refresh_location_ids):
+                    await self.__save_auth_data()
+                    r = await self.hass.async_add_executor_job(self.__get_data)
+                    if r.status_code != 200:
+                        _LOGGER.error('Invalid response from server for collection data')
+                        return False
+                    response = r.json()
+                    if not isinstance(response, dict) or not isinstance(response.get('items'), list):
+                        _LOGGER.error('No Waste data found!')
+                        return False
 
             collections = WasteCollectionRepository()
 
