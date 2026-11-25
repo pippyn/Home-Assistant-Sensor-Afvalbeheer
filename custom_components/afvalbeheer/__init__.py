@@ -1,7 +1,7 @@
 """
 Sensor component for waste pickup dates from dutch and belgium waste collectors
 Original Author: Pippijn Stortelder
-Current Version: 6.5.41 20261111
+Current Version: 6.5.42 20261125
 """
 
 import asyncio
@@ -18,7 +18,7 @@ from .const import PLATFORM_SCHEMA as PLATFORM_SCHEMA  # Preserve the legacy sch
 from .API import get_wastedata_from_config
 
 
-__version__ = "6.5.41"
+__version__ = "6.5.42"
 
 _LOGGER = logging.getLogger(__name__)
 
